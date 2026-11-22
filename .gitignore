@@ -1,0 +1,25 @@
+# secrets
+.env
+# environments
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+# large / generated
+models/
+data/raw/
+*.tar.gz
+*.wav
+*.onnx
+*.onnx.json
+*.pt
+*.bin
+*.safetensors
+video/build/
+video/voices/
+video/*.mp4
+deploy/nginx/run/
+deploy/nginx/temp/
+deploy/nginx/logs/
+logs/nginx_*.log
