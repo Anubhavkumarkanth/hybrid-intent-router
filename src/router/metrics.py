@@ -57,8 +57,21 @@ class MetricsStore:
             conn.close()
         self.q: queue.Queue = queue.Queue(maxsize=2000)
         self.background = background
+        self.written = self.failed = 0
+        self.last_error = None
+        self._thread = None
         if background:
-            threading.Thread(target=self._writer, daemon=True, name="metrics-writer").start()
+            self._thread = threading.Thread(target=self._writer, daemon=True, name="metrics-writer")
+            self._thread.start()
+
+    def status(self) -> dict:
+        import sys
+        import traceback
+        t = self._thread
+        frame = sys._current_frames().get(t.ident) if t else None
+        where = [ln.strip().splitlines()[0] for ln in traceback.format_stack(frame)[-4:]] if frame else None
+        return {"queued": self.q.qsize(), "written": self.written, "failed": self.failed,
+                "last_error": self.last_error, "writer_alive": bool(t and t.is_alive()), "writer_at": where}
 
     @classmethod
     def from_url(cls, url: str) -> MetricsStore:
@@ -96,7 +109,10 @@ class MetricsStore:
                     break
             try:
                 self._insert(items)
+                self.written += len(items)
             except Exception as e:  # metrics must never take the app down
+                self.failed += len(items)
+                self.last_error = type(e).__name__
                 log.warning("metrics write failed, dropped %d events: %s: %s", len(items), type(e).__name__, e)
 
     def flush(self, timeout: float = 5.0) -> None:
