@@ -8,6 +8,13 @@ inference, and each worker sets its own torch thread count right after fork.
 
 import os
 
+import torch
+
+# preload_app loads the model in this master process before forking. If the master starts PyTorch's
+# OpenMP thread pool, forked workers inherit a broken pool and hang on their first request (we hit
+# this: every /predict timed out). So the master stays single-threaded; workers set threads in post_fork.
+torch.set_num_threads(1)
+
 bind = os.environ.get("GUNICORN_BIND", "127.0.0.1:8000")
 workers = int(os.environ.get("GUNICORN_WORKERS", "3"))
 torch_threads = int(os.environ.get("TORCH_THREADS", str(max(1, (os.cpu_count() or 4) // workers))))

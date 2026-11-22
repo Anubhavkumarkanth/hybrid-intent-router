@@ -82,11 +82,13 @@ nginx-stop:
 
 stack-up: serve-bg nginx-start
 	curl -sf http://127.0.0.1:8080/health && echo "  <- /health through NGINX"
+	curl -sf -m 30 -X POST http://127.0.0.1:8080/predict -H 'Content-Type: application/json' \
+		-d '{"text": "wake me up at five am this week"}' && echo "  <- /predict through NGINX"
 
 stack-down: nginx-stop
 	@if [ -f $(RUN)/gunicorn.pid ]; then kill $$(cat $(RUN)/gunicorn.pid) && echo "gunicorn stopped"; \
 		else echo "gunicorn not running"; fi
-	@for i in $$(seq 30); do [ -f $(RUN)/gunicorn.pid ] || exit 0; sleep 1; done; echo "gunicorn still running"; exit 1
+	@for i in $$(seq 45); do [ -f $(RUN)/gunicorn.pid ] || exit 0; sleep 1; done; echo "gunicorn still running"; exit 1
 
 video:
 	$(PY) scripts/make_diagram.py

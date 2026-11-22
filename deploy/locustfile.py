@@ -35,7 +35,9 @@ class RouterUser(HttpUser):
 
     @task
     def predict(self):
-        with self.client.post("/predict", json={"text": random.choice(TEXTS)}, catch_response=True) as r:
+        # timeout: a hung server must show up as failures, not as "0 requests" (it happened once)
+        with self.client.post("/predict", json={"text": random.choice(TEXTS)}, catch_response=True,
+                              timeout=30) as r:
             if r.status_code != 200:
                 r.failure(f"HTTP {r.status_code}")
             elif "intent" not in r.json():

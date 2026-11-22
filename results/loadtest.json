@@ -1,0 +1,15 @@
+{
+  "users": 20,
+  "spawn_rate": 5,
+  "duration": "2m",
+  "workers": 3,
+  "torch_threads": 4,
+  "requests": 4908,
+  "failures": 0,
+  "requests_per_sec": 41.18,
+  "p50_ms": 180.0,
+  "p95_ms": 260.0,
+  "p99_ms": 300.0,
+  "avg_ms": 177.2,
+  "max_ms": 370.1
+}
