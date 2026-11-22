@@ -2,6 +2,9 @@
 
 A small model trained only on English answers 89% of English, Hindi and Kannada voice-bot messages on a CPU in about 38 ms, and keeps "send everything to the LLM" accuracy at 11% of the LLM cost.
 
+Live demo: https://hybrid-intent-router.onrender.com (free server, so the first request after a quiet spell
+takes a few seconds while it wakes up). The API is at `/predict`, as described below.
+
 Before a voice bot can do anything, it has to work out what the customer wants: their *intent*, such as
 `alarm_set` or `weather_query`. You could send every message to a large language model (LLM), but each call
 is a network round trip and costs money. So I fine-tuned a small multilingual model in plain PyTorch on
@@ -184,6 +187,38 @@ ECE = expected calibration error (lower is better), 15 bins.
 | p99 latency | 300 ms |
 <!-- RESULTS:loadtest:END -->
 
+## Live demo and how it fits on a free server
+
+The demo runs on Render's free plan, which gives 512 MB of RAM. The full-size model needs about 1.5 GB of memory to load,
+so I made a smaller copy of it with `scripts/quantize.py` (`make quantize`):
+
+- MuRIL's vocabulary covers 17 scripts, but this app only handles English, Hindi and Kannada. I kept only the
+  Latin, Devanagari and Kannada tokens. WordPiece can only match vocabulary pieces that appear in the word
+  itself, so text in these three languages gets exactly the same tokens.
+- The word-embedding table is stored as 8-bit integers with one scale per row.
+- Every Linear layer's weights are stored in 8 bits (ONNX `MatMulNBits`), and the model runs on onnxruntime,
+  without PyTorch.
+
+My first tries with standard dynamic INT8 quantization also quantized the activations, and they agreed with the
+original model on only 18-82% of sentences, so I dropped them. The version below is the one that is deployed:
+
+<!-- RESULTS:deploy:START -->
+| Language | Original model (full test) | Deployed model (full test) | Same answer as original (test_sub) |
+|---|---|---|---|
+| English | 88.1% | 88.2% | 99.8% |
+| Hindi | 77.9% | 77.7% | 99.6% |
+| Kannada | 70.7% | 70.7% | 98.2% |
+
+The deployed model is 167.6 MB instead of 950.5 MB and needs 313 MB of memory to load and answer, taking 26 ms per message on one CPU thread. With it, the router scores 83.8% on test_sub and sends 10.8% of messages to the LLM. The vocabulary keeps 90,022 of 197,258 tokens, and all 49,563 MASSIVE English, Hindi and Kannada sentences get identical tokens (49,563 of 49,563).
+<!-- RESULTS:deploy:END -->
+
+The model file lives in a public Hugging Face model repo
+(https://huggingface.co/Anubhav1604/hybrid-intent-router-onnx). Render downloads it during the build and checks
+each file's SHA-256 against `deploy/render/model_files.json`. `render.yaml` describes the whole service:
+gunicorn with 1 worker and 4 threads behind Render's own load balancer, the `GEMINI_API_KEY` secret, and at most
+10 Gemini calls per minute (`ROUTER_LLM_MAX_PER_MIN`), so strangers can't use up the API quota. Over that limit,
+unsure messages get the small model's answer (`small_fallback`).
+
 ## How to run
 
 You need WSL2 Ubuntu (or any Linux), Python 3.10-3.12, `nginx`, `ffmpeg` and `make`:
@@ -211,6 +246,8 @@ The `--timeout` and `--retries` flags are there because the PyTorch download kep
 | Serve (gunicorn + NGINX on :8080) | `make stack-up`, then `make stack-down` | trained model |
 | Load test | `ROUTER_DISABLE_LLM=1 make stack-up`, `make loadtest`, `make stack-down` | running stack |
 | Tutorial video | `make video`, `make video-check` | results |
+| Small ONNX model for the free server | `make quantize` | trained model |
+| Run the app on the ONNX model | `ROUTER_ONNX_DIR=models/onnx make stack-up` | `make quantize` |
 
 The API:
 
@@ -246,6 +283,10 @@ curl -s -X POST http://127.0.0.1:8080/predict -H 'Content-Type: application/json
   carry a few points of sampling noise.
 - LLM cost uses the paid-tier price of `gemini-3.5-flash-lite` (checked 2026-11-22). Prices change.
 - Training ran on a 4 GB laptop GPU. Serving and latency numbers are CPU-only, on one laptop.
+- The live demo uses the smaller ONNX model, not the PyTorch one. It answers the same as the original on
+  98-100% of the test sentences, but its exact numbers are the ones in the deployment table, not the main tables.
+  Text in other scripts (for example Tamil or Bengali) becomes unknown tokens there, because the vocabulary was cut
+  to English, Hindi and Kannada.
 - Router latency is a typical value built from median times (small model plus the share sent to the LLM
   times the median LLM call). The mean LLM call took 3,133 ms because some calls were slow while the API was
   overloaded.
@@ -260,7 +301,8 @@ curl -s -X POST http://127.0.0.1:8080/predict -H 'Content-Type: application/json
 ```
 src/router/   data.py model.py train.py evaluate.py llm.py llm_baseline.py calibrate.py route.py costs.py analysis.py
 app/          app.py (Flask API) templates/index.html (demo page)
-deploy/       gunicorn.conf.py nginx/nginx.conf locustfile.py
+deploy/       gunicorn.conf.py nginx/nginx.conf locustfile.py render/ (free Render server) space/ (Hugging Face)
+render.yaml   the Render service (live demo)
 scripts/      render_tables.py check_numbers.py loadtest_summary.py make_diagram.py smoke_api.sh
 tests/        unit tests (data, LLM client with a fake API, model, routing, API, results, video helpers)
 results/      every number and chart in this README

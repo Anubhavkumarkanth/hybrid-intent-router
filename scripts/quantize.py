@@ -6,7 +6,7 @@
 2. Export to ONNX (fp32), then
 3. store the word-embedding table as int8 with one scale per row (Gather -> Cast -> Mul), and
 4. quantize every Linear layer's weights to 8 bits in blocks of 32 (MatMulNBits), with int8 arithmetic.
-   (Plain dynamic INT8 quantization also quantizes activations and agreed with the original on only ~82% of
+   (Plain dynamic INT8 quantization also quantizes activations and agreed with the original on only 18-82% of
    sentences; that is why it is not used.)
 
 Writes models/onnx/ (model.onnx, tokenizer.json, meta.json) and results/quantized.json. T and t are not

@@ -13,7 +13,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import render_tables as rt  # noqa: E402
 
-REQUIRED = {"README.md": {"small", "llm", "routing", "savings", "loadtest"},
+REQUIRED = {"README.md": {"small", "llm", "routing", "savings", "loadtest", "deploy"},
             "FINAL_REPORT.md": {"small", "llm", "routing", "savings", "loadtest"},
             "INTERVIEW_GUIDE.md": {"pitch", "resume", "routing"}}
 

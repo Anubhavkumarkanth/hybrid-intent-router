@@ -155,6 +155,25 @@ def t_reference() -> str:
               "different checkpoint selection, so compare with care.")
 
 
+def t_deploy() -> str:
+    q, s = load("quantized.json"), load("small_model.json")
+    if not q or not s:
+        return "TBD"
+    a, b, agree = s["accuracy"], q["accuracy"], q["agreement_with_original"]
+    rows = [[LANG[lg], pct(a[f"{lg}_test_full"]), pct(b[f"{lg}_test_full"]), pct(agree[f"{lg}_test_sub"])]
+            for lg in ("en", "hi", "kn")]
+    r, v, tc = q["router_test_sub"]["pooled"], q["vocab"], q["tokenizer_check"]
+    return (table(["Language", "Original model (full test)", "Deployed model (full test)",
+                   "Same answer as original (test_sub)"], rows)
+            + f"\n\nThe deployed model is {q['size_mb']['onnx_small']} MB instead of "
+              f"{q['size_mb']['pytorch_checkpoint']} MB and needs {q['peak_memory_mb_load_and_predict']:.0f} MB of "
+              f"memory to load and answer, taking {q['cpu_latency_single_message_1_thread']['median_ms']:.0f} ms per "
+              f"message on one CPU thread. With it, the router scores {pct(r['accuracy'])} on test_sub and sends "
+              f"{pct(r['llm_share'])} of messages to the LLM. The vocabulary keeps {v['kept_vocab']:,} of "
+              f"{v['original_vocab']:,} tokens, and all {tc['sentences_checked']:,} MASSIVE English, Hindi and "
+              f"Kannada sentences get identical tokens ({tc['identical_tokens']:,} of {tc['sentences_checked']:,}).")
+
+
 def _headline() -> dict | None:
     r, s, lt = load("routing.json"), load("small_model.json"), load("loadtest.json")
     if not (r and s and lt):
@@ -212,7 +231,7 @@ def t_resume() -> str:
 SECTIONS = {
     "small": t_small, "llm": t_llm, "routing": t_routing, "savings": t_savings,
     "calibration": t_calibration, "loadtest": t_loadtest, "reference": t_reference,
-    "pitch": t_pitch, "resume": t_resume,
+    "pitch": t_pitch, "resume": t_resume, "deploy": t_deploy,
 }
 MARK = re.compile(r"(<!-- RESULTS:(\w+):START -->\n)(.*?)(\n<!-- RESULTS:\2:END -->)", re.S)
 

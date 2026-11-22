@@ -141,8 +141,20 @@ MASSIVE is voice-assistant data, not banking. The Hindi and Kannada sentences ar
 code-mixed speech. The LLM was tested on 800 sentences per language, and everything ran on one laptop.
 
 ### 20. What would you do next?
-INT8 dynamic quantization for faster CPU inference, a little Hindi and Kannada training data, tests on real
-code-mixed speech transcribed with Whisper, and a learned routing decision instead of a single threshold.
+A little Hindi and Kannada training data, tests on real code-mixed speech transcribed with Whisper, and a
+learned routing decision instead of a single threshold. (Making the model smaller and faster on a CPU is done:
+see the next question.)
+
+## Deployment question
+
+### How did you deploy it for free?
+The free Render plan has 512 MB of RAM and the full model needs about 1.5 GB, so I made a 168 MB ONNX copy. I cut
+the vocabulary to the Latin, Devanagari and Kannada tokens (90,022 of 197,258) and checked that all 49,563 MASSIVE
+sentences in those languages get identical tokens. Then I stored the embedding table as 8-bit rows and the Linear
+weights as 8-bit blocks. It answers the same as the original on 98.2-99.8% of test sentences, needs 313 MB, and
+runs without PyTorch. Standard dynamic INT8 quantization broke the model (14-18% accuracy), and finding out why
+was the most useful part. It's live at https://hybrid-intent-router.onrender.com, with Gemini calls capped at 10
+per minute.
 
 ## Bugs I hit and how I fixed them
 

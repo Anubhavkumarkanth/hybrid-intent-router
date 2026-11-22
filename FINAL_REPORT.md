@@ -141,12 +141,18 @@ at 09:27, and some phases overlapped. Two WSL restarts cost about 25 minutes.
    reported 0 requests. The master now runs single-threaded and workers set 4 threads after the fork.
    `make stack-up` sends a real `/predict`, and Locust has a 30 s timeout.
 
-## What is left
+## Where it lives
 
-The code is public at https://github.com/Anubhavkumarkanth/hybrid-intent-router.
+- Code: https://github.com/Anubhavkumarkanth/hybrid-intent-router
+- Live demo: https://hybrid-intent-router.onrender.com (Render free plan, with Gemini for unsure messages, capped at
+  10 calls per minute). It runs a 168 MB ONNX copy of the model that gives the same answer as the original on
+  98-100% of test sentences; the README's deployment section has the numbers and `docs/journal/12_deployment.md`
+  has the story.
+- Deployed model: https://huggingface.co/Anubhav1604/hybrid-intent-router-onnx
+
+## What is left
 
 - `.env` (the Gemini key), `.venv/`, `models/` (950 MB of weights), the raw tarball and `video/*.mp4` are
   gitignored. The video is `video/tutorial.mp4` on my machine; it can go on YouTube or into a GitHub release.
-- A public demo would need the 950 MB model and about 1-2 GB of RAM per worker; a small VM or a Hugging Face
-  Space would work. It should run with `ROUTER_DISABLE_LLM=1` unless paying for LLM calls is fine.
+- The free Render server sleeps after 15 quiet minutes, so the first request after that is slow.
 - WSL shuts down when no terminal is attached, so long jobs need an Ubuntu window left open.
