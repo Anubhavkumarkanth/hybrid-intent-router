@@ -1,0 +1,27 @@
+{
+  "note": "Published zero-shot (train on English) intent accuracy on MASSIVE test, percent.",
+  "checked": "2026-11-22",
+  "entries": [
+    {
+      "model": "XLM-R base",
+      "source": "MASSIVE paper, App. D Table 8",
+      "hi": 74.8,
+      "kn": 63.5,
+      "url": "https://arxiv.org/abs/2204.08582"
+    },
+    {
+      "model": "XLM-R",
+      "source": "IndicXTREME, Table 19",
+      "hi": 74.9,
+      "kn": 61.7,
+      "url": "https://arxiv.org/abs/2212.05409"
+    },
+    {
+      "model": "MuRIL",
+      "source": "IndicXTREME, Table 19",
+      "hi": 82.4,
+      "kn": 77.5,
+      "url": "https://arxiv.org/abs/2212.05409"
+    }
+  ]
+}

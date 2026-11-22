@@ -1,0 +1,15 @@
+[project]
+name = "hybrid-intent-router"
+version = "0.1.0"
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+pythonpath = ["src", "."]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 110
+extend-exclude = [".venv", "data", "models", "results", "logs", "video/build"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B"]

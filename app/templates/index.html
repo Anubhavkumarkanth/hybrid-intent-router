@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hybrid Intent Router</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --ink:#1d2330; --muted:#5b6475; --accent:#2a6fdb; --border:#d9dee7; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui, "Noto Sans", "Noto Sans Devanagari", "Noto Sans Kannada", sans-serif;
+         background:var(--bg); color:var(--ink); }
+  main { max-width: 760px; margin: 0 auto; padding: 32px 16px; }
+  h1 { margin: 0 0 4px; font-size: 1.6rem; }
+  p.sub { margin: 0 0 20px; color: var(--muted); }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:18px; margin-bottom:16px; }
+  textarea { width:100%; min-height:90px; font: inherit; font-size:1.05rem; padding:10px;
+             border:1px solid var(--border); border-radius:8px; resize: vertical; }
+  .row { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; align-items:center; }
+  button { font: inherit; border:1px solid var(--border); background:#fff; border-radius:8px; padding:7px 12px; cursor:pointer; }
+  button.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .label { font-size:.8rem; color:var(--muted); margin-right:4px; }
+  .result { display:grid; grid-template-columns: max-content 1fr; gap:6px 16px; font-size:1.05rem; }
+  .result b { color: var(--muted); font-weight: 600; }
+  pre { background:#1d2330; color:#e6e9ef; padding:12px; border-radius:8px; overflow-x:auto; font-size:.9rem; }
+  .pill { display:inline-block; padding:2px 10px; border-radius:999px; font-size:.9rem; }
+  .small { background:#dff3e4; color:#17602e; } .llm { background:#e3ecfc; color:#1d4fa8; }
+  .small_fallback { background:#fdf0d5; color:#8a5a00; }
+  .err { color:#b3261e; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Hybrid Intent Router</h1>
+  <p class="sub">A small multilingual model answers when it is confident (confidence &ge; {{ "%.2f"|format(threshold) }}).
+    Otherwise the message goes to an LLM{% if not llm_enabled %} (LLM is <b>off</b> on this server, so the small model answers){% endif %}.</p>
+
+  <div class="card">
+    <textarea id="text" maxlength="500" placeholder="Type a message in English, Hindi or Kannada..."></textarea>
+    <div class="row">
+      <span class="label">Examples:</span>
+      <button data-ex="wake me up at five am this week">English</button>
+      <button data-ex="play some jazz music">English 2</button>
+      <button data-ex="कल सुबह सात बजे का अलार्म लगाओ">Hindi</button>
+      <button data-ex="आज मौसम कैसा रहेगा">Hindi 2</button>
+      <button data-ex="ಈ ವಾರ ಬೆಳಿಗ್ಗೆ ಐದು ಗಂಟೆಗೆ ನನ್ನನ್ನು ಎಬ್ಬಿಸು">Kannada</button>
+      <button data-ex="ಇಂದು ಹವಾಮಾನ ಹೇಗಿದೆ">Kannada 2</button>
+    </div>
+    <div class="row"><button class="primary" id="go">Classify</button></div>
+  </div>
+
+  <div class="card" id="out" hidden>
+    <div class="result">
+      <b>Intent</b><span id="intent"></span>
+      <b>Confidence</b><span id="conf"></span>
+      <b>Answered by</b><span><span id="routed" class="pill"></span></span>
+      <b>Latency</b><span id="lat"></span>
+    </div>
+    <pre id="json"></pre>
+  </div>
+</main>
+<script>
+  const $ = (id) => document.getElementById(id);
+  document.querySelectorAll("[data-ex]").forEach(b => b.onclick = () => { $("text").value = b.dataset.ex; go(); });
+  $("go").onclick = go;
+  async function go() {
+    const out = $("out"); out.hidden = false;
+    $("json").textContent = "...";
+    try {
+      const r = await fetch("/predict", { method: "POST", headers: {"Content-Type": "application/json"},
+                                          body: JSON.stringify({ text: $("text").value }) });
+      const j = await r.json();
+      $("json").textContent = JSON.stringify(j, null, 2);
+      if (!r.ok) { $("intent").innerHTML = `<span class="err">${j.error}</span>`; $("conf").textContent = "";
+                   $("routed").textContent = ""; $("routed").className = "pill"; $("lat").textContent = ""; return; }
+      $("intent").textContent = j.intent;
+      $("conf").textContent = (j.confidence * 100).toFixed(1) + "%";
+      const names = { small: "small model", llm: "LLM", small_fallback: "small model (LLM unavailable)" };
+      $("routed").textContent = names[j.routed_to] || j.routed_to;
+      $("routed").className = "pill " + j.routed_to;
+      $("lat").textContent = j.latency_ms + " ms";
+    } catch (e) { $("json").textContent = "Request failed: " + e; }
+  }
+</script>
+</body>
+</html>
