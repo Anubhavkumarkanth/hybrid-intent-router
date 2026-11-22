@@ -90,6 +90,10 @@ stack-down: nginx-stop
 		else echo "gunicorn not running"; fi
 	@for i in $$(seq 45); do [ -f $(RUN)/gunicorn.pid ] || exit 0; sleep 1; done; echo "gunicorn still running"; exit 1
 
+# Hugging Face Space folder (see deploy/space/): only the files the server needs
+space:
+	bash scripts/build_space.sh
+
 video:
 	$(PY) scripts/make_diagram.py
 	$(PY) video/build_video.py 2>&1 | tee logs/10_video.log

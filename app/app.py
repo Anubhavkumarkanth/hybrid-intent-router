@@ -7,8 +7,10 @@ POST /predict  {"text": "..."} -> {"intent", "confidence", "routed_to", "latency
 GET  /         demo page
 
 Env:
-  ROUTER_DISABLE_LLM=1   small model only (used for load tests, saves API quota)
-  ROUTER_MODEL_DIR       default models/small
+  ROUTER_DISABLE_LLM=1       small model only (used for load tests, saves API quota)
+  ROUTER_MODEL_DIR           default models/small
+  ROUTER_LLM_MAX_PER_MIN=N   at most N LLM calls per minute per worker process (0 = no limit); protects the
+                             API quota on a public demo. Over the limit, unsure messages get small_fallback.
 """
 
 from __future__ import annotations
@@ -17,7 +19,9 @@ import json
 import logging
 import os
 import sys
+import threading
 import time
+from collections import deque
 from pathlib import Path
 from typing import Callable, Protocol
 
@@ -69,23 +73,47 @@ def read_settings(root: Path = ROOT) -> dict:
 
 def build_llm_fn(labels: list[str], prompt_version: str) -> Callable[[str], str] | None:
     from router import llm as L
-    from router.llm_baseline import train_examples
+    from router.llm_baseline import prompt_examples
 
     L.load_env()
     if not os.environ.get("GEMINI_API_KEY"):
         log.warning("GEMINI_API_KEY not set: LLM disabled")
         return None
     backend = L.GeminiBackend(timeout_s=10.0)
-    ex = train_examples(labels) if prompt_version == "v2_labels_examples" else None
+    ex = prompt_examples(labels) if prompt_version == "v2_labels_examples" else None
     instructions = L.build_instructions(labels, prompt_version, ex)
     return lambda text: L.predict_one(backend, instructions, labels, text)
 
 
+class RateLimit:
+    """Allow at most `per_min` events in any 60-second window (0 = unlimited). Thread-safe."""
+
+    def __init__(self, per_min: int, clock: Callable[[], float] = time.monotonic):
+        self.per_min, self.clock = per_min, clock
+        self.times: deque[float] = deque()
+        self.lock = threading.Lock()
+
+    def allow(self) -> bool:
+        if self.per_min <= 0:
+            return True
+        now = self.clock()
+        with self.lock:
+            while self.times and now - self.times[0] >= 60:
+                self.times.popleft()
+            if len(self.times) >= self.per_min:
+                return False
+            self.times.append(now)
+            return True
+
+
 def create_app(small: SmallModel | None = None, llm_fn: Callable[[str], str] | None = None,
-               threshold: float | None = None, use_llm: bool | None = None) -> Flask:
+               threshold: float | None = None, use_llm: bool | None = None,
+               llm_limit: RateLimit | None = None) -> Flask:
     app = Flask(__name__)
     if use_llm is None:
         use_llm = os.environ.get("ROUTER_DISABLE_LLM", "0") != "1"
+    if llm_limit is None:
+        llm_limit = RateLimit(int(os.environ.get("ROUTER_LLM_MAX_PER_MIN", "0")))
 
     if small is None or threshold is None:
         from router.data import load_labels
@@ -129,6 +157,9 @@ def create_app(small: SmallModel | None = None, llm_fn: Callable[[str], str] | N
         if conf < app.config["THRESHOLD"]:
             llm = app.config["LLM_FN"]
             if llm is None:
+                routed_to = "small_fallback"
+            elif not llm_limit.allow():
+                log.warning("LLM call limit reached, using small model answer")
                 routed_to = "small_fallback"
             else:
                 try:

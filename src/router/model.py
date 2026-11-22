@@ -13,14 +13,17 @@ from torch import nn
 
 
 class IntentClassifier(nn.Module):
-    def __init__(self, encoder_name: str, num_labels: int, dropout: float = 0.1):
+    def __init__(self, encoder_name: str, num_labels: int, dropout: float = 0.1, pretrained: bool = True):
         super().__init__()
         from transformers import AutoConfig, AutoModel
 
         self.encoder_name = encoder_name
         self.num_labels = num_labels
-        self.encoder = AutoModel.from_pretrained(encoder_name)
-        hidden = AutoConfig.from_pretrained(encoder_name).hidden_size
+        config = AutoConfig.from_pretrained(encoder_name)
+        # When loading our own checkpoint, build the empty architecture from the config: downloading the
+        # pretrained weights first would be wasted, because load_state_dict overwrites all of them.
+        self.encoder = AutoModel.from_pretrained(encoder_name) if pretrained else AutoModel.from_config(config)
+        hidden = config.hidden_size
         self.dropout = nn.Dropout(dropout)
         self.head = nn.Linear(hidden, num_labels)
 
@@ -45,7 +48,7 @@ def load_model(model_dir: Path, device: str = "cpu"):
 
     model_dir = Path(model_dir)
     meta = json.loads((model_dir / "meta.json").read_text())
-    model = IntentClassifier(meta["encoder_name"], meta["num_labels"])
+    model = IntentClassifier(meta["encoder_name"], meta["num_labels"], pretrained=False)
     state = torch.load(model_dir / "model.pt", map_location=device, weights_only=True)
     model.load_state_dict(state)
     model.to(device).eval()

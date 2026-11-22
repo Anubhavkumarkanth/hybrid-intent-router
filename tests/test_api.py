@@ -21,6 +21,26 @@ def client(conf=0.9, llm_fn=None, use_llm=True, threshold=0.5):
     return app.test_client()
 
 
+def test_llm_call_limit_falls_back_to_small_model():
+    from app.app import RateLimit
+
+    now = [0.0]
+    limit = RateLimit(2, clock=lambda: now[0])
+    app = create_app(small=FakeSmall(0.1), llm_fn=lambda t: "play_music", threshold=0.5, use_llm=True,
+                     llm_limit=limit)
+    c = app.test_client()
+    routed = [c.post("/predict", json={"text": "x"}).get_json()["routed_to"] for _ in range(3)]
+    assert routed == ["llm", "llm", "small_fallback"]  # third unsure message in the same minute
+    now[0] = 60.0  # a minute later the window is free again
+    assert c.post("/predict", json={"text": "x"}).get_json()["routed_to"] == "llm"
+
+
+def test_rate_limit_zero_means_unlimited():
+    from app.app import RateLimit
+
+    assert all(RateLimit(0).allow() for _ in range(1000))
+
+
 def test_health():
     r = client().get("/health")
     assert r.status_code == 200 and r.get_json() == {"status": "ok"}

@@ -40,6 +40,23 @@ def train_examples(labels: list[str]) -> dict[str, str]:
     return out
 
 
+EXAMPLES_FILE = RESULTS / "prompt_examples.json"
+
+
+def prompt_examples(labels: list[str]) -> dict[str, str]:
+    """The v2 prompt's examples. Read from results/prompt_examples.json when present, so a server
+    (e.g. the public demo) does not need the training data; otherwise built from the train split."""
+    if EXAMPLES_FILE.exists():
+        return json.loads(EXAMPLES_FILE.read_text(encoding="utf-8"))
+    return train_examples(labels)
+
+
+def cmd_examples() -> None:
+    EXAMPLES_FILE.write_text(json.dumps(train_examples(load_labels()), ensure_ascii=False, indent=2),
+                             encoding="utf-8")
+    print(f"wrote {EXAMPLES_FILE.relative_to(ROOT)}")
+
+
 def make_classifier(version: str, backend=None) -> L.Classifier:
     labels = load_labels()
     if backend is None:
@@ -156,7 +173,7 @@ def cmd_single() -> None:
 
 
 if __name__ == "__main__":
-    cmds = {"check": cmd_check, "pilot": cmd_pilot, "run": cmd_run, "single": cmd_single}
+    cmds = {"check": cmd_check, "pilot": cmd_pilot, "run": cmd_run, "single": cmd_single, "examples": cmd_examples}
     if len(sys.argv) != 2 or sys.argv[1] not in cmds:
         sys.exit(f"usage: python -m router.llm_baseline {{{'|'.join(cmds)}}}")
     cmds[sys.argv[1]]()
