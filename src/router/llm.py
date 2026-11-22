@@ -178,7 +178,7 @@ class TransientError(RuntimeError):
 class GeminiBackend:
     """Thin wrapper around google-genai `generate_content` with JSON schema output."""
 
-    def __init__(self, model: str = MODEL_ID, timeout_s: float = 30.0, api_key: str | None = None):
+    def __init__(self, model: str = MODEL_ID, timeout_s: float = 60.0, api_key: str | None = None):
         from google import genai
         from google.genai import types
 
@@ -213,6 +213,10 @@ class GeminiBackend:
             raise
         except errors.ServerError as e:
             raise TransientError(str(e)[:300]) from e
+        except _network_errors() as e:
+            # Read timeouts / dropped connections from the SDK's HTTP layer (httpx or httpx2).
+            # They are not builtin TimeoutError, so map them to TransientError to get retried.
+            raise TransientError(f"{type(e).__name__}: {e}"[:300]) from e
         latency = (time.perf_counter() - t0) * 1000
         u = resp.usage_metadata
         cand = (u.candidates_token_count or 0) if u else 0
@@ -224,6 +228,17 @@ class GeminiBackend:
             thinking_tokens=thoughts,
             latency_ms=latency,
         )
+
+
+def _network_errors() -> tuple[type[BaseException], ...]:
+    """HTTP transport errors (timeouts, connection errors) from httpx / httpx2, whichever is installed."""
+    errs: list[type[BaseException]] = [TimeoutError, ConnectionError]
+    for mod in ("httpx", "httpx2"):
+        try:
+            errs.append(__import__(mod).TransportError)
+        except ImportError:
+            continue
+    return tuple(errs)
 
 
 def call_with_backoff(
@@ -258,11 +273,13 @@ class Cache:
 
     def __post_init__(self) -> None:
         if self.path.exists():
-            with open(self.path, encoding="utf-8") as f:
-                for line in f:
-                    if line.strip():
-                        rec = json.loads(line)
-                        self._data[self.key(rec)] = rec
+            # A machine crash mid-append can leave NUL padding at the end of the file; drop it.
+            # Any other bad line still raises, so real corruption is never hidden.
+            text = self.path.read_text(encoding="utf-8").replace("\x00", "")
+            for line in text.splitlines():
+                if line.strip():
+                    rec = json.loads(line)
+                    self._data[self.key(rec)] = rec
 
     @staticmethod
     def key(rec: dict) -> tuple:
@@ -277,6 +294,8 @@ class Cache:
             for rec in recs:
                 self._data[self.key(rec)] = rec
                 f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+            f.flush()
+            os.fsync(f.fileno())  # paid-for answers must survive a crash (WSL died once mid-run)
 
     def records(self) -> list[dict]:
         return list(self._data.values())
@@ -337,7 +356,7 @@ class Classifier:
                 "batch_output_tokens": resp.output_tokens,
                 "batch_latency_ms": round(resp.latency_ms, 1),
             }
-            for r, intent in zip(chunk, intents)
+            for r, intent in zip(chunk, intents, strict=True)
         )
 
     def classify_single(self, lang: str, item: dict) -> dict:

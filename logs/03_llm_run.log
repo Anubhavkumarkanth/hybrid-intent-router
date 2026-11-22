@@ -1,0 +1,78 @@
+dev_sub en: 300 items
+  acc 0.8433
+dev_sub hi: 300 items
+  acc 0.8367
+dev_sub kn: 300 items
+  retry 1/5 after 2.4s: TransientError
+  retry 1/5 after 2.3s: TransientError
+  retry 1/5 after 2.9s: TransientError
+  retry 2/5 after 4.1s: TransientError
+  acc 0.8467
+test_sub en: 500 items
+  retry 1/5 after 2.5s: RateLimited
+  retry 2/5 after 4.3s: RateLimited
+  retry 1/5 after 2.4s: TransientError
+  retry 1/5 after 2.8s: TransientError
+  retry 1/5 after 2.2s: TransientError
+  retry 1/5 after 2.4s: TransientError
+  retry 1/5 after 2.6s: RateLimited
+  retry 1/5 after 2.6s: TransientError
+  retry 2/5 after 4.9s: TransientError
+  retry 3/5 after 8.1s: TransientError
+  retry 4/5 after 16.4s: TransientError
+  acc 0.862
+test_sub hi: 500 items
+  retry 1/5 after 2.9s: TransientError
+  retry 1/5 after 2.6s: RateLimited
+  retry 2/5 after 4.5s: RateLimited
+  retry 1/5 after 2.2s: RateLimited
+  retry 2/5 after 4.3s: RateLimited
+  retry 3/5 after 8.7s: RateLimited
+  retry 1/5 after 2.8s: TransientError
+  retry 2/5 after 4.7s: TransientError
+  retry 3/5 after 8.3s: TransientError
+  retry 1/5 after 2.3s: TransientError
+  retry 1/5 after 2.7s: TransientError
+  retry 1/5 after 2.9s: TransientError
+  acc 0.842
+test_sub kn: 500 items
+  retry 1/5 after 2.2s: TransientError
+  retry 1/5 after 2.1s: TransientError
+  retry 1/5 after 2.6s: TransientError
+  retry 2/5 after 4.6s: TransientError
+  retry 1/5 after 2.8s: TransientError
+  retry 2/5 after 4.1s: TransientError
+  acc 0.818
+{
+  "model": "gemini-3.5-flash-lite",
+  "prompt_version": "v2_labels_examples",
+  "mode": "batch",
+  "batch_size": 20,
+  "accuracy": {
+    "en_dev_sub": 0.8433,
+    "hi_dev_sub": 0.8367,
+    "kn_dev_sub": 0.8467,
+    "pooled_dev_sub": 0.8422,
+    "en_test_sub": 0.862,
+    "hi_test_sub": 0.842,
+    "kn_test_sub": 0.818,
+    "pooled_test_sub": 0.8407
+  },
+  "invalid": {
+    "en_dev_sub": 0,
+    "hi_dev_sub": 0,
+    "kn_dev_sub": 0,
+    "en_test_sub": 0,
+    "hi_test_sub": 0,
+    "kn_test_sub": 0
+  },
+  "n": {
+    "en_dev_sub": 300,
+    "hi_dev_sub": 300,
+    "kn_dev_sub": 300,
+    "en_test_sub": 500,
+    "hi_test_sub": 500,
+    "kn_test_sub": 500
+  },
+  "batch_requests_cached": 120
+}

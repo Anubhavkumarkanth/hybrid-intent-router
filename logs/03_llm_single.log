@@ -1,0 +1,27 @@
+  retry 1/5 after 2.8s: TransientError
+  retry 1/5 after 2.1s: RateLimited
+  retry 1/5 after 2.3s: RateLimited
+  retry 2/5 after 4.1s: RateLimited
+  retry 3/5 after 8.8s: RateLimited
+  retry 4/5 after 16.1s: RateLimited
+  retry 1/5 after 2.9s: TransientError
+  retry 1/5 after 2.7s: TransientError
+{
+  "model": "gemini-3.5-flash-lite",
+  "prompt_version": "v2_labels_examples",
+  "n": 50,
+  "per_lang_n": {
+    "en": 17,
+    "hi": 17,
+    "kn": 16
+  },
+  "latency_ms_median": 1344.5,
+  "latency_ms_p95": 9113.5,
+  "mean_input_tokens": 890.3,
+  "mean_output_tokens": 12.8,
+  "mean_thinking_tokens": 0.0,
+  "single_call_accuracy": 0.82,
+  "batched_accuracy_same_items": 0.82,
+  "accuracy_diff_single_minus_batch_pp": 0.0,
+  "agreement_single_vs_batch": 0.98
+}

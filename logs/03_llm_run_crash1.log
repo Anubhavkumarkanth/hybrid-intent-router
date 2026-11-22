@@ -1,0 +1,122 @@
+Traceback (most recent call last):
+  File "/home/anubhav/hybrid-intent-router/.venv/lib/python3.12/site-packages/httpx2/_transports/default.py", line 95, in map_httpcore_exceptions
+    yield
+  File "/home/anubhav/hybrid-intent-router/.venv/lib/python3.12/site-packages/httpx2/_transports/default.py", line 242, in handle_request
+    resp = self._pool.handle_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anubhav/hybrid-intent-router/.venv/lib/python3.12/site-packages/httpcore2/_sync/connection_pool.py", line 243, in handle_request
+    raise exc from None
+  File "/home/anubhav/hybrid-intent-router/.venv/lib/python3.12/site-packages/httpcore2/_sync/connection_pool.py", line 225, in handle_request
+    response = connection.handle_request(pool_request.request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anubhav/hybrid-intent-router/.venv/lib/python3.12/site-packages/httpcore2/_sync/connection.py", line 98, in handle_request
+    return self._connection.handle_request(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anubhav/hybrid-intent-router/.venv/lib/python3.12/site-packages/httpcore2/_sync/http11.py", line 125, in handle_request
+    raise exc
+  File "/home/anubhav/hybrid-intent-router/.venv/lib/python3.12/site-packages/httpcore2/_sync/http11.py", line 97, in handle_request
+    ) = self._receive_response_headers(**kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anubhav/hybrid-intent-router/.venv/lib/python3.12/site-packages/httpcore2/_sync/http11.py", line 167, in _receive_response_headers
+    event = self._receive_event(timeout=timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anubhav/hybrid-intent-router/.venv/lib/python3.12/site-packages/httpcore2/_sync/http11.py", line 200, in _receive_event
+    data = self._network_stream.read(self.READ_NUM_BYTES, timeout=timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anubhav/hybrid-intent-router/.venv/lib/python3.12/site-packages/httpcore2/_backends/sync.py", line 126, in read
+    with map_exceptions(exc_map):
+  File "/usr/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/home/anubhav/hybrid-intent-router/.venv/lib/python3.12/site-packages/httpcore2/_exceptions.py", line 16, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore2.ReadTimeout: The read operation timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/anubhav/hybrid-intent-router/src/router/llm_baseline.py", line 161, in <module>
+    cmds[sys.argv[1]]()
+  File "/home/anubhav/hybrid-intent-router/src/router/llm_baseline.py", line 103, in cmd_run
+    preds = clf.classify_batch(lang, rows)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anubhav/hybrid-intent-router/src/router/llm.py", line 306, in classify_batch
+    self._run_batch(lang, chunk)
+  File "/home/anubhav/hybrid-intent-router/src/router/llm.py", line 314, in _run_batch
+    resp = call_with_backoff(self.backend, prompt, schema, sleep=self.sleep)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anubhav/hybrid-intent-router/src/router/llm.py", line 240, in call_with_backoff
+    return backend.generate(prompt, schema)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anubhav/hybrid-intent-router/src/router/llm.py", line 206, in generate
+    resp = self.client.models.generate_content(model=self.model, contents=prompt, config=config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anubhav/hybrid-intent-router/.venv/lib/python3.12/site-packages/google/genai/models.py", line 6204, in generate_content
+    response = self._generate_content_with_continuation(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anubhav/hybrid-intent-router/.venv/lib/python3.12/site-packages/google/genai/models.py", line 6045, in _generate_content_with_continuation
+    response = self._generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anubhav/hybrid-intent-router/.venv/lib/python3.12/site-packages/google/genai/models.py", line 4573, in _generate_content
+    response = self._api_client.request(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anubhav/hybrid-intent-router/.venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 2374, in request
+    response = self._request(http_request, http_options, stream=False)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anubhav/hybrid-intent-router/.venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 2150, in _request
+    return self._retry(self._request_once, http_request, stream)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anubhav/hybrid-intent-router/.venv/lib/python3.12/site-packages/tenacity/__init__.py", line 470, in __call__
+    do = self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anubhav/hybrid-intent-router/.venv/lib/python3.12/site-packages/tenacity/__init__.py", line 371, in iter
+    result = action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/anubhav/hybrid-intent-router/.venv/lib/python3.12/site-packages/tenacity/__init__.py", line 413, in exc_check
+    raise retry_exc.reraise()
+          ^^^^^^^^^^^^^^^^^^^
+  File "/home/anubhav/hybrid-intent-router/.venv/lib/python3.12/site-packages/tenacity/__init__.py", line 184, in reraise
+    raise self.last_attempt.result()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/home/anubhav/hybrid-intent-router/.venv/lib/python3.12/site-packages/tenacity/__init__.py", line 473, in __call__
+    result = fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/anubhav/hybrid-intent-router/.venv/lib/python3.12/site-packages/google/genai/_api_client.py", line 2126, in _request_once
+    response = self._httpx_client.send(httpx_request, stream=stream)  # type: ignore[union-attr, arg-type]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anubhav/hybrid-intent-router/.venv/lib/python3.12/site-packages/httpx2/_client.py", line 974, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anubhav/hybrid-intent-router/.venv/lib/python3.12/site-packages/httpx2/_client.py", line 1002, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anubhav/hybrid-intent-router/.venv/lib/python3.12/site-packages/httpx2/_client.py", line 1037, in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anubhav/hybrid-intent-router/.venv/lib/python3.12/site-packages/httpx2/_client.py", line 1070, in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anubhav/hybrid-intent-router/.venv/lib/python3.12/site-packages/httpx2/_transports/default.py", line 241, in handle_request
+    with map_httpcore_exceptions():
+  File "/usr/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/home/anubhav/hybrid-intent-router/.venv/lib/python3.12/site-packages/httpx2/_transports/default.py", line 112, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx2.ReadTimeout: The read operation timed out
+dev_sub en: 300 items
+  retry 1/5 after 2.1s: TransientError
+  retry 2/5 after 4.4s: TransientError
+  retry 1/5 after 2.2s: TransientError
+  retry 2/5 after 4.6s: TransientError
+  retry 1/5 after 2.4s: TransientError
+  retry 2/5 after 5.0s: TransientError
+  acc 0.8433
+dev_sub hi: 300 items
+  retry 1/5 after 2.2s: TransientError
+  retry 1/5 after 2.8s: TransientError

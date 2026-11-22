@@ -1,0 +1,5 @@
+v1_labels {'en': 0.9, 'hi': 0.75, 'kn': 0.75} pooled 0.8
+  retry 1/5 after 2.8s: TransientError
+  retry 2/5 after 4.8s: TransientError
+v2_labels_examples {'en': 0.9, 'hi': 0.85, 'kn': 0.85} pooled 0.8667
+frozen prompt version: v2_labels_examples

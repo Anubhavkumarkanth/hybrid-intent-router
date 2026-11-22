@@ -1,0 +1,33 @@
+{
+  "model": "gemini-3.5-flash-lite",
+  "prompt_version": "v2_labels_examples",
+  "mode": "batch",
+  "batch_size": 20,
+  "accuracy": {
+    "en_dev_sub": 0.8433,
+    "hi_dev_sub": 0.8367,
+    "kn_dev_sub": 0.8467,
+    "pooled_dev_sub": 0.8422,
+    "en_test_sub": 0.862,
+    "hi_test_sub": 0.842,
+    "kn_test_sub": 0.818,
+    "pooled_test_sub": 0.8407
+  },
+  "invalid": {
+    "en_dev_sub": 0,
+    "hi_dev_sub": 0,
+    "kn_dev_sub": 0,
+    "en_test_sub": 0,
+    "hi_test_sub": 0,
+    "kn_test_sub": 0
+  },
+  "n": {
+    "en_dev_sub": 300,
+    "hi_dev_sub": 300,
+    "kn_dev_sub": 300,
+    "en_test_sub": 500,
+    "hi_test_sub": 500,
+    "kn_test_sub": 500
+  },
+  "batch_requests_cached": 120
+}

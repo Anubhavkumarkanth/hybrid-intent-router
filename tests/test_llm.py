@@ -132,6 +132,17 @@ def test_cache_key_separates_language_and_version(tmp_path):
     assert clf3.classify_batch("en", items) == ["alarm_set"]  # cached
 
 
+def test_cache_survives_crash_padding_but_not_corruption(tmp_path):
+    """Regression: WSL died mid-append and left NUL bytes at the end of the cache file."""
+    rec = {"model": "m", "prompt_version": "v", "mode": "batch", "lang": "en", "id": "1", "intent": "alarm_set"}
+    p = tmp_path / "cache.jsonl"
+    p.write_text(json.dumps(rec) + "\n" + "\x00" * 50, encoding="utf-8")
+    assert L.Cache(path=p).get("m", "v", "batch", "en", "1")["intent"] == "alarm_set"
+    p.write_text(json.dumps(rec) + "\n{broken\n", encoding="utf-8")
+    with pytest.raises(json.JSONDecodeError):
+        L.Cache(path=p)
+
+
 def test_single_records_tokens_and_latency(tmp_path):
     clf = make_clf(tmp_path, ['{"intent": "weather_query"}'])
     rec = clf.classify_single("kn", {"id": "9", "text": "x"})
@@ -156,3 +167,30 @@ def test_backoff_gives_up_and_quota_is_not_retried():
     be2 = FakeBackend([L.QuotaExhausted("daily")])
     with pytest.raises(L.QuotaExhausted):
         L.call_with_backoff(be2, "p", {}, sleep=lambda s: None)
+
+
+
+def test_network_timeout_is_retried():
+    """Regression: an HTTP-layer ReadTimeout (httpx2) used to crash the whole run instead of retrying.
+
+    Drives the real GeminiBackend.generate with a fake SDK client (no network)."""
+    import types as pytypes
+
+    import httpx2
+    from google.genai import types as gtypes
+
+    calls = {"n": 0}
+
+    def generate_content(model, contents, config):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            raise httpx2.ReadTimeout("The read operation timed out")
+        usage = pytypes.SimpleNamespace(prompt_token_count=50, candidates_token_count=4, thoughts_token_count=2)
+        return pytypes.SimpleNamespace(text='{"intent": "alarm_set"}', usage_metadata=usage)
+
+    be = object.__new__(L.GeminiBackend)  # skip __init__ (no API key, no real client)
+    be._types, be.model = gtypes, "fake"
+    be.client = pytypes.SimpleNamespace(models=pytypes.SimpleNamespace(generate_content=generate_content))
+    r = L.call_with_backoff(be, "p", {"type": "object"}, sleep=lambda s: None)
+    assert r.text == '{"intent": "alarm_set"}' and calls["n"] == 2
+    assert r.input_tokens == 50 and r.output_tokens == 6 and r.thinking_tokens == 2
