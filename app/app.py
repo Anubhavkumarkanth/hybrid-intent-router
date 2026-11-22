@@ -304,8 +304,6 @@ def create_app(small: SmallModel | None = None, llm_fn: Callable[[str], str] | N
     def api_metrics():
         if metrics is None:
             return jsonify(error="metrics are off"), 404
-        if request.args.get("writer") == "1" and hasattr(metrics, "status"):  # temporary: live write debugging
-            return jsonify(metrics.status())
         hours =min(max(request.args.get("hours", 24, type=float), 1), 168)
         hit = summary_cache.get(hours)
         if hit and time.monotonic() - hit[0] < 5:  # many open dashboards poll this; one query per 5 s is enough

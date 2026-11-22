@@ -57,21 +57,20 @@ class MetricsStore:
             conn.close()
         self.q: queue.Queue = queue.Queue(maxsize=2000)
         self.background = background
-        self.written = self.failed = 0
-        self.last_error = None
         self._thread = None
-        if background:
-            self._thread = threading.Thread(target=self._writer, daemon=True, name="metrics-writer")
-            self._thread.start()
+        self._start_lock = threading.Lock()
 
-    def status(self) -> dict:
-        import sys
-        import traceback
-        t = self._thread
-        frame = sys._current_frames().get(t.ident) if t else None
-        where = [ln.strip().splitlines()[0] for ln in traceback.format_stack(frame)[-4:]] if frame else None
-        return {"queued": self.q.qsize(), "written": self.written, "failed": self.failed,
-                "last_error": self.last_error, "writer_alive": bool(t and t.is_alive()), "writer_at": where}
+    def _ensure_writer(self) -> None:
+        # Started on first use, not in __init__: the app can be built in gunicorn's parent process and forked
+        # into the worker, and a thread does not survive a fork (on Render the events queued up unwritten).
+        # The queue is replaced too: one copied across a fork still lists the dead thread as a waiter, so the
+        # next put() would wake that instead of the new writer.
+        if self._thread is None or not self._thread.is_alive():
+            with self._start_lock:
+                if self._thread is None or not self._thread.is_alive():
+                    self.q = queue.Queue(maxsize=2000)
+                    self._thread = threading.Thread(target=self._writer, daemon=True, name="metrics-writer")
+                    self._thread.start()
 
     @classmethod
     def from_url(cls, url: str) -> MetricsStore:
@@ -85,6 +84,7 @@ class MetricsStore:
         if not self.background:
             self._insert([item])
             return
+        self._ensure_writer()
         try:
             self.q.put_nowait(item)
         except queue.Full:
@@ -93,8 +93,7 @@ class MetricsStore:
     def _insert(self, items: list[tuple]) -> None:
         conn = self.connect()
         try:
-            # One plain multi-row INSERT: psycopg's executemany() uses pipeline mode, and through Neon's
-            # connection pooler that saved nothing and raised nothing on the live site.
+            # One multi-row INSERT: a single round trip for the whole batch.
             conn.cursor().execute(insert_sql(len(items)), [v for item in items for v in item])
         finally:
             conn.close()
@@ -109,10 +108,7 @@ class MetricsStore:
                     break
             try:
                 self._insert(items)
-                self.written += len(items)
             except Exception as e:  # metrics must never take the app down
-                self.failed += len(items)
-                self.last_error = type(e).__name__
                 log.warning("metrics write failed, dropped %d events: %s: %s", len(items), type(e).__name__, e)
 
     def flush(self, timeout: float = 5.0) -> None:

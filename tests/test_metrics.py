@@ -1,5 +1,6 @@
 """Metrics: the pure summary maths, and the store against a fake Postgres connection (no database needed)."""
 
+import os
 import time
 
 import pytest
@@ -77,6 +78,24 @@ def test_store_creates_table_writes_in_background_and_reads_window():
     s = store.summary(hours=24)
     assert s["total"] == 5 and s["total_all_time"] == 6 and s["backend"] == "postgres"
     assert "old" not in dict(s["top_intents"])
+
+
+@pytest.mark.skipif(not hasattr(os, "fork"), reason="needs fork")
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")  # Python warns about fork() with threads running
+def test_writer_runs_in_a_forked_worker():
+    # Regression: gunicorn built the app in its parent and forked; threads do not survive a fork, so the
+    # worker's events queued up and were never written.
+    db = FakePostgres()
+    store = M.MetricsStore(db)
+    store.record(language="en", routed_to="small", intent="alarm_set")
+    store.flush()
+    pid = os.fork()
+    if pid == 0:
+        store.record(language="hi", routed_to="llm", intent="play_music")
+        store.flush()
+        os._exit(0 if len(db.rows) == 2 else 1)
+    _, status = os.waitpid(pid, 0)
+    assert os.waitstatus_to_exitcode(status) == 0
 
 
 def test_only_postgres_urls_are_accepted():
