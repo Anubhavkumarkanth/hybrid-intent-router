@@ -1,0 +1,15 @@
+# Runtime. Install torch first with the right index:
+#   GPU (CUDA 12.8): pip install torch==2.11.0 --index-url https://download.pytorch.org/whl/cu128
+#   CPU only:        pip install torch==2.11.0 --index-url https://download.pytorch.org/whl/cpu
+torch==2.11.0
+transformers==5.24.0
+tokenizers==0.23.3
+safetensors==0.8.0
+numpy==2.5.5
+google-genai==3.6.1
+flask==3.1.3
+gunicorn==27.0.1
+matplotlib==3.11.2
+pillow==13.0.0
+pygments==2.21.0
+piper-tts==1.8.0
