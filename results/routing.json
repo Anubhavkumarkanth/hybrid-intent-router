@@ -1,0 +1,175 @@
+{
+  "temperature": 1.342,
+  "calibration": {
+    "temperature": 1.342,
+    "fit_on": "full English dev (2033 items)",
+    "ece_en_dev_full": {
+      "before": 0.0763,
+      "after": 0.016
+    },
+    "ece_dev_sub": {
+      "en": {
+        "before": 0.0998,
+        "after": 0.0388
+      },
+      "hi": {
+        "before": 0.1401,
+        "after": 0.0683
+      },
+      "kn": {
+        "before": 0.17,
+        "after": 0.0907
+      }
+    },
+    "nll_en_dev_full": {
+      "before": 0.6384,
+      "after": 0.5649
+    }
+  },
+  "llm": {
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "v2_labels_examples",
+    "single_call_stats": {
+      "input_tokens": 890.3,
+      "output_tokens": 12.8,
+      "llm_latency_ms": 1344.5
+    },
+    "price_per_1m_input_usd": 0.3,
+    "price_per_1m_output_usd": 2.5,
+    "price_source": "https://aistudio.google.com/docs/pricing (checked 2026-11-22)"
+  },
+  "small_model_cpu_latency_ms": 37.53,
+  "threshold_rule": "lowest LLM share with pooled dev_sub accuracy >= LLM-only dev_sub accuracy - 1.0 pp",
+  "llm_only_dev_sub_pooled_acc": 0.8422,
+  "target_dev_sub_acc": 0.8322,
+  "chosen_threshold": {
+    "t": 0.56,
+    "accuracy": 0.8322,
+    "llm_share": 0.1433,
+    "llm_cost_per_1000_usd": 0.0429,
+    "avg_latency_ms": 230.2417
+  },
+  "small_model_alone_meets_target_on_dev": false,
+  "dev_sub": {
+    "en": {
+      "n": 300,
+      "small_only_acc": 0.8567,
+      "llm_only_acc": 0.8433,
+      "router_acc": 0.86,
+      "oracle_acc": 0.9067,
+      "llm_share": 0.0567,
+      "llm_invalid": 0,
+      "router_cost_per_1000_usd": 0.0169,
+      "llm_only_cost_per_1000_usd": 0.2991,
+      "router_avg_latency_ms": 113.7183,
+      "llm_only_avg_latency_ms": 1344.5,
+      "small_only_avg_latency_ms": 37.53
+    },
+    "hi": {
+      "n": 300,
+      "small_only_acc": 0.7567,
+      "llm_only_acc": 0.8367,
+      "router_acc": 0.83,
+      "oracle_acc": 0.9033,
+      "llm_share": 0.1533,
+      "llm_invalid": 0,
+      "router_cost_per_1000_usd": 0.0459,
+      "llm_only_cost_per_1000_usd": 0.2991,
+      "router_avg_latency_ms": 243.6867,
+      "llm_only_avg_latency_ms": 1344.5,
+      "small_only_avg_latency_ms": 37.53
+    },
+    "kn": {
+      "n": 300,
+      "small_only_acc": 0.6933,
+      "llm_only_acc": 0.8467,
+      "router_acc": 0.8067,
+      "oracle_acc": 0.8967,
+      "llm_share": 0.22,
+      "llm_invalid": 0,
+      "router_cost_per_1000_usd": 0.0658,
+      "llm_only_cost_per_1000_usd": 0.2991,
+      "router_avg_latency_ms": 333.32,
+      "llm_only_avg_latency_ms": 1344.5,
+      "small_only_avg_latency_ms": 37.53
+    },
+    "pooled": {
+      "n": 900,
+      "small_only_acc": 0.7689,
+      "llm_only_acc": 0.8422,
+      "router_acc": 0.8322,
+      "oracle_acc": 0.9022,
+      "llm_share": 0.1433,
+      "llm_invalid": 0,
+      "router_cost_per_1000_usd": 0.0429,
+      "llm_only_cost_per_1000_usd": 0.2991,
+      "router_avg_latency_ms": 230.2417,
+      "llm_only_avg_latency_ms": 1344.5,
+      "small_only_avg_latency_ms": 37.53
+    }
+  },
+  "test_sub": {
+    "en": {
+      "n": 500,
+      "small_only_acc": 0.882,
+      "llm_only_acc": 0.862,
+      "router_acc": 0.906,
+      "oracle_acc": 0.934,
+      "llm_share": 0.038,
+      "llm_invalid": 0,
+      "router_cost_per_1000_usd": 0.0114,
+      "llm_only_cost_per_1000_usd": 0.2991,
+      "router_avg_latency_ms": 88.621,
+      "llm_only_avg_latency_ms": 1344.5,
+      "small_only_avg_latency_ms": 37.53
+    },
+    "hi": {
+      "n": 500,
+      "small_only_acc": 0.77,
+      "llm_only_acc": 0.842,
+      "router_acc": 0.82,
+      "oracle_acc": 0.908,
+      "llm_share": 0.13,
+      "llm_invalid": 0,
+      "router_cost_per_1000_usd": 0.0389,
+      "llm_only_cost_per_1000_usd": 0.2991,
+      "router_avg_latency_ms": 212.315,
+      "llm_only_avg_latency_ms": 1344.5,
+      "small_only_avg_latency_ms": 37.53
+    },
+    "kn": {
+      "n": 500,
+      "small_only_acc": 0.706,
+      "llm_only_acc": 0.818,
+      "router_acc": 0.8,
+      "oracle_acc": 0.902,
+      "llm_share": 0.164,
+      "llm_invalid": 0,
+      "router_cost_per_1000_usd": 0.0491,
+      "llm_only_cost_per_1000_usd": 0.2991,
+      "router_avg_latency_ms": 258.028,
+      "llm_only_avg_latency_ms": 1344.5,
+      "small_only_avg_latency_ms": 37.53
+    },
+    "pooled": {
+      "n": 1500,
+      "small_only_acc": 0.786,
+      "llm_only_acc": 0.8407,
+      "router_acc": 0.842,
+      "oracle_acc": 0.9147,
+      "llm_share": 0.1107,
+      "llm_invalid": 0,
+      "router_cost_per_1000_usd": 0.0331,
+      "llm_only_cost_per_1000_usd": 0.2991,
+      "router_avg_latency_ms": 186.3213,
+      "llm_only_avg_latency_ms": 1344.5,
+      "small_only_avg_latency_ms": 37.53
+    }
+  },
+  "savings_test_sub_pooled": {
+    "llm_calls_avoided_share": 0.8893,
+    "cost_saving_share": 0.8893,
+    "latency_saving_ms": 1158.1787,
+    "accuracy_change_pp": 0.1333
+  }
+}

@@ -1,0 +1,82 @@
+[
+  {
+    "lang": "English",
+    "text": "have i received any emails with tracking numbers",
+    "gold": "email_query",
+    "small": "email_query",
+    "conf": "97.8%",
+    "route": "small model",
+    "final": "email_query",
+    "ok": true
+  },
+  {
+    "lang": "Hindi",
+    "text": "मेरी किराना सूची पढ़ो",
+    "gold": "lists_query",
+    "small": "lists_query",
+    "conf": "91.9%",
+    "route": "small model",
+    "final": "lists_query",
+    "ok": true
+  },
+  {
+    "lang": "Kannada",
+    "text": "ನೀವು ಯಾವುದೇ ಸಲಹೆ ಕ್ರಮ ಚಲನಚಿತ್ರಗಳನ್ನು ಹೊಂದಿದ್ದೀರಾ",
+    "gold": "recommendation_movies",
+    "small": "general_quirky",
+    "conf": "74.3%",
+    "route": "small model",
+    "final": "general_quirky",
+    "ok": false
+  },
+  {
+    "lang": "Kannada",
+    "text": "ಟ್ವೀಟ್ ಕಳುಹಿಸೋಣ",
+    "gold": "social_post",
+    "small": "social_post",
+    "conf": "95.4%",
+    "route": "small model",
+    "final": "social_post",
+    "ok": true
+  },
+  {
+    "lang": "Hindi",
+    "text": "रेडियो पर मधुर गीत बजाएं",
+    "gold": "play_radio",
+    "small": "play_music",
+    "conf": "49.9%",
+    "route": "LLM",
+    "final": "play_radio",
+    "ok": true
+  },
+  {
+    "lang": "Kannada",
+    "text": "ಹಾಯ್ ಪಟ್ಟಿಯಿಂದ ನನ್ನ ಮೆಚ್ಚಿನ ಪಾಡ್‌ಕ್ಯಾಸ್ಟ್ ಪ್ಲೇ ಮಾ",
+    "gold": "play_podcasts",
+    "small": "play_music",
+    "conf": "16.3%",
+    "route": "LLM",
+    "final": "play_podcasts",
+    "ok": true
+  },
+  {
+    "lang": "English",
+    "text": "one dolla equals how much inr",
+    "gold": "qa_currency",
+    "small": "qa_currency",
+    "conf": "45.1%",
+    "route": "LLM",
+    "final": "qa_currency",
+    "ok": true
+  },
+  {
+    "lang": "Hindi",
+    "text": "क्या मुझे आज रात अपने साथ जैकेट लाना चाहिए",
+    "gold": "weather_query",
+    "small": "weather_query",
+    "conf": "28.3%",
+    "route": "LLM",
+    "final": "weather_query",
+    "ok": true
+  }
+]

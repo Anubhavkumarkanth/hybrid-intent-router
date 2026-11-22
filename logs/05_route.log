@@ -1,0 +1,9 @@
+temperature T = 1.3420
+ECE dev_sub: {'en': {'before': 0.0998, 'after': 0.0388}, 'hi': {'before': 0.1401, 'after': 0.0683}, 'kn': {'before': 0.17, 'after': 0.0907}}
+LLM-only pooled dev_sub acc 0.8422; target 0.8322
+chosen t = 0.56 (dev pooled acc 0.8322, LLM share 0.1433)
+test_sub en: small 0.8820 llm 0.8620 router 0.9060 oracle 0.9340 share 0.0380
+test_sub hi: small 0.7700 llm 0.8420 router 0.8200 oracle 0.9080 share 0.1300
+test_sub kn: small 0.7060 llm 0.8180 router 0.8000 oracle 0.9020 share 0.1640
+test_sub pooled: small 0.7860 llm 0.8407 router 0.8420 oracle 0.9147 share 0.1107
+wrote results/routing.json, results/routing_curve.csv and charts
