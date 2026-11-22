@@ -216,7 +216,7 @@ def output_image(path: str, spec: list[str], max_chars: int = 92) -> Image.Image
                      for ln in out] + [400])) + 2 * pad
     img = Image.new("RGB", (width, len(out) * lh + 2 * pad + 44), TERM_BG)
     d = ImageDraw.Draw(img)
-    for i, c in enumerate(("#d65c5c", "#d6b85c", "#5cb87a")):  # window dots
+    for i, c in enumerate(("#8a93a3", "#a5adbb", "#c3c9d4")):  # window dots
         d.ellipse([pad + i * 26, 14, pad + i * 26 + 14, 28], fill=c)
     y = 44 + pad
     for ln in out:

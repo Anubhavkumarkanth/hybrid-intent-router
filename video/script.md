@@ -37,21 +37,11 @@ visual: image results/charts/architecture.png
 > If the confidence is above a threshold, which I call t, we keep the small model's answer. If it is below t, we send the message to the LLM.
 > The whole project is about measuring this honestly. How many messages can the small model handle alone? What happens to accuracy? And how much time and money does it save?
 
-## The plan: eleven phases
-- Environment check, research, data pipeline
-- LLM baseline, small model training, calibration and routing
-- Flask API, gunicorn + NGINX serving, load test
-- Quality gate, documentation, this video
-- Every phase ends with a check, a journal entry and a git commit
-visual: none
-> I built the project in phases. Environment check, research, data, the LLM baseline, training, calibration and routing, the API, serving with a load test, a quality gate, documentation, and this video.
-> Every phase ends with a check that must pass, a journal entry, and a git commit. So nothing is "looks done". It is either proven or not done.
-
 ## Phase 0: check the machine first
 - WSL2 Ubuntu on Windows, 12 CPU cores, 7.4 GB RAM
 - NVIDIA RTX 3050 laptop GPU with 4 GB for training
 - The .gitignore with .env was committed first, so the API key can never reach git
-visual: output logs/00_env.log 1-24
+visual: output logs/00_env.log 26-46
 > Before writing any code, I checked the machine and saved the output to a log file.
 > The project runs in WSL2 Ubuntu, because gunicorn does not run on native Windows.
 > There are 12 CPU cores and 7.4 gigabytes of RAM, which later decide how many server workers I can run. The laptop also has a small NVIDIA GPU with 4 gigabytes, which is enough for training.
@@ -196,14 +186,6 @@ visual: output logs/04_evaluate.log tail 12
 > This is zero-shot cross-lingual transfer. MuRIL learned during pre-training that a Hindi sentence and its English translation mean the same thing, so an English classifier partly works in Hindi.
 > The published MuRIL numbers are higher, partly because those papers chose checkpoints differently. I only used English dev, to keep it truly zero-shot.
 
-## Phase 4: speed on a CPU
-- One message, CPU, 4 threads: median {{small_model.json:cpu_latency_single_message.median_ms|ms}}, p95 {{small_model.json:cpu_latency_single_message.p95_ms|ms}}
-- LLM single call: median {{llm_single_call.json:latency_ms_median|ms}}
-- Model size on disk: {{small_model.json:model_size_mb|mb}}
-visual: none
-> Speed matters for a voice bot. On the CPU, with four threads, the small model answers one message in a median of {{small_model.json:cpu_latency_single_message.median_ms|ms}}.
-> The LLM took {{llm_single_call.json:latency_ms_median|ms}}. So the small model is many times faster, and it costs nothing per call.
-
 ## Phase 5: can we trust the confidence?
 - Neural networks are often over-confident
 - Temperature scaling: divide the logits by one number T before softmax
@@ -231,7 +213,8 @@ visual: code src/router/route.py 29-39
 visual: image results/charts/accuracy_vs_llm_share.png
 > This chart shows the whole trade-off. On the left is dev sub, on the right is test sub. Each line is one language, and the dashed line is all three together.
 > Moving right means sending more messages to the LLM. The dots show the chosen threshold.
-> ROUTING_CURVE_SENTENCE
+> Look at the English line. With almost nothing sent to the LLM, it is already high, and a few LLM answers push it even higher. Hindi and Kannada start lower and climb fast as their unsure messages go to the LLM.
+> Notice that the test curve peaks around forty percent. The two models make different mistakes. My rule chose the fewest LLM calls instead, because that was the goal I wrote down before seeing any results.
 
 ## Phase 5: final results on test_sub
 - Small model only: {{routing.json:test_sub.pooled.small_only_acc|pct}}
@@ -241,7 +224,7 @@ visual: image results/charts/accuracy_vs_llm_share.png
 visual: none
 > Here are the final numbers on test sub, all three languages together, with the threshold fixed from dev.
 > The small model alone: {{routing.json:test_sub.pooled.small_only_acc|pct}}. The LLM alone: {{routing.json:test_sub.pooled.llm_only_acc|pct}}. The router: {{routing.json:test_sub.pooled.router_acc|pct}}, while sending only {{routing.json:test_sub.pooled.llm_share|pct}} of messages to the LLM.
-> ROUTING_RESULT_SENTENCE
+> So the router matches the LLM-only accuracy, with about one LLM call for every nine messages. The accuracy change is {{routing.json:savings_test_sub_pooled.accuracy_change_pp|pp}}.
 > The oracle, which is right whenever either model is right, reaches {{routing.json:test_sub.pooled.oracle_acc|pct}}. It shows how much a perfect router could still gain.
 
 ## Phase 5: per language
@@ -257,7 +240,9 @@ visual: none
 - LLM calls avoided: {{routing.json:savings_test_sub_pooled.llm_calls_avoided_share|pct}}
 - Average latency: {{routing.json:test_sub.pooled.llm_only_avg_latency_ms|ms}} -> {{routing.json:test_sub.pooled.router_avg_latency_ms|ms}}
 - Accuracy change vs LLM only: {{routing.json:savings_test_sub_pooled.accuracy_change_pp|pp}}
+- Small model on the CPU: median {{small_model.json:cpu_latency_single_message.median_ms|ms}} per message
 visual: image results/charts/cost_per_1000.png
+> Speed matters for a voice bot. On the CPU, with four threads, the small model answers one message in a median of {{small_model.json:cpu_latency_single_message.median_ms|ms}}, against {{llm_single_call.json:latency_ms_median|ms}} for one LLM call.
 > Now money and time. Using the paid price of the model and the real token counts, the LLM costs {{routing.json:test_sub.pooled.llm_only_cost_per_1000_usd|usd}} per thousand messages. The router costs {{routing.json:test_sub.pooled.router_cost_per_1000_usd|usd}}.
 > The router avoids {{routing.json:savings_test_sub_pooled.llm_calls_avoided_share|pct}} of LLM calls, and the average time per message drops from {{routing.json:test_sub.pooled.llm_only_avg_latency_ms|ms}} to {{routing.json:test_sub.pooled.router_avg_latency_ms|ms}}.
 > The accuracy change against the LLM alone is {{routing.json:savings_test_sub_pooled.accuracy_change_pp|pp}}.
@@ -313,7 +298,8 @@ visual: code deploy/nginx/nginx.conf 6-44
 visual: output logs/07_loadtest_summary.log
 > Then a load test with Locust. {{loadtest.json:users|int}} simulated users sent real test sentences through NGINX, with the LLM switched off so no API quota was spent.
 > The server handled {{loadtest.json:requests_per_sec|f1}} requests per second, with {{loadtest.json:failures|int}} failures. Half of the requests finished within {{loadtest.json:p50_ms|ms}}, and ninety-five percent within {{loadtest.json:p95_ms|ms}}.
-> LOADTEST_BOTTLENECK_SENTENCE
+> The bottleneck is the CPU. One message alone takes about {{small_model.json:cpu_latency_single_message.median_ms|ms}}, but under load the twelve cores are shared by three workers and the load generator, so requests wait in a queue. To go faster I would quantize the model or add CPU, not add more workers.
+> One real bug happened here. The first load test showed zero requests. The workers had inherited a broken PyTorch thread pool from the master process and froze. The fix was one line: keep the master single-threaded, and let each worker set its own threads after it starts.
 
 ## Phase 8: the quality gate
 - make verify: ruff lint + all pytest tests + number check

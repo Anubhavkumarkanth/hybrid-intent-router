@@ -1,0 +1,10 @@
+.venv/bin/python -m ruff check .
+All checks passed!
+.venv/bin/python -m pytest -q
+................................................................         [100%]
+64 passed in 4.91s
+.venv/bin/python scripts/check_numbers.py
+checked README.md: 7 result sections
+checked FINAL_REPORT.md: 5 result sections
+checked INTERVIEW_GUIDE.md: 3 result sections
+check_numbers: OK, all result tables match results/

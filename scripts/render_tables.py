@@ -189,9 +189,10 @@ def t_resume() -> str:
             f"{h['cost_cut']} lower LLM cost); served with Flask, gunicorn and NGINX at {h['rps']} requests/s "
             f"(p95 {h['p95']}).\n"
             f"- **Data analyst resume:** Compared an LLM with a small model on 1,500 multilingual test messages; "
-            f"chose a routing threshold on a separate dev set from 102 candidates and showed {h['avoided']} fewer "
-            f"LLM calls and {h['cost_cut']} lower cost at {h['pp']} percentage points accuracy; built the charts and "
-            f"auto-generated result tables that tests check against the raw results.")
+            f"chose a routing threshold on a separate dev set from 102 candidates and showed the router keeps "
+            f"LLM-only accuracy ({h['pp']} percentage points) with {h['avoided']} fewer LLM calls (LLM cost per "
+            f"1,000 messages {h['cost_llm']} -> {h['cost_router']}); built the charts and auto-generated result "
+            f"tables that tests check against the raw results.")
 
 
 SECTIONS = {

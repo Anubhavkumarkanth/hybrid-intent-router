@@ -24,3 +24,4 @@ deploy/nginx/temp/
 deploy/nginx/logs/
 logs/nginx_*.log
 data/processed/*.jsonl
+logs/gunicorn_*.log
