@@ -1,0 +1,10 @@
+{
+  "repo": "Anubhav1604/hybrid-intent-router-onnx",
+  "revision": "dfd37c7146c531239a3ad53920f9a6c2a1328374",
+  "dir": "models/onnx",
+  "files": {
+    "model.onnx": "e4916a903d3284bcf333847cf269f291fc076fdd7802aef9ba5b38f3bbd7c99b",
+    "tokenizer.json": "03ee44289d49b3b6c348bed412b55667526eaef449a6c063604e9c871527a923",
+    "meta.json": "ab121b7d92e7e378c7584de29a95187e09ef3c02cb25c087822c3e55399d7205"
+  }
+}

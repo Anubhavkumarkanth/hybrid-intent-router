@@ -1,0 +1,60 @@
+{
+  "method": "vocabulary pruned to Latin/Devanagari/Kannada tokens; word embeddings int8 per row; Linear weights 8-bit (block 32), int8 arithmetic (accuracy_level 4)",
+  "vocab": {
+    "original_vocab": 197258,
+    "kept_vocab": 90022
+  },
+  "tokenizer_check": {
+    "sentences_checked": 49563,
+    "identical_tokens": 49563
+  },
+  "temperature": 1.342,
+  "threshold": 0.56,
+  "accuracy": {
+    "en_test_full": 0.8823,
+    "en_dev_sub": 0.8533,
+    "en_test_sub": 0.884,
+    "hi_test_full": 0.7771,
+    "hi_dev_sub": 0.7567,
+    "hi_test_sub": 0.77,
+    "kn_test_full": 0.7068,
+    "kn_dev_sub": 0.6833,
+    "kn_test_sub": 0.712
+  },
+  "agreement_with_original": {
+    "en_dev_sub": 0.9933,
+    "en_test_sub": 0.998,
+    "hi_dev_sub": 1.0,
+    "hi_test_sub": 0.996,
+    "kn_dev_sub": 0.9867,
+    "kn_test_sub": 0.982
+  },
+  "router_test_sub": {
+    "en": {
+      "accuracy": 0.902,
+      "llm_share": 0.036
+    },
+    "hi": {
+      "accuracy": 0.82,
+      "llm_share": 0.13
+    },
+    "kn": {
+      "accuracy": 0.792,
+      "llm_share": 0.158
+    },
+    "pooled": {
+      "accuracy": 0.838,
+      "llm_share": 0.108
+    }
+  },
+  "cpu_latency_single_message_1_thread": {
+    "median_ms": 25.63,
+    "p95_ms": 40.11,
+    "n": 200
+  },
+  "size_mb": {
+    "pytorch_checkpoint": 950.5,
+    "onnx_small": 167.6
+  },
+  "peak_memory_mb_load_and_predict": 312.8
+}

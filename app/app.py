@@ -8,7 +8,9 @@ GET  /         demo page
 
 Env:
   ROUTER_DISABLE_LLM=1       small model only (used for load tests, saves API quota)
-  ROUTER_MODEL_DIR           default models/small
+  ROUTER_MODEL_DIR           default models/small (PyTorch checkpoint)
+  ROUTER_ONNX_DIR            use the small ONNX model in this folder instead (e.g. models/onnx), no PyTorch
+  ROUTER_ONNX_THREADS        onnxruntime threads (default 1)
   ROUTER_LLM_MAX_PER_MIN=N   at most N LLM calls per minute per worker process (0 = no limit); protects the
                              API quota on a public demo. Over the limit, unsure messages get small_fallback.
 """
@@ -60,6 +62,26 @@ class TorchSmallModel:
             probs = torch.softmax(logits / self.T, -1)
             conf, idx = probs.max(-1)
         return self.labels[int(idx)], float(conf)
+
+
+class OnnxSmallModel:
+    """The shrunken ONNX model (scripts/quantize.py) on onnxruntime: no PyTorch, fits a 512 MB server."""
+
+    def __init__(self, model_dir: Path, temperature: float, labels: list[str], threads: int = 1):
+        from router.onnx_model import OnnxIntentModel
+
+        self.model = OnnxIntentModel(model_dir, threads=threads)
+        self.T = temperature
+        self.labels = labels
+
+    def predict(self, text: str) -> tuple[str, float]:
+        import numpy as np
+
+        z = self.model.logits([text])[0] / self.T
+        p = np.exp(z - z.max())
+        p /= p.sum()
+        i = int(p.argmax())
+        return self.labels[i], float(p[i])
 
 
 def read_settings(root: Path = ROOT) -> dict:
@@ -122,8 +144,13 @@ def create_app(small: SmallModel | None = None, llm_fn: Callable[[str], str] | N
         settings = read_settings()
         threshold = settings["threshold"] if threshold is None else threshold
         if small is None:
-            model_dir = Path(os.environ.get("ROUTER_MODEL_DIR", ROOT / "models" / "small"))
-            small = TorchSmallModel(model_dir, settings["temperature"], labels)
+            onnx_dir = os.environ.get("ROUTER_ONNX_DIR")
+            if onnx_dir:
+                small = OnnxSmallModel(ROOT / onnx_dir, settings["temperature"], labels,
+                                       threads=int(os.environ.get("ROUTER_ONNX_THREADS", "1")))
+            else:
+                model_dir = Path(os.environ.get("ROUTER_MODEL_DIR", ROOT / "models" / "small"))
+                small = TorchSmallModel(model_dir, settings["temperature"], labels)
         if use_llm and llm_fn is None:
             llm_fn = build_llm_fn(labels, settings["prompt_version"])
     if not use_llm:

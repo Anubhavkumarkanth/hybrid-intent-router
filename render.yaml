@@ -1,0 +1,22 @@
+# Render blueprint: the live demo on Render's free plan (512 MB RAM).
+# It runs the shrunken ONNX model (scripts/quantize.py) with onnxruntime, so PyTorch is not installed.
+# Render's own load balancer sits in front, so NGINX is not needed here.
+services:
+  - type: web
+    name: hybrid-intent-router
+    runtime: python
+    plan: free
+    region: singapore
+    buildCommand: pip install -r deploy/render/requirements.txt && python deploy/render/fetch_model.py
+    startCommand: gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 4 --timeout 120 "app.app:make_app()"
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.3
+      - key: ROUTER_ONNX_DIR
+        value: models/onnx
+      - key: ROUTER_LLM_MAX_PER_MIN
+        value: "10"
+      - key: GEMINI_API_KEY
+        sync: false
