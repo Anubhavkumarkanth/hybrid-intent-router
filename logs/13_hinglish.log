@@ -1,0 +1,44 @@
+  hinglish: 20/500
+  hinglish: 40/500
+  hinglish: 60/500
+  hinglish: 80/500
+  hinglish: 100/500
+  hinglish: 120/500
+  hinglish: 140/500
+  hinglish: 160/500
+  hinglish: 180/500
+  hinglish: 200/500
+  hinglish: 220/500
+  hinglish: 240/500
+  hinglish: 260/500
+  hinglish: 280/500
+  hinglish: 300/500
+  hinglish: 320/500
+  hinglish: 340/500
+  hinglish: 360/500
+  hinglish: 380/500
+  hinglish: 400/500
+  hinglish: 420/500
+  hinglish: 440/500
+  hinglish: 460/500
+  hinglish: 480/500
+  hinglish: 500/500
+{
+  "n": 500,
+  "threshold": 0.56,
+  "temperature": 1.342,
+  "small_only_acc": 0.8,
+  "llm_only_acc": 0.85,
+  "router_acc": 0.834,
+  "llm_share": 0.082,
+  "oracle_acc": 0.916,
+  "llm_invalid": 0,
+  "english_same_sentences": {
+    "small_only_acc": 0.882,
+    "llm_only_acc": 0.862,
+    "router_acc": 0.906,
+    "llm_share": 0.038
+  },
+  "how_made": "The 500 English test_sub sentences rewritten as casual Hinglish by the same Gemini model; intent labels are MASSIVE's. T and t are the ones chosen on dev data, not re-tuned.",
+  "caveat": "The same LLM family wrote and classifies the Hinglish, which may flatter the LLM-only number."
+}

@@ -1,0 +1,51 @@
+{
+  "n": 500,
+  "threshold": 0.56,
+  "temperature": 1.342,
+  "small_only_acc": 0.8,
+  "llm_only_acc": 0.85,
+  "router_acc": 0.834,
+  "llm_share": 0.082,
+  "oracle_acc": 0.916,
+  "llm_invalid": 0,
+  "english_same_sentences": {
+    "small_only_acc": 0.882,
+    "llm_only_acc": 0.862,
+    "router_acc": 0.906,
+    "llm_share": 0.038
+  },
+  "how_made": "The 500 English test_sub sentences rewritten as casual Hinglish by the same Gemini model; intent labels are MASSIVE's. T and t are the ones chosen on dev data, not re-tuned.",
+  "caveat": "The same LLM family wrote and classifies the Hinglish, which may flatter the LLM-only number.",
+  "examples": [
+    {
+      "english": "quiet",
+      "hinglish": "chup",
+      "intent": "audio_volume_mute"
+    },
+    {
+      "english": "olly turn the lights off in the bedroom",
+      "hinglish": "olly bedroom ki lights off kar do",
+      "intent": "iot_hue_lightoff"
+    },
+    {
+      "english": "i want the status on my screen brightness",
+      "hinglish": "meri screen brightness ka status kya hai",
+      "intent": "general_quirky"
+    },
+    {
+      "english": "tell me about my alarms",
+      "hinglish": "mere alarms ke baare mein batao",
+      "intent": "alarm_query"
+    },
+    {
+      "english": "lower the lights",
+      "hinglish": "lights kam kar do",
+      "intent": "iot_hue_lightdim"
+    },
+    {
+      "english": "can they do delivery",
+      "hinglish": "kya ye delivery karte hain",
+      "intent": "takeaway_query"
+    }
+  ]
+}

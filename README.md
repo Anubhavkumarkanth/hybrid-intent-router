@@ -5,6 +5,15 @@ A small model trained only on English answers 89% of English, Hindi and Kannada 
 Live demo: https://hybrid-intent-router.onrender.com (free server, so the first request after a quiet spell
 takes a few seconds while it wakes up). The API is at `/predict`, as described below.
 
+On the live site you can:
+
+- speak or type in English, Hindi, Kannada or Hinglish, and hear the reply (the browser's speech recognition
+  and speech synthesis);
+- watch it do the task for some intents: live weather (Open-Meteo), the time in any city, currency conversion
+  (European Central Bank rates), maths, word meanings and jokes (`src/router/actions.py`);
+- see a live dashboard of real traffic: requests per hour, how many needed the LLM, latency, LLM cost avoided,
+  languages and top intents. It is stored in PostgreSQL (`src/router/metrics.py`) and keeps no message text.
+
 Before a voice bot can do anything, it has to work out what the customer wants: their *intent*, such as
 `alarm_set` or `weather_query`. You could send every message to a large language model (LLM), but each call
 is a network round trip and costs money. So I fine-tuned a small multilingual model in plain PyTorch on
@@ -186,6 +195,24 @@ ECE = expected calibration error (lower is better), 15 bins.
 | p95 latency | 260 ms |
 | p99 latency | 300 ms |
 <!-- RESULTS:loadtest:END -->
+
+## Hinglish: how most Indian users actually type
+
+Many people in India type Hindi in the Latin alphabet, mixed with English ("kal subah 6 baje alarm laga do").
+To test that, `scripts/hinglish.py` (`make hinglish`) asked Gemini to rewrite the 500 English test sentences
+as casual Hinglish, keeping MASSIVE's intent labels, then ran the router on them with the same threshold:
+
+<!-- RESULTS:hinglish:START -->
+| Same 500 test sentences | Small model only | LLM only | Router | Sent to LLM |
+|---|---|---|---|---|
+| English | 88.2% | 86.2% | 90.6% | 3.8% |
+| Hinglish | 80.0% | 85.0% | 83.4% | 8.2% |
+
+The 500 English test_sub sentences rewritten as casual Hinglish by the same Gemini model; intent labels are MASSIVE's. T and t are the ones chosen on dev data, not re-tuned. The same LLM family wrote and classifies the Hinglish, which may flatter the LLM-only number.
+<!-- RESULTS:hinglish:END -->
+
+The small model never saw Hinglish in training and still does better on it than on Hindi in Devanagari
+script; MuRIL was pre-trained with transliterated text, which is the likely reason.
 
 ## Live demo and how it fits on a free server
 

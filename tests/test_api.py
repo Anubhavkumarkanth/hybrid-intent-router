@@ -66,7 +66,38 @@ def test_index_shows_headline_numbers_from_results():
     html = client().get("/").get_data(as_text=True)
     routing = json.loads((Path(__file__).resolve().parents[1] / "results" / "routing.json").read_text())
     assert f"{routing['test_sub']['pooled']['router_acc'] * 100:.1f}%" in html
-    assert "All 60 intents" in html and "page-data" in html
+    assert "Live dashboard" in html and "page-data" in html and "/api/" not in html.split("<script")[0]
+
+
+def test_predict_does_the_task_and_records_metrics_without_text(monkeypatch):
+    from router import actions as A
+    from router.metrics import MetricsStore
+    from tests.test_metrics import FakePostgres
+
+    monkeypatch.setattr(A, "run_action", lambda intent, text: {"kind": "maths", "title": "2 + 2", "reply": "2 + 2 = 4",
+                                                                "detail": {"value": 4}, "source": "calculator"})
+    db = FakePostgres()
+    app = create_app(small=FakeTop(0.9), llm_fn=None, threshold=0.5, use_llm=False,
+                     metrics=MetricsStore(db, background=False))
+    c = app.test_client()
+    j = c.post("/predict", json={"text": "what is two plus two my secret", "lang": "en", "voice": True}).get_json()
+    assert j["reply"] == "2 + 2 = 4" and j["action"]["kind"] == "maths" and j["language"] == "en"
+    s = c.get("/api/metrics").get_json()
+    assert s["total"] == 1 and s["voice"] == 1 and s["actions"] == {"maths": 1}
+    assert not any("secret" in str(v) for row in db.rows for v in row)  # the message text is never stored
+
+
+def test_reply_for_intent_without_action_and_language_guess():
+    from app.app import script_language
+
+    j = client(conf=0.9).post("/predict", json={"text": "x"}).get_json()
+    assert j["action"] is None and j["reply"] == "Got it. You want me to set an alarm."
+    assert script_language("मुझे जगा दो") == "hi" and script_language("ಹಾಡು ಹಾಕು") == "kn"
+    assert script_language("wake me up") == "en"
+
+
+def test_metrics_endpoint_is_off_without_a_store():
+    assert client().get("/api/metrics").status_code == 404
 
 
 def test_rate_limit_zero_means_unlimited():
@@ -91,7 +122,7 @@ def test_read_settings_takes_threshold_and_temperature_from_routing_json(tmp_pat
 
 def test_index_page():
     r = client().get("/")
-    assert r.status_code == 200 and b"textarea" in r.data
+    assert r.status_code == 200 and b"id=\"text\"" in r.data and b"id=\"mic\"" in r.data
 
 
 def test_confident_uses_small_model():

@@ -1,0 +1,500 @@
+{"id": "3", "text": "chup", "intent": "audio_volume_mute", "label": 4, "english": "quiet"}
+{"id": "19", "text": "olly bedroom ki lights off kar do", "intent": "iot_hue_lightoff", "label": 25, "english": "olly turn the lights off in the bedroom"}
+{"id": "41", "text": "meri screen brightness ka status kya hai", "intent": "general_quirky", "label": 20, "english": "i want the status on my screen brightness"}
+{"id": "63", "text": "mere alarms ke baare mein batao", "intent": "alarm_query", "label": 0, "english": "tell me about my alarms"}
+{"id": "158", "text": "lights kam kar do", "intent": "iot_hue_lightdim", "label": 24, "english": "lower the lights"}
+{"id": "169", "text": "kya ye delivery karte hain", "intent": "takeaway_query", "label": 54, "english": "can they do delivery"}
+{"id": "174", "text": "thursday subah saat baje ka alarm set kar do", "intent": "alarm_set", "label": 2, "english": "set wake up thursday seven am"}
+{"id": "178", "text": "international news batao", "intent": "news_query", "label": 37, "english": "tell me international news"}
+{"id": "319", "text": "aaj se do din baad barcelona ka mausam kaisa hoga", "intent": "weather_query", "label": 59, "english": "tell me the weather in barcelona in two days from now"}
+{"id": "334", "text": "mujhe san fransico ka weather jaan na hai", "intent": "weather_query", "label": 59, "english": "i wish to know the weather in san fransico"}
+{"id": "391", "text": "meri playlist se koi bhi random song chalao", "intent": "play_music", "label": 40, "english": "play a random song from my playlist"}
+{"id": "397", "text": "joe prsaise ka koi bhi gaana play karo", "intent": "play_music", "label": 40, "english": "play any song by joe prsaise"}
+{"id": "399", "text": "pehla alarm hata do", "intent": "alarm_remove", "label": 1, "english": "remove the first alarm"}
+{"id": "407", "text": "kya tum agle ek ghante ke liye rock music play kar sakte ho", "intent": "play_music", "label": 40, "english": "can you play rock music for the next hour"}
+{"id": "428", "text": "bathroom ki lights off kar do", "intent": "iot_hue_lightoff", "label": 25, "english": "turn off the bathroom lights"}
+{"id": "437", "text": "bad religion folder open karo", "intent": "play_music", "label": 40, "english": "open bad religion folder"}
+{"id": "441", "text": "latest news headlines kya hain", "intent": "news_query", "label": 37, "english": "what are the latest news headlines"}
+{"id": "456", "text": "bedroom ki lights ko green kar do", "intent": "iot_hue_lightchange", "label": 23, "english": "change the bedroom lights to green"}
+{"id": "494", "text": "koi accha sa joke sunao", "intent": "general_joke", "label": 19, "english": "what's a good joke"}
+{"id": "506", "text": "major lazer ke gaane open karo", "intent": "play_music", "label": 40, "english": "open songs from major lazer"}
+{"id": "533", "text": "subah nau baje ka alarm set kar do", "intent": "alarm_set", "label": 2, "english": "set an alarm for nine am"}
+{"id": "560", "text": "subah aath baje wala alarm band kar do", "intent": "alarm_remove", "label": 1, "english": "turn off eight am alarm"}
+{"id": "576", "text": "playlist se all by chalao", "intent": "play_music", "label": 40, "english": "play all by playlist"}
+{"id": "631", "text": "dakota pipeline news ke liye notification laga do", "intent": "news_query", "label": 37, "english": "set notification for news about the dakota pipeline"}
+{"id": "651", "text": "room ki lights band kar do", "intent": "iot_hue_lightoff", "label": 25, "english": "turn off room lights"}
+{"id": "680", "text": "bitcoin price ke bare mein mujhe batate raho", "intent": "news_query", "label": 37, "english": "keep me informed about bitcoin price"}
+{"id": "738", "text": "aaj bahar kitni thand hai", "intent": "weather_query", "label": 59, "english": "how cold is it outside today"}
+{"id": "861", "text": "mere set kiye hue alarms dikhao", "intent": "alarm_query", "label": 0, "english": "my set alarms"}
+{"id": "864", "text": "robot vacuum se living room abhi saaf karwao", "intent": "iot_cleaning", "label": 21, "english": "robot vacuum the living room now"}
+{"id": "939", "text": "subah saat baje ka mera alarm set kar do", "intent": "alarm_set", "label": 2, "english": "set my alarm for seven am"}
+{"id": "962", "text": "lights ki brightness badha do", "intent": "iot_hue_lightup", "label": 27, "english": "increase the brightness of the lights"}
+{"id": "974", "text": "abhi new york mein kya time hua hai", "intent": "datetime_query", "label": 13, "english": "what time is it in new york now"}
+{"id": "1007", "text": "meri rock playlist se creed chalao", "intent": "play_music", "label": 40, "english": "play creed from my rock playlist"}
+{"id": "1043", "text": "sabse paas wale thai restaurant ko call karo jo delivery deta hai", "intent": "takeaway_order", "label": 53, "english": "call the nearest thai restaurant with delivery"}
+{"id": "1071", "text": "hallway ki lights ko aur tez kar do", "intent": "iot_hue_lightup", "label": 27, "english": "brighten the lights in the hallway"}
+{"id": "1076", "text": "rock metal mat play karo", "intent": "music_dislikeness", "label": 33, "english": "do not play rock metal"}
+{"id": "1084", "text": "user friendly", "intent": "news_query", "label": 37, "english": "user friendly"}
+{"id": "1158", "text": "ek joke sunao", "intent": "general_joke", "label": 19, "english": "crack a joke"}
+{"id": "1301", "text": "trump ki nayi foreign policy ke bare mein batao", "intent": "news_query", "label": 37, "english": "tell me about the new foreign policy of trump"}
+{"id": "1318", "text": "music app kholo aur mere liye ek song chalao", "intent": "play_music", "label": 40, "english": "start music app and play a song for me"}
+{"id": "1400", "text": "main zyadatar dhyan deta hoon", "intent": "weather_query", "label": 59, "english": "i mostly pay attention"}
+{"id": "1404", "text": "kya mujhe costa mesa ka kal ka mausam mil sakta hai", "intent": "weather_query", "label": 59, "english": "can i please have the weather for tomorrow here in costa mesa"}
+{"id": "1425", "text": "mujhe batana jab france ke baare mein pata chale", "intent": "news_query", "label": 37, "english": "let me know when you hear about france"}
+{"id": "1428", "text": "mujhe kuch red lighting chahiye", "intent": "iot_hue_lightchange", "label": 23, "english": "i'd like some red lighting"}
+{"id": "1449", "text": "saal do hazaar atharah mein easter kab hai", "intent": "datetime_query", "label": 13, "english": "when is easter in the year two thousand and eighteen"}
+{"id": "1483", "text": "maine kaunse alarms set kiye hain", "intent": "alarm_query", "label": 0, "english": "what alarms did i set"}
+{"id": "1516", "text": "domino's se sausage wali ek pizza order karo", "intent": "takeaway_order", "label": 53, "english": "order a pizza with sausage from domino's"}
+{"id": "1537", "text": "germany ka current time dikhao", "intent": "datetime_query", "label": 13, "english": "show me the current time in germany"}
+{"id": "1551", "text": "wemo on kar do", "intent": "iot_wemo_on", "label": 29, "english": "turn on wemo"}
+{"id": "1630", "text": "current music ka volume badha do", "intent": "audio_volume_up", "label": 6, "english": "raise the volume of the current music"}
+{"id": "1710", "text": "music mode ko rock mein change kar do", "intent": "music_settings", "label": 36, "english": "change the music mode to rock"}
+{"id": "1715", "text": "volume pachaas percent kam kar do", "intent": "audio_volume_down", "label": 3, "english": "lower volume by fifty percent"}
+{"id": "1745", "text": "tumhe yeh song pasand hai", "intent": "music_likeness", "label": 34, "english": "you like the song"}
+{"id": "1777", "text": "next song chalao", "intent": "play_music", "label": 40, "english": "next song"}
+{"id": "1804", "text": "aur lights on karo please", "intent": "iot_hue_lightup", "label": 27, "english": "more lights please"}
+{"id": "1831", "text": "pizza hut se ek pizza order karo", "intent": "takeaway_order", "label": 53, "english": "order one pizza from pizza hut"}
+{"id": "2007", "text": "please thirteen play karo", "intent": "play_music", "label": 40, "english": "please play thirteen"}
+{"id": "2082", "text": "light badhao", "intent": "iot_hue_lightup", "label": 27, "english": "raise the light"}
+{"id": "2160", "text": "main ab sone ja raha hoon", "intent": "iot_hue_lightoff", "label": 25, "english": "i'm going to sleep now"}
+{"id": "2165", "text": "kya dinner taiyar hai", "intent": "takeaway_query", "label": 54, "english": "is dinner ready yet"}
+{"id": "2174", "text": "hotel california ka singer kaun hai", "intent": "music_query", "label": 35, "english": "who is the singer of hotel california"}
+{"id": "2258", "text": "kya aaj mujhe sweater pehnne ki zaroorat hai", "intent": "weather_query", "label": 59, "english": "do i need a sweater today"}
+{"id": "2271", "text": "maine jo songs purchase aur favorite kiye hain woh play karo", "intent": "play_music", "label": 40, "english": "please play songs i've purchased and favorited"}
+{"id": "2311", "text": "alexa lights ko seven tak down kar do", "intent": "iot_hue_lightdim", "label": 24, "english": "alexa turn the lights down to seven"}
+{"id": "2322", "text": "kal ka mausam kaisa rahega", "intent": "weather_query", "label": 59, "english": "what's the weather like tomorrow"}
+{"id": "2334", "text": "kal subah chhe baje ka ek alarm laga do", "intent": "alarm_set", "label": 2, "english": "add an alarm for tomorrow morning at six am"}
+{"id": "2373", "text": "song ki info do", "intent": "music_query", "label": 35, "english": "song info"}
+{"id": "2400", "text": "kitna pyara gana hai please ise mere liye save kar lo", "intent": "music_likeness", "label": 34, "english": "isn't it a lovely song please save this for me"}
+{"id": "2438", "text": "tech news bhejo", "intent": "news_query", "label": 37, "english": "send tech news"}
+{"id": "2472", "text": "kya abhi main jahan hoon wahan ka time sahi hai", "intent": "datetime_query", "label": 13, "english": "is the time currently correct for where i am located"}
+{"id": "2527", "text": "classic rock play karo", "intent": "play_music", "label": 40, "english": "play classic rock"}
+{"id": "2542", "text": "bedroom ki lights red kar do aur hall ki normal color please", "intent": "iot_hue_lightchange", "label": 23, "english": "make the bedroom lights red and the hall lights normal color please"}
+{"id": "2551", "text": "mere ghar ki lights ko green kar do", "intent": "iot_hue_lightchange", "label": 23, "english": "change the lights in my home to green"}
+{"id": "2564", "text": "please agle friday subah chhe baje ka alarm set kar do", "intent": "alarm_set", "label": 2, "english": "please set the alarm for next friday at six thirty am"}
+{"id": "2594", "text": "latest environmental news ke bare mein batao", "intent": "news_query", "label": 37, "english": "tell me about the latest environmental news"}
+{"id": "2780", "text": "kya koi upcoming concerts hain by", "intent": "music_likeness", "label": 34, "english": "are there any upcoming concerts by"}
+{"id": "2798", "text": "alexa song over the rainbow play karo", "intent": "play_music", "label": 40, "english": "alexa play song over the rainbow"}
+{"id": "2801", "text": "london mein abhi kya time hua hai", "intent": "datetime_query", "label": 13, "english": "what time is it in london"}
+{"id": "2840", "text": "agle mahine ki do tareekh ko kaun sa din padega", "intent": "datetime_query", "label": 13, "english": "the second of next mont lands on what day"}
+{"id": "2887", "text": "please subah ki news mein weather se related koi articles dikhao", "intent": "news_query", "label": 37, "english": "please show me any articles related to weather in the morning news"}
+{"id": "2898", "text": "election ke bare mein koi update hai kya", "intent": "news_query", "label": 37, "english": "are there any updates in regard to the election"}
+{"id": "2960", "text": "vacuum on kar do", "intent": "iot_cleaning", "label": 21, "english": "start the vacuum"}
+{"id": "2995", "text": "stock market se judi news batao", "intent": "qa_stock", "label": 47, "english": "please tell me news related to the stock market"}
+{"id": "3011", "text": "light on kar do mere liye", "intent": "iot_hue_lightup", "label": 27, "english": "retrieve the light for me"}
+{"id": "3114", "text": "mujhe yeh music bahut pasand hai kya tum isko meri dance playlist mein save kar sakte ho aur yaad rakhna ki yeh mujhe pasand hai", "intent": "music_likeness", "label": 34, "english": "i love this music can you please save this to my dance playlist and remember that i like it"}
+{"id": "3116", "text": "pichle saal ka mera favorite song play karo", "intent": "play_music", "label": 40, "english": "play my favorite song from last year"}
+{"id": "3128", "text": "olly is mahine kitne tornadoes aaye hain", "intent": "general_quirky", "label": 20, "english": "olly how many tornadoes have there been this month"}
+{"id": "3178", "text": "yeh gana kaun se saal mein aaya tha", "intent": "music_query", "label": 35, "english": "what year did this song come out"}
+{"id": "3196", "text": "hey olly kya tum mere liye ek creamy coffee bana sakte ho", "intent": "iot_coffee", "label": 22, "english": "hey olly can you please make me a creamy coffee"}
+{"id": "3214", "text": "trump ke russia ke sath rishton ki investigation ka abhi kya haal hai", "intent": "news_query", "label": 37, "english": "what is the current state of the investigation into trump's ties with russia"}
+{"id": "3329", "text": "mujhe news dekhni hai", "intent": "news_query", "label": 37, "english": "i want to see the news"}
+{"id": "3330", "text": "mujhe ek joke sunna hai", "intent": "general_joke", "label": 19, "english": "i want to hear a joke"}
+{"id": "3406", "text": "dus din ka forecast kya hai", "intent": "weather_query", "label": 59, "english": "what is the ten day forecast"}
+{"id": "3407", "text": "is hafte baarish ya snow ka koi forecast hai kya", "intent": "weather_query", "label": 59, "english": "are there any forecasts of rain or snow this week"}
+{"id": "3408", "text": "kya is weekend mausam achha rahega", "intent": "weather_query", "label": 59, "english": "is the weather going to be nice this weekend"}
+{"id": "3435", "text": "latest alarm hata do", "intent": "alarm_remove", "label": 1, "english": "remove the latest alarm"}
+{"id": "3460", "text": "quiet time kar do", "intent": "audio_volume_mute", "label": 4, "english": "quiet time"}
+{"id": "3507", "text": "forecast mein snow hai kya", "intent": "weather_query", "label": 59, "english": "is there snow in the forecast"}
+{"id": "3532", "text": "please time zone change karke canada kar do", "intent": "datetime_convert", "label": 12, "english": "please change time zone to canada"}
+{"id": "3671", "text": "kya main is restaurant ke sath continue kar sakta hoon", "intent": "takeaway_query", "label": 54, "english": "can i carry out with this restaurant"}
+{"id": "3702", "text": "olly kal ke liye koi alarm set hai kya", "intent": "alarm_query", "label": 0, "english": "olly do i have an alarm set for tomorrow"}
+{"id": "3714", "text": "meri playlist niche se play karna start karo", "intent": "play_music", "label": 40, "english": "play my playlist starting from the bottom"}
+{"id": "3775", "text": "mujhe smart socket abhi off chahiye", "intent": "iot_wemo_off", "label": 28, "english": "i want the smart socket off now"}
+{"id": "3779", "text": "youtube playlist blank chalao", "intent": "play_music", "label": 40, "english": "play youtube playlist blank"}
+{"id": "3812", "text": "pandra min ke liye mute kar do", "intent": "audio_volume_mute", "label": 4, "english": "mute for fifteen minutes"}
+{"id": "3894", "text": "wo wapas padho", "intent": "play_audiobook", "label": 38, "english": "read that back"}
+{"id": "3960", "text": "time kya hua hai batao", "intent": "datetime_query", "label": 13, "english": "say the time"}
+{"id": "4024", "text": "please power down kar do", "intent": "iot_wemo_off", "label": 28, "english": "please power down"}
+{"id": "4137", "text": "kya tum confirm kar sakte ho ki paradise takeaway deta hai", "intent": "takeaway_query", "label": 54, "english": "could you please confirm if paradise does takeaway"}
+{"id": "4155", "text": "volume ko paintees percent kar do", "intent": "audio_volume_other", "label": 5, "english": "change volume to thirty five percent"}
+{"id": "4168", "text": "kansas ka mausam check kar do please", "intent": "weather_query", "label": 59, "english": "please check the weather in kansas"}
+{"id": "4187", "text": "hey siri time kya ho raha hai", "intent": "datetime_query", "label": 13, "english": "hey siri what's the time"}
+{"id": "4205", "text": "mujhe rush ka limelight sunna hai", "intent": "play_music", "label": 40, "english": "i want to hear limelight by rush"}
+{"id": "4244", "text": "olly coffee machine on kar do mere liye coffee banane ke liye", "intent": "iot_coffee", "label": 22, "english": "olly turn on the coffee machine to make me some coffee"}
+{"id": "4248", "text": "ghar ki lights blue kar do", "intent": "iot_hue_lightchange", "label": 23, "english": "house lights blue"}
+{"id": "4254", "text": "united states ke east coast par kya time ho raha hai", "intent": "datetime_query", "label": 13, "english": "what time is it on the east coast of the united states"}
+{"id": "4258", "text": "latest news kya hai", "intent": "news_query", "label": 37, "english": "what's the latest news"}
+{"id": "4290", "text": "kya mujhe aaj raat apne sath jacket leni chahiye", "intent": "weather_query", "label": 59, "english": "should i bring a jacket with me tonight"}
+{"id": "4376", "text": "aaj bahar mausam kaisa hai", "intent": "weather_query", "label": 59, "english": "how is it outside today"}
+{"id": "4377", "text": "abhi ka weather kaisa hai", "intent": "weather_query", "label": 59, "english": "what's the current weather"}
+{"id": "4443", "text": "teen baje coffee machine chalu kar dena", "intent": "iot_coffee", "label": 22, "english": "start the coffee machine at three"}
+{"id": "4463", "text": "march mein kitne saturdays hain", "intent": "datetime_query", "label": 13, "english": "how many saturdays are in march"}
+{"id": "4477", "text": "next song play karo", "intent": "play_music", "label": 40, "english": "play song next"}
+{"id": "4487", "text": "kya thursday ko baarish hogi", "intent": "weather_query", "label": 59, "english": "will it be raining on thursday"}
+{"id": "4587", "text": "meri favorites playlist chalao", "intent": "play_music", "label": 40, "english": "play my favorites"}
+{"id": "4689", "text": "kya tumhe mausam pata hai", "intent": "weather_query", "label": 59, "english": "do you know the weather"}
+{"id": "4702", "text": "google mere speakers on kar do", "intent": "audio_volume_up", "label": 6, "english": "please turn my speakers on google"}
+{"id": "4772", "text": "is time zone mein kya time ho raha hai", "intent": "datetime_query", "label": 13, "english": "tell me the time in this time zone"}
+{"id": "4798", "text": "mujhe roz coffee chahiye", "intent": "iot_coffee", "label": 22, "english": "i want coffee everyday"}
+{"id": "4799", "text": "wemo plug socket on kar do", "intent": "iot_wemo_on", "label": 29, "english": "please turn on the wemo plug socket"}
+{"id": "4813", "text": "dusre city mein kya time hai", "intent": "datetime_query", "label": 13, "english": "what is the time in another city"}
+{"id": "4826", "text": "lights ko pink kar do", "intent": "iot_hue_lightchange", "label": 23, "english": "make the lights pink"}
+{"id": "4921", "text": "mera pehla alarm band kar do", "intent": "alarm_remove", "label": 1, "english": "turn off my first alarm"}
+{"id": "4934", "text": "mera domino's order kab tak aayega", "intent": "takeaway_query", "label": 54, "english": "what time is my domino's order expected to arrive"}
+{"id": "4951", "text": "mujhe abhi ka time jaan na hai", "intent": "datetime_query", "label": 13, "english": "i'd like to know what time it is right now"}
+{"id": "4960", "text": "teesre din ka music chalao", "intent": "play_music", "label": 40, "english": "music third day"}
+{"id": "4985", "text": "haan mujhe chal rahe gaane par opinion save karna hai aur yeh bhi ki kaun sa player is gaane ko support karta hai", "intent": "music_likeness", "label": 34, "english": "yes i like to save opinion on song playing and which player support that song"}
+{"id": "5017", "text": "kya tum coffee bana sakte ho please", "intent": "iot_coffee", "label": 22, "english": "can you please make a coffee"}
+{"id": "5040", "text": "abhi mausam kaisa hai", "intent": "weather_query", "label": 59, "english": "what's the weather now"}
+{"id": "5062", "text": "mujhe eighties ke gaane sunao", "intent": "play_music", "label": 40, "english": "please play me songs from the eighties"}
+{"id": "5122", "text": "check karo ki default alarm set hai kya", "intent": "alarm_query", "label": 0, "english": "check if default alarm is set"}
+{"id": "5127", "text": "kisi ke budget mein meals on wheels ka sach kya hai", "intent": "news_query", "label": 37, "english": "here's the truth about meals on wheels in someone's budget"}
+{"id": "5128", "text": "german ke liye travel ticket confirm kar do", "intent": "transport_ticket", "label": 57, "english": "confirm a travel ticket to german"}
+{"id": "5131", "text": "sanfranscio mein kitna time hua hai batao", "intent": "datetime_query", "label": 13, "english": "please tell me what is the time in sanfranscio"}
+{"id": "5156", "text": "living room ki light off kar do", "intent": "iot_hue_lightoff", "label": 25, "english": "turn the light off in the living room"}
+{"id": "5204", "text": "subah ke aath baje manila time ko new york time mein convert karo", "intent": "datetime_convert", "label": 12, "english": "convert eight am manila time to new york time"}
+{"id": "5221", "text": "speaker ka vibrate off kar do", "intent": "audio_volume_mute", "label": 4, "english": "turn the vibrate off from speaker"}
+{"id": "5243", "text": "siri bathroom ki lights off kar do please", "intent": "iot_hue_lightoff", "label": 25, "english": "siri please turn the lights off in the bathroom"}
+{"id": "5279", "text": "music player mein bas sad song chalao", "intent": "play_music", "label": 40, "english": "please play only sad song in music player"}
+{"id": "5330", "text": "vacuum on karo aur living room clean karo", "intent": "iot_cleaning", "label": 21, "english": "put on the vacuum on now and clean the living room"}
+{"id": "5341", "text": "mujhe time batao", "intent": "datetime_query", "label": 13, "english": "please alert me to the time"}
+{"id": "5347", "text": "techno music play karo", "intent": "play_music", "label": 40, "english": "play techno music"}
+{"id": "5349", "text": "olly thodi dim light kar do", "intent": "iot_hue_lightdim", "label": 24, "english": "olly give me some dim light"}
+{"id": "5370", "text": "trump ki latest controversy kya hai", "intent": "news_query", "label": 37, "english": "what's the latest trump controversy"}
+{"id": "5378", "text": "s.", "intent": "play_music", "label": 40, "english": "s."}
+{"id": "5414", "text": "music chala doge kya", "intent": "play_music", "label": 40, "english": "will you put on the music"}
+{"id": "5475", "text": "subah chhe baje mujhe utha dena", "intent": "alarm_set", "label": 2, "english": "i need you to get me up at six am"}
+{"id": "5481", "text": "volume kam kar do", "intent": "audio_volume_down", "label": 3, "english": "cut down the volume"}
+{"id": "5544", "text": "is gaane ka music director kaun hai", "intent": "music_query", "label": 35, "english": "who is the music director of this song"}
+{"id": "5550", "text": "koi aawaz mat karo", "intent": "audio_volume_mute", "label": 4, "english": "don't make any sounds"}
+{"id": "5614", "text": "abhi radio par kya chal raha hai", "intent": "music_query", "label": 35, "english": "what's on the radio right now"}
+{"id": "5652", "text": "wemo plug socket off kar do", "intent": "iot_wemo_off", "label": 28, "english": "switch wemo plug socket off"}
+{"id": "5658", "text": "beatles ka music play karo mere liye", "intent": "play_music", "label": 40, "english": "play for me the music by the beatles"}
+{"id": "5691", "text": "opinion petabit", "intent": "music_likeness", "label": 34, "english": "opinion petabit"}
+{"id": "5697", "text": "vacuuming shuru karo", "intent": "iot_cleaning", "label": 21, "english": "begin vacuuming"}
+{"id": "5707", "text": "meri favorites sunao", "intent": "play_music", "label": 40, "english": "listen to my favorites"}
+{"id": "5722", "text": "is hafte ka saat din ka forecast dikhao", "intent": "weather_query", "label": 59, "english": "display the seven day forecast for this week"}
+{"id": "5840", "text": "mujhe papa john's se thoda khana order karna hai", "intent": "takeaway_order", "label": 53, "english": "i need to order some food from papa john's"}
+{"id": "5886", "text": "hot topic", "intent": "news_query", "label": 37, "english": "hot topic"}
+{"id": "5919", "text": "new york bridge proposal par latest update kya hai", "intent": "news_query", "label": 37, "english": "what is the latest update on the new york bridge proposal"}
+{"id": "5930", "text": "huffington post se koi breaking news hai kya", "intent": "news_query", "label": 37, "english": "any breaking news from the huffington post"}
+{"id": "5955", "text": "law and order ke maamle mein shehar kitna safe hai", "intent": "weather_query", "label": 59, "english": "how safe is the city regarding law and order"}
+{"id": "5985", "text": "un ki latest news dikhao", "intent": "news_query", "label": 37, "english": "show me the latest news from the un"}
+{"id": "5996", "text": "kya mujhe aaj dopahar mein apne snow boots ki zaroorat padegi", "intent": "weather_query", "label": 59, "english": "will i need my snow boots this afternoon"}
+{"id": "6014", "text": "yeh kaun sa artist hai", "intent": "music_query", "label": 35, "english": "what artist is this"}
+{"id": "6034", "text": "coffee", "intent": "iot_coffee", "label": 22, "english": "coffee"}
+{"id": "6069", "text": "kya aaj toofaan aane ke chances hain", "intent": "weather_query", "label": 59, "english": "are storms likely today"}
+{"id": "6072", "text": "china on the go se khana lene ke liye mujhe kitne minute wait karna padega", "intent": "takeaway_query", "label": 54, "english": "how many minutes do i need to wait to pick up my food from china on the go"}
+{"id": "6073", "text": "porch light off kar do", "intent": "iot_hue_lightoff", "label": 25, "english": "turn off porch light"}
+{"id": "6101", "text": "kya abhi koi alarm set hai", "intent": "alarm_query", "label": 0, "english": "are there any alarms currently set"}
+{"id": "6151", "text": "mujhe aaj ka mausam jaanna hai", "intent": "weather_query", "label": 59, "english": "i want to know today's weather"}
+{"id": "6194", "text": "aaj mausam kaisa hai", "intent": "weather_query", "label": 59, "english": "how's the weather today"}
+{"id": "6229", "text": "mera din bura gaya", "intent": "general_quirky", "label": 20, "english": "i had a bad day"}
+{"id": "6248", "text": "tumhari umar kya hai", "intent": "general_quirky", "label": 20, "english": "how old are you"}
+{"id": "6282", "text": "chalo thodi baat karte hain", "intent": "general_quirky", "label": 20, "english": "lets have a chat"}
+{"id": "6288", "text": "maine uthte hi khana kha liya", "intent": "general_quirky", "label": 20, "english": "i had food as soon as i got up"}
+{"id": "6289", "text": "arey aaj mausam kaisa hai", "intent": "weather_query", "label": 59, "english": "hey what is the weather like today"}
+{"id": "6305", "text": "tum aaj kya karna chahte ho", "intent": "general_quirky", "label": 20, "english": "what do you want to do today"}
+{"id": "6325", "text": "mera din bahut mushkil tha", "intent": "general_quirky", "label": 20, "english": "my day was extremely hard"}
+{"id": "6366", "text": "america me ghumne ke liye kuch behtareen tourist places batao", "intent": "recommendation_locations", "label": 49, "english": "tell me some best tourist places to visit in america"}
+{"id": "6388", "text": "mera din bahut accha gaya", "intent": "general_quirky", "label": 20, "english": "my day was great"}
+{"id": "6402", "text": "mujhe kuch health tips do", "intent": "general_quirky", "label": 20, "english": "give me some health tips"}
+{"id": "6411", "text": "agle budhwar ko mausam kaisa rahega", "intent": "weather_query", "label": 59, "english": "what's the weather next wednesday"}
+{"id": "6495", "text": "kya tum please salah de sakte ho", "intent": "general_quirky", "label": 20, "english": "can you please advise"}
+{"id": "6517", "text": "history", "intent": "general_quirky", "label": 20, "english": "history"}
+{"id": "6582", "text": "hi wahan ho kya", "intent": "general_quirky", "label": 20, "english": "hi you there"}
+{"id": "6600", "text": "health", "intent": "general_quirky", "label": 20, "english": "health"}
+{"id": "6652", "text": "diet par tikhe rehna", "intent": "general_quirky", "label": 20, "english": "sticking to diet"}
+{"id": "6729", "text": "tiffany ke ghar ka breakfast cancel kar do", "intent": "calendar_remove", "label": 8, "english": "cancel the breakfast at tiffany's house"}
+{"id": "6761", "text": "subah nau baje ki meeting mere calendar se hata do", "intent": "calendar_remove", "label": 8, "english": "remove from my calendar meeting at nine am"}
+{"id": "6806", "text": "is friday afternoon mera calendar event dikhana", "intent": "calendar_query", "label": 7, "english": "show me my calendar event this friday afternoon"}
+{"id": "6897", "text": "saat tareekh ko shaam ko paanch baje linda ko pick karne ke liye yaad dila dena", "intent": "calendar_set", "label": 9, "english": "remind me to pick up linda at five in the evening on seventh"}
+{"id": "6902", "text": "agle mahine car ki oil change karane ke liye reminder set kar dena", "intent": "calendar_set", "label": 9, "english": "set a reminder up next month to get my oil changed"}
+{"id": "6926", "text": "kya aaj friday hai", "intent": "calendar_query", "label": 7, "english": "is it friday"}
+{"id": "6946", "text": "kya agle wednesday koi meetings hain", "intent": "calendar_query", "label": 7, "english": "are there any meetings set for next wednesday"}
+{"id": "6962", "text": "kya mujhe pata chal sakta hai ki agle saturday shaam ke chhe baje mera kya kaam hai", "intent": "calendar_set", "label": 9, "english": "can i know what i have to do the next saturday at six p. m."}
+{"id": "6967", "text": "kya aap is issue ke facts check kar sakte hain", "intent": "calendar_query", "label": 7, "english": "can you check the facts on this issue"}
+{"id": "6980", "text": "mujhe to-do list do", "intent": "calendar_query", "label": 7, "english": "give me to do list"}
+{"id": "7025", "text": "calendar se new year hata do", "intent": "calendar_remove", "label": 8, "english": "remove new year from calendar"}
+{"id": "7087", "text": "mere calendar se kal ki meeting cancel kar do", "intent": "calendar_remove", "label": 8, "english": "cancel the tomorrow's meeting from my calendar"}
+{"id": "7111", "text": "tees march ko mera doctor appointment kitne baje hai", "intent": "calendar_query", "label": 7, "english": "what time is my doctor appointment on march thirty first"}
+{"id": "7122", "text": "kya aap is event ko repeat kar sakte hain", "intent": "calendar_set", "label": 9, "english": "could you repeat this event"}
+{"id": "7151", "text": "har odd-numbered sunday ke liye ek reminder set kar do", "intent": "calendar_set", "label": 9, "english": "for every odd numbered sunday set a reminder for"}
+{"id": "7232", "text": "agle hafte kya-kya events hain", "intent": "calendar_query", "label": 7, "english": "what are the events next week"}
+{"id": "7258", "text": "ek ghante baad boss ko email bhejne ka yaad dila dena", "intent": "calendar_set", "label": 9, "english": "remind me to send email to boss after one hour"}
+{"id": "7287", "text": "ek din pehle mujhe meri anniversary ka yaad dila dena", "intent": "calendar_set", "label": 9, "english": "remind me about my anniversary in one day advance"}
+{"id": "7289", "text": "jeff ke sath wale saare events hata do", "intent": "calendar_remove", "label": 8, "english": "get rid of all events with jeff"}
+{"id": "7293", "text": "saturday ke liye ek ghante ka appointment schedule kar do", "intent": "calendar_set", "label": 9, "english": "schedule a one hour appointment for saturday"}
+{"id": "7397", "text": "kya agle teen mahine ke liye koi events planned hain", "intent": "calendar_query", "label": 7, "english": "is there any events planned for the next three months"}
+{"id": "7450", "text": "mujhe is person ke sath ek meeting schedule karwani hai", "intent": "calendar_set", "label": 9, "english": "i need a meeting to be schedule with this person"}
+{"id": "7496", "text": "kya aaj mere koi appointments hain", "intent": "calendar_query", "label": 7, "english": "do i have appointments today"}
+{"id": "7520", "text": "mujhe roz dopahar do baje lunch ke liye remind kar dena", "intent": "calendar_set", "label": 9, "english": "remind me everyday at two p. m. for lunch"}
+{"id": "7528", "text": "tera june election result ka din hai, please ise set kar do", "intent": "calendar_set", "label": 9, "english": "thirteenth june is a day of election result please set it"}
+{"id": "7542", "text": "please mujhe iske baare mein kal yaad dila dena", "intent": "calendar_set", "label": 9, "english": "please remind me about this tomorrow"}
+{"id": "7557", "text": "calendar par location a ka ek reminder bana do", "intent": "calendar_set", "label": 9, "english": "make a reminder of location a on calendar"}
+{"id": "7628", "text": "jab main library mein hoon toh mujhe naya library card lene ke liye yaad dila dena", "intent": "calendar_set", "label": 9, "english": "remind me when i am at the library to get a new library card"}
+{"id": "7662", "text": "kya tum mere aaj ke meetings list kar sakte ho", "intent": "calendar_query", "label": 7, "english": "can you list out my meetings today"}
+{"id": "7690", "text": "aage kya kya hai mere paas", "intent": "calendar_query", "label": 7, "english": "what do i have coming up"}
+{"id": "7693", "text": "kya ikkis tarikh ke liye kuch plan hai mera", "intent": "calendar_query", "label": 7, "english": "do i have anything planned for the twenty first"}
+{"id": "7711", "text": "arey do march ki meri baaki saari meetings aur calls cancel kar do kyunki us din jim ka birthday hai, ise calendar mein ek event ki tarah tag kar do", "intent": "calendar_set", "label": 9, "english": "hey cancel all my other meetings and calls for second march as it is jim's birthday tag it as an event in your calendar"}
+{"id": "7726", "text": "mujhe har monday kuch karna hai, uske liye ek reminder set kar do", "intent": "calendar_set", "label": 9, "english": "i need to something every monday set a reminder for it"}
+{"id": "7730", "text": "mujhe agle monday ko mark karna hai", "intent": "calendar_set", "label": 9, "english": "i need you to mark next monday"}
+{"id": "7768", "text": "please char february ko dopahar do baje king's park mein practice add kar do", "intent": "calendar_set", "label": 9, "english": "please add practice on feb four at king's park at two p. m."}
+{"id": "7817", "text": "kya is date ke baare mein yeh sach hai", "intent": "calendar_query", "label": 7, "english": "is this true about this date"}
+{"id": "7876", "text": "pichle do mahine mein kya kya hua hai", "intent": "news_query", "label": 37, "english": "what's been happening for the last two months"}
+{"id": "8004", "text": "dorothy ko hamare divorce ke baare mein baat karni hai, kya aap please jald se jald ek meeting set kar sakte hain jab main free hoon", "intent": "calendar_set", "label": 9, "english": "dorothy needs to talk to me about our divorce can you please set up a meeting as soon as i am available"}
+{"id": "8013", "text": "agle mahine ki meri meeting dikhao", "intent": "calendar_query", "label": 7, "english": "show me my meeting for the next month"}
+{"id": "8035", "text": "mujhe oil change karwane ke liye yaad dila dena", "intent": "calendar_set", "label": 9, "english": "remind me to get the oil changed"}
+{"id": "8100", "text": "reschedule karne ke liye mere appointments email kar do", "intent": "email_sendemail", "label": 17, "english": "email my appointments to reschedule"}
+{"id": "8129", "text": "mere paas abhi bhi kaun kaun se reminders baaki hain", "intent": "calendar_query", "label": 7, "english": "what reminders do i still have"}
+{"id": "8241", "text": "is saal ke baaki dinon ke liye mera calendar clear kar do", "intent": "calendar_remove", "label": 8, "english": "clear everything off my calendar for the rest of the year"}
+{"id": "8276", "text": "mera agla scheduled appointment hata do please", "intent": "calendar_remove", "label": 8, "english": "remove my next scheduled appointment please"}
+{"id": "8280", "text": "mujhhe pandrah march ke liye reminder set karna hai", "intent": "calendar_set", "label": 9, "english": "i need to set reminder on fifteenth march"}
+{"id": "8358", "text": "mujhe iske baare mein yaad dila dena", "intent": "calendar_set", "label": 9, "english": "remind me about this"}
+{"id": "8426", "text": "kal se lekar aaj subah tak ke current events batao", "intent": "calendar_query", "label": 7, "english": "tell me current events between yesterday and this morning"}
+{"id": "8430", "text": "meri saari appointments cancel kar do", "intent": "calendar_remove", "label": 8, "english": "cancel all my appointments"}
+{"id": "8466", "text": "wednesday ko subah nau baje meri meeting hai mujhe reminder bhej do", "intent": "calendar_set", "label": 9, "english": "i have a nine am meeting on wednesday send me a reminder"}
+{"id": "8562", "text": "aaj do baje p. m. wali meri meeting delete kar do", "intent": "calendar_remove", "label": 8, "english": "delete my meeting for two o'clock p. m. today"}
+{"id": "8568", "text": "kya tum tuesday ko subah gyarah baje brunch ke liye james aur alice ko calendar invite bhej doge", "intent": "calendar_set", "label": 9, "english": "will you send a calendar invite out to james and alice for brunch at eleven am on tuesday"}
+{"id": "8570", "text": "kya tum mark kar doge ki main kal do p. m. ke event ke liye busy hoon", "intent": "calendar_set", "label": 9, "english": "will you mark that i am busy for an event tomorrow at two p. m."}
+{"id": "8598", "text": "mujhe yaad dila dena ki sham ko chhe baje airport se mark ko pick karna hai", "intent": "calendar_set", "label": 9, "english": "remind me to pick up mark at the airport at six p. m."}
+{"id": "8631", "text": "usse mere calendar se erase kar do", "intent": "calendar_remove", "label": 8, "english": "erase that from my calendar"}
+{"id": "8653", "text": "mere calendar mein jo event hai uska reminder de do", "intent": "calendar_set", "label": 9, "english": "remind me of the event in my calendar"}
+{"id": "8670", "text": "calendar se events remove kar do", "intent": "calendar_remove", "label": 8, "english": "remove events from calendar"}
+{"id": "8765", "text": "mera red lobster wala dinner aaj raat nau baje ke liye calendar par daal do", "intent": "calendar_set", "label": 9, "english": "put my dinner at red lobster on the calendar for today at nine"}
+{"id": "8766", "text": "kya saturday pachees march ko meri koi meeting hai", "intent": "calendar_query", "label": 7, "english": "do i have a meeting on saturday march twenty fifth"}
+{"id": "8782", "text": "kya aaj dopahar mein meri koi meeting hai", "intent": "calendar_query", "label": 7, "english": "do i have a meeting this afternoon"}
+{"id": "8825", "text": "agle friday tom ke sath jo meri meeting hai uska reminder mujhe bhej do", "intent": "calendar_set", "label": 9, "english": "send me a reminder of my meeting with tom next friday"}
+{"id": "8857", "text": "eminem ke sath jo aane wali meeting hai uska yaad dila dena", "intent": "calendar_set", "label": 9, "english": "remind upcoming meeting with eminem"}
+{"id": "8867", "text": "olly reminder ke liye alarm set kar do", "intent": "alarm_set", "label": 2, "english": "olly set alarm for reminder"}
+{"id": "8900", "text": "har sunday ke liye repeating reminder set kar do", "intent": "calendar_set", "label": 9, "english": "set repeating reminder for every sunday"}
+{"id": "8904", "text": "recent events ki information do", "intent": "calendar_query", "label": 7, "english": "information of recent events"}
+{"id": "8975", "text": "aaj kya kya meetings scheduled hain", "intent": "calendar_query", "label": 7, "english": "what are meeting scheduled for today"}
+{"id": "9110", "text": "exhibition twenty seventeen mass twenty five march ko corresponding date par note kar lo", "intent": "calendar_set", "label": 9, "english": "exhibition two thousand and seventeen mass on mar twenty five make a note of it on the corresponding date"}
+{"id": "9112", "text": "isey mere calendar par add kar do", "intent": "calendar_set", "label": 9, "english": "do add this on my calendar"}
+{"id": "9124", "text": "agle hafte ke mere work calendar ke events dikhao", "intent": "calendar_set", "label": 9, "english": "show me the events in my work calendar for next week"}
+{"id": "9156", "text": "remind karo", "intent": "calendar_set", "label": 9, "english": "remind"}
+{"id": "9204", "text": "b. b. c. radio chalao", "intent": "play_radio", "label": 42, "english": "start b. b. c. radio"}
+{"id": "9236", "text": "channel one hundred and six point nine par jao", "intent": "play_radio", "label": 42, "english": "go to channel one hundred and six point nine"}
+{"id": "9254", "text": "please nine hundred and thirty eight f. m. radio mirchi tune karo", "intent": "play_radio", "label": 42, "english": "please tune nine hundred and thirty eight f. m. radio mirchi"}
+{"id": "9301", "text": "ek f. m. chalao", "intent": "play_radio", "label": 42, "english": "play an f. m."}
+{"id": "9364", "text": "chalo music hits play karte hain", "intent": "play_radio", "label": 42, "english": "let's play music hits"}
+{"id": "9394", "text": "hey olly radio play karo", "intent": "play_radio", "label": 42, "english": "hey olly play the radio"}
+{"id": "9406", "text": "sirius xm radio channel start karo", "intent": "play_radio", "label": 42, "english": "start sirius xm radio channel"}
+{"id": "9408", "text": "radio play start karo", "intent": "play_radio", "label": 42, "english": "start radio play"}
+{"id": "9426", "text": "mujhe ek aisa station sunna hai jo r. & b. play karta ho", "intent": "play_radio", "label": 42, "english": "i want to hear a station that plays r. & b."}
+{"id": "9460", "text": "nineties hip hop play karo", "intent": "play_music", "label": 40, "english": "play nineties hip hop"}
+{"id": "9541", "text": "radio par sweet song play karo", "intent": "play_radio", "label": 42, "english": "play the sweet song on radio"}
+{"id": "9569", "text": "ok google one hundred and six point seven play karo", "intent": "play_radio", "label": 42, "english": "ok google play one hundred and six point seven"}
+{"id": "9630", "text": "mere liye radio mirchi play karo", "intent": "play_radio", "label": 42, "english": "play radio mirchi for me"}
+{"id": "9676", "text": "karl pilkington wali audio book resume kar do", "intent": "play_audiobook", "label": 38, "english": "resume my audio book from karl pilkington"}
+{"id": "9718", "text": "animal farm resume karo", "intent": "play_audiobook", "label": 38, "english": "resume animal farm"}
+{"id": "9738", "text": "kya tum mere liye classical music play kar sakte ho", "intent": "play_music", "label": 40, "english": "could you please play the classical music for me"}
+{"id": "9760", "text": "play stop karo", "intent": "play_audiobook", "label": 38, "english": "stop play"}
+{"id": "9793", "text": "romantic songs play karo", "intent": "play_music", "label": 40, "english": "play the romantic songs"}
+{"id": "9844", "text": "jo audio book main sun raha tha uska last chapter continue karo", "intent": "play_audiobook", "label": 38, "english": "continue the last chapter of the audio book i was listening to"}
+{"id": "9851", "text": "joe ki book wahan se resume karo jahan maine last chhodi thi", "intent": "play_audiobook", "label": 38, "english": "resume joes book from where i left off last time"}
+{"id": "9897", "text": "tom clancy splinter cell playback karo", "intent": "play_audiobook", "label": 38, "english": "playback tom clancy splinter cell"}
+{"id": "9924", "text": "iski recipe batao", "intent": "cooking_recipe", "label": 11, "english": "tell me the recipe of"}
+{"id": "9940", "text": "mere liye chocolate cake ki recipe dhundo", "intent": "cooking_recipe", "label": 11, "english": "find me a chocolate cake recipe"}
+{"id": "9941", "text": "butter chicken kaise banate hain", "intent": "cooking_recipe", "label": 11, "english": "how do i cook butter chicken"}
+{"id": "9956", "text": "butter ki jagah main kya use kar sakta hu", "intent": "cooking_recipe", "label": 11, "english": "what can i substitute butter with"}
+{"id": "10019", "text": "please batao ki barah oatmeal cookies kaise bake karte hain", "intent": "cooking_recipe", "label": 11, "english": "please tell me how to i bake twelve oatmeal cookies"}
+{"id": "10027", "text": "khana banane ke instructions do", "intent": "cooking_recipe", "label": 11, "english": "instructions to make a meal"}
+{"id": "10038", "text": "mujhe cooking ke liye acche ideas chahiye", "intent": "cooking_recipe", "label": 11, "english": "i need good ideas for cooking"}
+{"id": "10049", "text": "poor boy sandwich kaise banate hain batao", "intent": "cooking_recipe", "label": 11, "english": "tell me how to make a poor boy sandwich"}
+{"id": "10077", "text": "aaj raat ke dinner ke liye koi recipe dhundo", "intent": "cooking_recipe", "label": 11, "english": "find a recipe for dinner tonight"}
+{"id": "10078", "text": "supper ke liye kya cook karu", "intent": "cooking_recipe", "label": 11, "english": "what should i cook for supper"}
+{"id": "10119", "text": "pandra pound turkey ko kitni der tak cook karte hain", "intent": "cooking_recipe", "label": 11, "english": "how long do you cook a fifteen pound turkey"}
+{"id": "10224", "text": "ye tasty hona chahiye", "intent": "cooking_recipe", "label": 11, "english": "it must be taste"}
+{"id": "10263", "text": "chess app kholo aur game shuru karo", "intent": "play_game", "label": 39, "english": "open chess app and begin game"}
+{"id": "10276", "text": "chalo battleship khelte hain", "intent": "play_game", "label": 39, "english": "lets play battleship"}
+{"id": "10333", "text": "saga kholo", "intent": "play_game", "label": 39, "english": "open saga"}
+{"id": "10355", "text": "chess play karo", "intent": "play_game", "label": 39, "english": "play chess"}
+{"id": "10365", "text": "contra ka game second player ki tarah chalu karo", "intent": "play_game", "label": 39, "english": "play a game of contra as a second player"}
+{"id": "10381", "text": "hamare liye ek competitive crossword shuru karo", "intent": "play_game", "label": 39, "english": "start a competitive crossword for us"}
+{"id": "10442", "text": "meri list se events hata do", "intent": "lists_remove", "label": 32, "english": "remove events from my list"}
+{"id": "10494", "text": "stationary se pencil remove kar do", "intent": "lists_remove", "label": 32, "english": "remove pencil from stationary"}
+{"id": "10497", "text": "kya mujhe paris ke five star hotels ki list mil sakti hai", "intent": "qa_factoid", "label": 45, "english": "may i have a list of five star hotels in paris"}
+{"id": "10534", "text": "aaj ki to do list kaisi hai", "intent": "lists_query", "label": 31, "english": "how the to do list for today"}
+{"id": "10621", "text": "menu card mein paav bhaji add kar do", "intent": "lists_createoradd", "label": 30, "english": "add paav bhaji in menu card"}
+{"id": "10667", "text": "list ke schedules recite karo", "intent": "lists_query", "label": 31, "english": "recite the schedules of the list"}
+{"id": "10738", "text": "kya aap please meri grocery list mein ek item add kar sakte ho", "intent": "lists_createoradd", "label": 30, "english": "can you please add an item to my grocery list"}
+{"id": "10743", "text": "wo item remove kar do", "intent": "lists_remove", "label": 32, "english": "remove that item"}
+{"id": "10786", "text": "aaj ki meri activities list clear kar do", "intent": "lists_remove", "label": 32, "english": "clear my activities list for today"}
+{"id": "10804", "text": "meri grocery list padho", "intent": "lists_query", "label": 31, "english": "read my grocery list"}
+{"id": "10832", "text": "olly mera agla kya plan hai", "intent": "calendar_query", "label": 7, "english": "olly what do i have planned next"}
+{"id": "10868", "text": "olly list par kuch aur baaki hai kya", "intent": "lists_query", "label": 31, "english": "olly anything else left on the list"}
+{"id": "10909", "text": "olly meri lists mujhe padh kar sunao", "intent": "lists_query", "label": 31, "english": "olly read my lists to me"}
+{"id": "10931", "text": "meri playlist mein kya hai", "intent": "lists_query", "label": 31, "english": "what is on my playlist"}
+{"id": "10982", "text": "meri grocery list me hamburger daal dena", "intent": "lists_createoradd", "label": 30, "english": "put hamburger on my grocery list"}
+{"id": "10985", "text": "is hafte ke apne saare todos delete kar do", "intent": "lists_remove", "label": 32, "english": "delete my to do's for this week"}
+{"id": "11023", "text": "shopping list hata do", "intent": "lists_remove", "label": 32, "english": "remove shopping list"}
+{"id": "11067", "text": "please meri grocery list me oranges add kar dena", "intent": "lists_createoradd", "label": 30, "english": "please add oranges to my grocery list"}
+{"id": "11085", "text": "shopping list me se milk nikaal do", "intent": "lists_remove", "label": 32, "english": "take out the milk from the shopping list"}
+{"id": "11133", "text": "jo guest list maine pichle hafte banai thi use remove kar do", "intent": "lists_remove", "label": 32, "english": "remove the guest list i created last week"}
+{"id": "11164", "text": "list se away off kar do", "intent": "lists_remove", "label": 32, "english": "away off from list"}
+{"id": "11166", "text": "google keep kholo", "intent": "lists_query", "label": 31, "english": "open google keep"}
+{"id": "11177", "text": "shopping list me ek wrist watch add kar do", "intent": "lists_createoradd", "label": 30, "english": "add a wrist watch to the shopping list"}
+{"id": "11189", "text": "list dhoondo", "intent": "lists_query", "label": 31, "english": "find the list"}
+{"id": "11238", "text": "please mere liye ek nayi list bana do", "intent": "lists_createoradd", "label": 30, "english": "please create a new list for me"}
+{"id": "11250", "text": "meri grocery list mujhe waapas padh ke sunao", "intent": "lists_query", "label": 31, "english": "read back my grocery list to me"}
+{"id": "11303", "text": "next reason podcast play karo", "intent": "play_podcasts", "label": 41, "english": "play next reason podcast"}
+{"id": "11318", "text": "podcast ka agla episode play karo", "intent": "play_podcasts", "label": 41, "english": "play the next episode of a podcast"}
+{"id": "11322", "text": "aaj ke top podcasts kaun se hain", "intent": "play_podcasts", "label": 41, "english": "what are todays top podcasts"}
+{"id": "11340", "text": "kya allearsnet ka koi naya podcast hai", "intent": "play_podcasts", "label": 41, "english": "does allearsnet have a new podcast"}
+{"id": "11418", "text": "duncan trussel ka latest podcast chalao", "intent": "play_podcasts", "label": 41, "english": "play duncan trussel's latest podcast"}
+{"id": "11424", "text": "vitaly channel", "intent": "play_podcasts", "label": 41, "english": "vitaly channel"}
+{"id": "11427", "text": "gilmore guys start karo", "intent": "play_podcasts", "label": 41, "english": "start the gilmore guys"}
+{"id": "11453", "text": "n f l par podcasts start karo", "intent": "play_podcasts", "label": 41, "english": "start podcasts on n. f. l."}
+{"id": "11459", "text": "is podcast ka pichhla episode chalao", "intent": "play_podcasts", "label": 41, "english": "go back to the last episode in this podcast"}
+{"id": "11529", "text": "arey list se mera favorite podcast play karo", "intent": "play_podcasts", "label": 41, "english": "hey play my favorite podcast from list"}
+{"id": "11554", "text": "mujhe podcast sunna hai", "intent": "play_podcasts", "label": 41, "english": "i want you to play the podcast"}
+{"id": "11600", "text": "boston ke is theater mein aaj raat kaun si movie dekh sakta hoon", "intent": "recommendation_events", "label": 48, "english": "what movie can i watch tonight on the theater here in boston"}
+{"id": "11612", "text": "tulsa mein kaun se gun shows hain", "intent": "recommendation_events", "label": 48, "english": "what gun shows are in tulsa"}
+{"id": "11628", "text": "leavenworth mein pharmacy kahan hai", "intent": "recommendation_locations", "label": 49, "english": "where is the pharmacy in leavenworth"}
+{"id": "11633", "text": "cinema mein aaj kaun si movies lag rahi hain", "intent": "recommendation_movies", "label": 50, "english": "what movies are showing in cinema today"}
+{"id": "11664", "text": "olly main ek bar dhoond raha hoon kya tumhe koi acchi pata hai", "intent": "recommendation_locations", "label": 49, "english": "olly i'm looking for a bar do you know a good one"}
+{"id": "11685", "text": "agar tum mujhe hamare area ke events ke baare mein batao toh accha lagega", "intent": "recommendation_events", "label": 48, "english": "i would be happy if you update me the events going on our area"}
+{"id": "11695", "text": "action movies ke liye koi suggestion hai kya", "intent": "recommendation_movies", "label": 50, "english": "do you have any suggestion action movies"}
+{"id": "11845", "text": "olly bay area ke kuch exciting events batao", "intent": "recommendation_events", "label": 48, "english": "olly hit me up with some exciting events in the bay area"}
+{"id": "11860", "text": "local events ke baare mein batao", "intent": "recommendation_events", "label": 48, "english": "tell me the local events"}
+{"id": "11947", "text": "mere aas paas kaun se restaurants hain", "intent": "recommendation_locations", "label": 49, "english": "what are some restaurants near me"}
+{"id": "11969", "text": "kya aas paas kuch khaas ho raha hai", "intent": "recommendation_events", "label": 48, "english": "is there anything special going on nearby"}
+{"id": "11990", "text": "theater mein aisi kaun si movie hai jo acchi ho", "intent": "recommendation_movies", "label": 50, "english": "what's a movie in theaters that doesn't suck"}
+{"id": "12073", "text": "local current events batao", "intent": "recommendation_events", "label": 48, "english": "refer local current events"}
+{"id": "12159", "text": "kya tum mere liye ek uber book kar sakte ho", "intent": "transport_taxi", "label": 56, "english": "can you book an uber for me"}
+{"id": "12244", "text": "ek baje movie jaane ke liye taxi book karo", "intent": "transport_taxi", "label": 56, "english": "book a taxi to go to the movies at one"}
+{"id": "12248", "text": "olly sabse paas wali uber dhoondo", "intent": "transport_taxi", "label": 56, "english": "olly find the nearest uber"}
+{"id": "12261", "text": "agle wednesday ya thursday los angeles ke liye train ke options batao", "intent": "transport_query", "label": 55, "english": "tell me my options for a train to los angles next wednesday or thursday"}
+{"id": "12281", "text": "london se manchester ke liye train ticket book kar do", "intent": "transport_ticket", "label": 57, "english": "please book a train ticket from london to manchester"}
+{"id": "12289", "text": "kya mere route par traffic jam hai", "intent": "transport_traffic", "label": 58, "english": "is there a traffic jam on my route"}
+{"id": "12310", "text": "edinburgh se leeds ki available train tickets ki list do", "intent": "transport_query", "label": 55, "english": "give me the list of available train tickets from edinburgh to leeds"}
+{"id": "12376", "text": "d. c. ke liye pehli metro kab hai", "intent": "transport_query", "label": 55, "english": "what is the first metro to d. c."}
+{"id": "12381", "text": "baltimore maryland se new york new york ke liye train ticket book karo", "intent": "transport_ticket", "label": 57, "english": "book a train ticket from baltimore maryland to new york new york"}
+{"id": "12402", "text": "is city mein chalne wali agli train yahan se kab niklegi", "intent": "transport_query", "label": 55, "english": "when does the next train traveling the city leave here"}
+{"id": "12437", "text": "theater tak jaane mein kitna time lagega", "intent": "transport_query", "label": 55, "english": "what is the commute time to the theater"}
+{"id": "12526", "text": "starbucks jaane ka sabse fast rasta kaun sa hai", "intent": "transport_query", "label": 55, "english": "what is the fastest way to get to starbucks"}
+{"id": "12536", "text": "barcelona ke liye ek train ticket book kar do please", "intent": "transport_ticket", "label": 57, "english": "book me a train ticket to barcelona please"}
+{"id": "12558", "text": "mere liye ek taxi uber book kar do", "intent": "transport_taxi", "label": 56, "english": "please book me a taxi uber"}
+{"id": "12581", "text": "f. train aaj kab chalegi", "intent": "transport_query", "label": 55, "english": "when does the f. train run today"}
+{"id": "12607", "text": "mujhe hwood se orlando ke liye train se ticket leni hai", "intent": "transport_ticket", "label": 57, "english": "i need to get a ticket via train to orlando from hwood"}
+{"id": "12717", "text": "abhi traffic kaisa hai", "intent": "transport_traffic", "label": 58, "english": "what is the traffic like now"}
+{"id": "12814", "text": "tuesday ko jaipur se mumbai ki ticket book kar do please", "intent": "transport_ticket", "label": 57, "english": "please book a ticket form jaipur to mumbai on tuesday"}
+{"id": "12851", "text": "mere ghar ka rasta dikhao", "intent": "transport_query", "label": 55, "english": "show me direction to my home"}
+{"id": "12932", "text": "olly mujhe madison street ka rasta chahiye", "intent": "transport_query", "label": 55, "english": "olly i need directions to madison street"}
+{"id": "12986", "text": "capricious ka meaning check karo", "intent": "qa_definition", "label": 44, "english": "check definition of capricious"}
+{"id": "13040", "text": "nine ka square root kya hai", "intent": "qa_maths", "label": 46, "english": "what is the square root of nine"}
+{"id": "13043", "text": "mujhe kisi local bakery se sweet potato pie chahiye", "intent": "lists_createoradd", "label": 30, "english": "i want sweet potato pie from a local bakery"}
+{"id": "13044", "text": "mujhe saturday night ke sold out concert ki tickets chahiye", "intent": "general_quirky", "label": 20, "english": "i want tickets to the sold out concert on saturday night"}
+{"id": "13101", "text": "one plus one kitna hota hai", "intent": "qa_maths", "label": 46, "english": "what is one plus one"}
+{"id": "13206", "text": "location kya hai", "intent": "qa_definition", "label": 44, "english": "location"}
+{"id": "13340", "text": "main chahta hoon ki yeh search results se answer compute kar sake jaise wolfram alpha karta hai", "intent": "general_quirky", "label": 20, "english": "i would like it to be able to compute answer from search results like wolfram alpha does"}
+{"id": "13346", "text": "bas thodi si chit chat karni hai", "intent": "general_quirky", "label": 20, "english": "just idle chit chat"}
+{"id": "13348", "text": "mujhe aapse poochna hai ki ek pinhead par kitne angels dance kar sakte hain", "intent": "general_quirky", "label": 20, "english": "i need to ask you how many angels can dance on a pinhead"}
+{"id": "13411", "text": "yeh do sau chalis plus chhe sau chaavan problem ka answer dikhao", "intent": "qa_maths", "label": 46, "english": "show me the answer for this problem two hundred and forty six plus six hundred and fifty four"}
+{"id": "13521", "text": "earth gol kyun hai", "intent": "general_quirky", "label": 20, "english": "why is the earth round"}
+{"id": "13524", "text": "main chahta hoon ki yeh ideas analyze karne mein help kare", "intent": "general_quirky", "label": 20, "english": "i would like it to help analyze ideas"}
+{"id": "13546", "text": "will smith ki last movie kaun si thi", "intent": "qa_factoid", "label": 45, "english": "what was the last movie will smith was in"}
+{"id": "13547", "text": "kal raat will ferrell kahan dikhe the", "intent": "general_quirky", "label": 20, "english": "where was will ferrell seen last night"}
+{"id": "13554", "text": "brad pitt ki height kitni hai", "intent": "qa_factoid", "label": 45, "english": "how tall is brad pitt"}
+{"id": "13580", "text": "mount everest kitna lamba hai", "intent": "qa_factoid", "label": 45, "english": "how tall is mount everest"}
+{"id": "13604", "text": "batao steve jobs kahan paida hue the", "intent": "qa_factoid", "label": 45, "english": "tell me where steve jobs was born"}
+{"id": "13607", "text": "kya aap confirm kar sakte hain ki leonardo married hain", "intent": "qa_factoid", "label": 45, "english": "could you please confirm if leonardo is married"}
+{"id": "13616", "text": "jyadatar celebrities kahan hang out karte hain", "intent": "qa_factoid", "label": 45, "english": "where do most celebrities hang out"}
+{"id": "13639", "text": "pichle ek hafte mein disney ki stock value mein kitna increase hua hai", "intent": "qa_stock", "label": 47, "english": "what is the increase in stock value over the past week of disney"}
+{"id": "13688", "text": "china ka current exchange rate kya hai", "intent": "qa_currency", "label": 43, "english": "what is the most current exchange rate in china"}
+{"id": "13689", "text": "chair kya hoti hai", "intent": "qa_definition", "label": 44, "english": "what is a chair"}
+{"id": "13690", "text": "chairs ka colour kya hota hai", "intent": "qa_factoid", "label": 45, "english": "what color are chairs"}
+{"id": "13694", "text": "person ki biography", "intent": "general_quirky", "label": 20, "english": "biography of person"}
+{"id": "13714", "text": "aam kya hota hai", "intent": "qa_definition", "label": 44, "english": "what is a mango"}
+{"id": "13741", "text": "china ka currency exchange rate kya hai", "intent": "qa_currency", "label": 43, "english": "what's the currency exchange rate for china"}
+{"id": "13777", "text": "credit card ke baare mein batao", "intent": "qa_definition", "label": 44, "english": "can you describe a credit card"}
+{"id": "13881", "text": "michael jackson ke baare mein kuch information do", "intent": "qa_factoid", "label": 45, "english": "please give me information on michael jackson"}
+{"id": "13888", "text": "indianapolis indiana mein temperature kya hai", "intent": "qa_factoid", "label": 45, "english": "what is the temperature in indianapolis indiana"}
+{"id": "13900", "text": "life ka definition kya hai", "intent": "qa_definition", "label": 44, "english": "the definition of life"}
+{"id": "13982", "text": "abhi dollar ka rate kya chal raha hai", "intent": "qa_currency", "label": 43, "english": "dollar rate at present"}
+{"id": "14000", "text": "sloth kaisa animal hota hai describe karo", "intent": "qa_definition", "label": 44, "english": "describe a sloth"}
+{"id": "14026", "text": "agar ek pencil chaar dollar ki hai aur ek book das dollar ki, toh do pencil aur teen book lene par mujhe kitna pay karna padega", "intent": "qa_maths", "label": 46, "english": "if a pencil cost four dollars and a book ten dollars cost how much i should pay if i buy two pencil and three book"}
+{"id": "14033", "text": "obama ka birth kab hua tha", "intent": "qa_factoid", "label": 45, "english": "tell me when obama was born"}
+{"id": "14040", "text": "hulk hogan kitna lamba hai", "intent": "qa_factoid", "label": 45, "english": "how tall is hulk hogan"}
+{"id": "14071", "text": "kal maine kya pehna tha mujhe batao", "intent": "general_quirky", "label": 20, "english": "tell me what i wore yesterday"}
+{"id": "14074", "text": "ek dollar mein kitna inr hota hai", "intent": "qa_currency", "label": 43, "english": "one dolla equals how much inr"}
+{"id": "14083", "text": "jackie chan abhi kahan rehta hai", "intent": "qa_factoid", "label": 45, "english": "where jackie chan currently live"}
+{"id": "14117", "text": "pyramids kahan par located hain", "intent": "qa_factoid", "label": 45, "english": "where are pyramids located"}
+{"id": "14130", "text": "goog ka current price kya hai", "intent": "qa_stock", "label": 47, "english": "what is googs current price"}
+{"id": "14150", "text": "converse shoes kya hote hain", "intent": "qa_definition", "label": 44, "english": "what are converse shoes"}
+{"id": "14151", "text": "kis tarah ke sunglasses ko aviators bola jata hai", "intent": "qa_factoid", "label": 45, "english": "what kinds of sunglasses are considered aviators"}
+{"id": "14170", "text": "kya kim kardashian converse pehnti hai", "intent": "qa_factoid", "label": 45, "english": "does kim kardashian wear converse"}
+{"id": "14190", "text": "starbuck ka stock aajkal kitne ka chal raha hai", "intent": "qa_stock", "label": 47, "english": "how much is starbuck's stock these days"}
+{"id": "14306", "text": "india ka geographical location explain karo", "intent": "qa_factoid", "label": 45, "english": "explain the geographical location of india"}
+{"id": "14315", "text": "kya yeh history ka sabse kam ya sabse zyada important moment hai", "intent": "general_quirky", "label": 20, "english": "is this the least or most important moment in history ever"}
+{"id": "14354", "text": "universe ka answer kya hai", "intent": "qa_factoid", "label": 45, "english": "what's the answer to the universe"}
+{"id": "14368", "text": "bees saal baad world ki population kitni hogi", "intent": "general_quirky", "label": 20, "english": "how much will be the world population after twenty years"}
+{"id": "14437", "text": "u. s. d. se pound ka exchange rate find karo", "intent": "qa_currency", "label": 43, "english": "find exchange rate for u. s. d. to pound"}
+{"id": "14481", "text": "kya hum sun ja sakte hain", "intent": "general_quirky", "label": 20, "english": "can we go to sun"}
+{"id": "14597", "text": "new york ki population kya hai", "intent": "qa_factoid", "label": 45, "english": "what is the population of new york"}
+{"id": "14601", "text": "abraham lincoln kitne saal tak united states ke president rahe the", "intent": "qa_factoid", "label": 45, "english": "for how many years was abraham lincoln president of united states"}
+{"id": "14684", "text": "russia ka prime minister kaun hai", "intent": "qa_factoid", "label": 45, "english": "who is the prime minister of russia"}
+{"id": "14690", "text": "ok google president kya hota hai", "intent": "qa_definition", "label": 44, "english": "ok google what is a president"}
+{"id": "14705", "text": "ok google sophia vergara kahan rehti hai", "intent": "qa_factoid", "label": 45, "english": "ok google where does sophia vergara live"}
+{"id": "14792", "text": "mere paas mein koi walking trail kahan hai", "intent": "recommendation_locations", "label": 49, "english": "where is a walking trail near me"}
+{"id": "14859", "text": "ek british pound ke sath exchange rate kya hai", "intent": "qa_currency", "label": 43, "english": "what is the exchange rate with in one british pound"}
+{"id": "14912", "text": "president madison kahan paida hue the", "intent": "qa_factoid", "label": 45, "english": "where was president madison born"}
+{"id": "14973", "text": "us aur indian rupees ka prevailing exchange rate kya hai", "intent": "qa_currency", "label": 43, "english": "what is the prevailing exchange rate us versus indian rupees"}
+{"id": "15055", "text": "kaunsa pole zyada thanda hai south ya north", "intent": "qa_factoid", "label": 45, "english": "which pole is colder south or north"}
+{"id": "15127", "text": "speaker define karo", "intent": "qa_definition", "label": 44, "english": "define speaker"}
+{"id": "15137", "text": "helicopter ban jao", "intent": "general_quirky", "label": 20, "english": "become a helicopter"}
+{"id": "15186", "text": "wedding wishes do", "intent": "social_post", "label": 51, "english": "wedding wishes"}
+{"id": "15274", "text": "please mera social media scan karke batao kya ho raha hai", "intent": "social_query", "label": 52, "english": "please scan my social media and tell me what's happening"}
+{"id": "15276", "text": "facebook par ek naya status daal do ki main ache mausam ko enjoy kar raha hoon", "intent": "social_post", "label": 51, "english": "post a new status on facebook saying that i am enjoying the nice weather"}
+{"id": "15296", "text": "mere feed par naye posts padh kar sunao", "intent": "social_query", "label": 52, "english": "read me new post on my feed"}
+{"id": "15321", "text": "kya kisi ne mere status par comment kiya hai", "intent": "social_query", "label": 52, "english": "has anyone commented on my status"}
+{"id": "15337", "text": "yeh video facebook par post kar do", "intent": "social_post", "label": 51, "english": "post this video to facebook"}
+{"id": "15358", "text": "olly apple ko tweet karo ki iphone kaam nahi kar raha hai", "intent": "social_post", "label": 51, "english": "olly tweet apple that the iphone doesn't work"}
+{"id": "15409", "text": "twitter kholo meri complaint type karo aur consumer service ko post kar do", "intent": "social_post", "label": 51, "english": "open twitter type my complaint and post to at consumer service"}
+{"id": "15456", "text": "main united airlines ko ek tweet bhejna chahta hoon ki main gussa hoon kyunki tumne mera bag guma diya", "intent": "social_post", "label": 51, "english": "i want to send a tweet to united airlines i'm angry you lost my bags"}
+{"id": "15503", "text": "consumer service ko naya tweet karo", "intent": "social_post", "label": 51, "english": "new tweet to consumer service"}
+{"id": "15513", "text": "kya social media par kuch zaroori ho raha hai", "intent": "social_query", "label": 52, "english": "is there anything important happening on social media"}
+{"id": "15553", "text": "daikin service ke liye please ek negative response tweet karo", "intent": "social_post", "label": 51, "english": "please negative response tweet on daikin service"}
+{"id": "15554", "text": "delay services ke liye dell service par please tweet karo", "intent": "social_post", "label": 51, "english": "please tweet on dell service for delay services"}
+{"id": "15556", "text": "ek complaint tweet karte hain", "intent": "social_post", "label": 51, "english": "let's tweet a complaint"}
+{"id": "15610", "text": "yeh tweet post karo: very bad follow up by a. b. c. company not satisfied in my account", "intent": "social_post", "label": 51, "english": "post a tweet as follows very bad follow up by a. b. c. company not satisfied in my account"}
+{"id": "15693", "text": "tweet karo ki chocolate packet ke andar ek insect tha", "intent": "social_post", "label": 51, "english": "tweet that there was an insect in the chocolate packet"}
+{"id": "15707", "text": "ek tweet bhejte hain", "intent": "social_post", "label": 51, "english": "lets send a tweet"}
+{"id": "15732", "text": "samsung ko tweet karo aur unse kaho ki apne products se logo ko maarna band karein", "intent": "social_post", "label": 51, "english": "tweet samsung and tell them to stop killing people with their products"}
+{"id": "15747", "text": "is person ka email add kar do", "intent": "email_addcontact", "label": 14, "english": "add this person's email"}
+{"id": "15763", "text": "naye emails check karo please", "intent": "email_query", "label": 15, "english": "please check for new emails"}
+{"id": "15880", "text": "mere mails check karo please", "intent": "email_query", "label": 15, "english": "please check my mails"}
+{"id": "15906", "text": "john ko thank you ka reply bhejo", "intent": "email_sendemail", "label": 17, "english": "reply thank you to john"}
+{"id": "15911", "text": "susan ke liye ek email taiyar karo", "intent": "email_sendemail", "label": 17, "english": "prepare email for susan"}
+{"id": "15968", "text": "agar ye kisi bahut jaane-pehchaane jagah se hai toh isko important mark kar do", "intent": "email_query", "label": 15, "english": "if it is from a very familiar place mark it as important"}
+{"id": "15987", "text": "is naye email ko contact ke sath add kar do", "intent": "email_addcontact", "label": 14, "english": "add this new email with contact"}
+{"id": "16005", "text": "joseph at gmail dot com par email bhejo", "intent": "email_sendemail", "label": 17, "english": "send email to joseph at gmail dot com"}
+{"id": "16010", "text": "mujhe batao ki mere inbox mein koi naye messages hain kya", "intent": "email_query", "label": 15, "english": "tell me if i have any new messages in my inbox"}
+{"id": "16028", "text": "hey siri coworker ko ek email shuru karo", "intent": "email_sendemail", "label": 17, "english": "hey siri start an email to coworker"}
+{"id": "16038", "text": "hey kya john ne mujhe hal hi mein koi email bheja hai", "intent": "email_query", "label": 15, "english": "hey has john sent me any email lately"}
+{"id": "16148", "text": "jack ko quick reply do toh please ek mail bhej do", "intent": "email_sendemail", "label": 17, "english": "quick reply to jack so please send a mail"}
+{"id": "16163", "text": "kal mujhe kisne mail kiya tha", "intent": "email_query", "label": 15, "english": "who mailed me yesterday"}
+{"id": "16221", "text": "kate ka email nikalo aur likho ki main use bata dunga", "intent": "email_sendemail", "label": 17, "english": "pull up kate's email and write that i will let her know"}
+{"id": "16229", "text": "kaunse contact ko maine barah mahino se call nahi kiya hai", "intent": "email_querycontact", "label": 16, "english": "which contact haven't i called in twelve months"}
+{"id": "16245", "text": "joe at a. o. l. dot com ko email bhejo", "intent": "email_sendemail", "label": 17, "english": "send email to joe at a. o. l. dot com"}
+{"id": "16361", "text": "kya pichle ek ghante mein mere paas koi naye emails aaye hain", "intent": "email_query", "label": 15, "english": "do i have any new emails in the last hour"}
+{"id": "16373", "text": "kya mujhe tracking numbers ke sath koi emails mile hain", "intent": "email_query", "label": 15, "english": "have i received any emails with tracking numbers"}
+{"id": "16419", "text": "please uncle john ko ek email bhejo ye likhkar ki yes i can make it", "intent": "email_sendemail", "label": 17, "english": "please send an email to uncle john with the following yes i can make it"}
+{"id": "16427", "text": "aaj mujhe kitne naye emails mile hain", "intent": "email_query", "label": 15, "english": "how many new emails have i received today"}
+{"id": "16438", "text": "mujhe ye email abhi bhejna hai", "intent": "email_sendemail", "label": 17, "english": "i need this email sent now"}
+{"id": "16519", "text": "mujhe apne contacts mein ek naya email add karna hai", "intent": "email_sendemail", "label": 17, "english": "i need to add a new email to my contacts"}
+{"id": "16523", "text": "kya tum mujhe jo ki contact information bata sakte ho", "intent": "email_querycontact", "label": 16, "english": "can you tell me the contact information of jo"}
+{"id": "16563", "text": "olly mera email check karo", "intent": "email_query", "label": 15, "english": "olly check my email"}
+{"id": "16666", "text": "kya koi naye emails aaye hain", "intent": "email_query", "label": 15, "english": "do i have any incoming emails"}
+{"id": "16668", "text": "kya aaj chaar baje ke baad se koi emails aaye hain", "intent": "email_query", "label": 15, "english": "have any emails come in since four hundred today"}
+{"id": "16672", "text": "kya ben ka koi message ya contact aaya hai", "intent": "email_query", "label": 15, "english": "has ben got in touch"}
+{"id": "16703", "text": "main sabse recent email ka reply dena chahta hoon", "intent": "email_sendemail", "label": 17, "english": "i would like to reply to the most recent email"}
+{"id": "16733", "text": "amazon ke latest emails dikhao", "intent": "email_query", "label": 15, "english": "show me the latest emails from amazon"}
+{"id": "16754", "text": "email dictate karo", "intent": "email_sendemail", "label": 17, "english": "dictate email"}
+{"id": "16765", "text": "kal ke email mein interview ka time kya tha", "intent": "email_query", "label": 15, "english": "what is the interview time from yesterday's email"}
+{"id": "16780", "text": "juanpedro at gmail dot com par ek email bhejo", "intent": "email_sendemail", "label": 17, "english": "send an email to juanpedro at gmail dot com"}
+{"id": "16851", "text": "email notifications dikhao", "intent": "email_query", "label": 15, "english": "email notifications"}
+{"id": "16907", "text": "jay ka phone number kya hai", "intent": "email_querycontact", "label": 16, "english": "jay's phone number"}
+{"id": "16914", "text": "kya is sender se mujhe koi emails aaye hain", "intent": "email_query", "label": 15, "english": "do i have emails from this sender"}
+{"id": "16938", "text": "john ke email ka reply karo", "intent": "email_sendemail", "label": 17, "english": "reply to johns email"}
+{"id": "16961", "text": "is message ke sath respond karo", "intent": "email_sendemail", "label": 17, "english": "respond with"}
+{"id": "17069", "text": "kya outlook mein koi naye emails hain", "intent": "email_query", "label": 15, "english": "are there any new emails in outlook"}
+{"id": "17081", "text": "mere recently saved documents ke sath apne company worker ke liye ek email banao", "intent": "email_sendemail", "label": 17, "english": "create an email for my company worker with my recently saved documents"}
+{"id": "17095", "text": "leon ka email kya hai", "intent": "email_querycontact", "label": 16, "english": "what's leon's email"}
+{"id": "17135", "text": "kya lighting news ke koi emails hain", "intent": "email_query", "label": 15, "english": "any lighting news emails"}
+{"id": "17142", "text": "jab humne last dekha tha tab se inbox mein kya aaya hai", "intent": "email_query", "label": 15, "english": "what's in my inbox since we last looked"}
+{"id": "17147", "text": "is content ke sath mail ka reply karo: hello you", "intent": "email_sendemail", "label": 17, "english": "reply to the mail with the following content hello you"}
+{"id": "17148", "text": "alexa is content ke sath mail ka reply karo: hello you", "intent": "email_sendemail", "label": 17, "english": "alexa reply to the mail with the following content hello you"}

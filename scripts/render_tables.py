@@ -155,6 +155,17 @@ def t_reference() -> str:
               "different checkpoint selection, so compare with care.")
 
 
+def t_hinglish() -> str:
+    h = load("hinglish.json")
+    if not h:
+        return "TBD"
+    e = h["english_same_sentences"]
+    rows = [["English", pct(e["small_only_acc"]), pct(e["llm_only_acc"]), pct(e["router_acc"]), pct(e["llm_share"])],
+            ["Hinglish", pct(h["small_only_acc"]), pct(h["llm_only_acc"]), pct(h["router_acc"]), pct(h["llm_share"])]]
+    return (table(["Same 500 test sentences", "Small model only", "LLM only", "Router", "Sent to LLM"], rows)
+            + f"\n\n{h['how_made']} {h['caveat']}")
+
+
 def t_deploy() -> str:
     q, s = load("quantized.json"), load("small_model.json")
     if not q or not s:
@@ -231,7 +242,7 @@ def t_resume() -> str:
 SECTIONS = {
     "small": t_small, "llm": t_llm, "routing": t_routing, "savings": t_savings,
     "calibration": t_calibration, "loadtest": t_loadtest, "reference": t_reference,
-    "pitch": t_pitch, "resume": t_resume, "deploy": t_deploy,
+    "pitch": t_pitch, "resume": t_resume, "deploy": t_deploy, "hinglish": t_hinglish,
 }
 MARK = re.compile(r"(<!-- RESULTS:(\w+):START -->\n)(.*?)(\n<!-- RESULTS:\2:END -->)", re.S)
 

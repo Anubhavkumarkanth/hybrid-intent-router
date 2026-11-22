@@ -143,6 +143,21 @@ def page_data(root: Path = ROOT, deployed_onnx: bool = False) -> dict:
     if load:
         data["load"] = {"rps": load["requests_per_sec"], "p95": load["p95_ms"], "failures": load["failures"],
                         "requests": load["requests"]}
+    hin = _load(root, "results/hinglish.json")
+    if hin:
+        data["hinglish"] = {k: hin[k] for k in ("n", "small_only_acc", "llm_only_acc", "router_acc", "llm_share")}
+    curve_file = root / "results" / "routing_curve.csv"
+    if curve_file.exists():
+        import csv
+
+        curve: dict[str, list] = {}
+        with open(curve_file, newline="") as f:
+            for row in csv.DictReader(f):
+                if row["split"] == "test_sub":
+                    curve.setdefault(row["group"], []).append(
+                        [round(float(row["llm_share"]) * 100, 1), round(float(row["accuracy"]) * 100, 1),
+                         float(row["t"])])
+        data["curve"] = curve
     return data
 
 
@@ -192,7 +207,9 @@ class RateLimit:
 
 def create_app(small: SmallModel | None = None, llm_fn: Callable[[str], str] | None = None,
                threshold: float | None = None, use_llm: bool | None = None,
-               llm_limit: RateLimit | None = None) -> Flask:
+               llm_limit: RateLimit | None = None, metrics=None) -> Flask:
+    from router.actions import describe, run_action
+
     app = Flask(__name__)
     if use_llm is None:
         use_llm = os.environ.get("ROUTER_DISABLE_LLM", "0") != "1"
@@ -266,18 +283,73 @@ def create_app(small: SmallModel | None = None, llm_fn: Callable[[str], str] | N
                 except Exception as e:  # any LLM failure -> keep the small model's answer
                     log.warning("LLM failed, using small model answer: %s: %s", type(e).__name__, e)
                     routed_to = "small_fallback"
-        return jsonify(intent=intent, confidence=round(conf, 4), routed_to=routed_to,
-                       latency_ms=round((time.perf_counter() - t0) * 1000, 1),
-                       threshold=app.config["THRESHOLD"],
-                       small_model_top=[{"intent": i, "confidence": round(c, 4)} for i, c in top])
+        latency_ms = round((time.perf_counter() - t0) * 1000, 1)
+
+        # Do the task for intents that have an action (weather, time, currency, ...); otherwise confirm it.
+        action = run_action(intent, text)
+        reply = action["reply"] if action else f"Got it. You want me to {describe(intent)}."
+        language = body.get("lang") if body.get("lang") in LANGS else script_language(text)
+        voice = body.get("voice") is True
+        if metrics is not None:
+            metrics.record(language=language, routed_to=routed_to, intent=intent, confidence=round(conf, 4),
+                           latency_ms=latency_ms, action=action["kind"] if action else None, voice=voice)
+        return jsonify(intent=intent, confidence=round(conf, 4), routed_to=routed_to, latency_ms=latency_ms,
+                       threshold=app.config["THRESHOLD"], language=language,
+                       small_model_top=[{"intent": i, "confidence": round(c, 4)} for i, c in top],
+                       action=action, reply=reply, total_ms=round((time.perf_counter() - t0) * 1000, 1))
+
+    summary_cache: dict = {}
+
+    @app.get("/api/metrics")
+    def api_metrics():
+        if metrics is None:
+            return jsonify(error="metrics are off"), 404
+        hours = min(max(request.args.get("hours", 24, type=float), 1), 168)
+        hit = summary_cache.get(hours)
+        if hit and time.monotonic() - hit[0] < 5:  # many open dashboards poll this; one query per 5 s is enough
+            return jsonify(hit[1])
+        s = metrics.summary(hours=hours, cost_per_call=cost_per_call())
+        summary_cache[hours] = (time.monotonic(), s)
+        return jsonify(s)
 
     return app
+
+
+LANGS = {"en", "hi", "kn", "hinglish"}
+
+
+def script_language(text: str) -> str:
+    """Language guess from the writing system (Latin text is counted as English)."""
+    dev = sum(0x0900 <= ord(c) <= 0x097F for c in text)
+    kan = sum(0x0C80 <= ord(c) <= 0x0CFF for c in text)
+    lat = sum(c.isascii() and c.isalpha() for c in text)
+    best = max((dev, "hi"), (kan, "kn"), (lat, "en"))
+    return best[1] if best[0] else "en"
+
+
+def cost_per_call(root: Path = ROOT) -> float:
+    from router import costs
+
+    single = _load(root, "results/llm_single_call.json")
+    return costs.cost_per_call(single["mean_input_tokens"], single["mean_output_tokens"]) if single else 0.0
 
 
 def make_app() -> Flask:
     """Entry point for gunicorn: `gunicorn 'app.app:make_app()'`."""
     logging.basicConfig(level=logging.INFO)
-    return create_app()
+    store = None
+    url = os.environ.get("DATABASE_URL")
+    if url:
+        from router.metrics import MetricsStore
+
+        try:
+            store = MetricsStore.from_url(url)
+            log.info("metrics: PostgreSQL")
+        except Exception as e:  # a database problem must not stop the demo from serving
+            log.warning("metrics off, database unavailable: %s: %s", type(e).__name__, e)
+    else:
+        log.info("metrics off: no DATABASE_URL")
+    return create_app(metrics=store)
 
 
 if __name__ == "__main__":

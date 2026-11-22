@@ -4,467 +4,518 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Hybrid Intent Router</title>
-<meta name="description" content="A small multilingual model answers voice-bot messages in English, Hindi and Kannada, and asks an LLM only when it is unsure.">
+<meta name="description" content="A voice assistant brain that understands English, Hindi, Kannada and Hinglish, does the task, and only pays for an LLM when it is unsure.">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
   :root {
-    --bg:#f4f6f9; --card:#ffffff; --ink:#1b2130; --muted:#5d6676; --faint:#8a93a3; --line:#e1e5ec;
-    --accent:#2a6fdb; --accent-soft:#e7eefc; --small:#1a8f55; --small-soft:#e2f4ea; --llm:#2a6fdb; --llm-soft:#e7eefc;
-    --fb:#7b5ea7; --fb-soft:#efe9f7; --bad:#b3261e; --bad-soft:#fbe9e7; --track:#e9edf3;
-    --code:#1b2130; --code-ink:#e6e9ef; --shadow:0 1px 2px rgba(20,30,50,.06), 0 4px 14px rgba(20,30,50,.05);
+    --bg:#f3f6fb; --ink:#141a26; --muted:#556072; --faint:#8a94a6; --line:rgba(20,30,50,.10);
+    --glass:rgba(255,255,255,.72); --glass-strong:rgba(255,255,255,.9);
+    --blue:#2a6fdb; --purple:#7b5ea7; --green:#1a8f55; --teal:#1f8fa3; --red:#b3261e;
+    --blue-soft:rgba(42,111,219,.12); --purple-soft:rgba(123,94,167,.13); --green-soft:rgba(26,143,85,.13);
+    --track:rgba(20,30,50,.08); --shadow:0 10px 30px rgba(20,40,80,.08);
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg:#0f141c; --card:#161c26; --ink:#e6e9ef; --muted:#a3acbb; --faint:#7d8696; --line:#273142;
-      --accent:#6ea1f0; --accent-soft:#1c2a42; --small:#4cc38a; --small-soft:#16301f; --llm:#6ea1f0; --llm-soft:#1c2a42;
-      --fb:#a98bd6; --fb-soft:#2a2238; --bad:#f08a80; --bad-soft:#3a1f1d; --track:#232c3b;
-      --code:#0b0f15; --code-ink:#dfe4ec; --shadow:none;
+      --bg:#0b1018; --ink:#e7ecf3; --muted:#a4afc0; --faint:#7d889b; --line:rgba(255,255,255,.09);
+      --glass:rgba(18,25,38,.66); --glass-strong:rgba(20,28,42,.9);
+      --blue:#6ea1f0; --purple:#ab8fd9; --green:#4cc38a; --teal:#4cc0d4; --red:#f08a80;
+      --blue-soft:rgba(110,161,240,.16); --purple-soft:rgba(171,143,217,.16); --green-soft:rgba(76,195,138,.16);
+      --track:rgba(255,255,255,.08); --shadow:0 10px 30px rgba(0,0,0,.35);
     }
   }
   * { box-sizing:border-box; }
   html { scroll-behavior:smooth; }
-  body { margin:0; background:var(--bg); color:var(--ink); line-height:1.5;
+  body { margin:0; background:var(--bg); color:var(--ink); line-height:1.5; overflow-x:hidden;
          font-family:system-ui, "Segoe UI", "Nirmala UI", "Noto Sans", "Noto Sans Devanagari", "Noto Sans Kannada", sans-serif; }
-  a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
-  .wrap { max-width:1100px; margin:0 auto; padding:0 20px; }
-  header.top { position:sticky; top:0; z-index:5; background:color-mix(in srgb, var(--bg) 88%, transparent);
-               backdrop-filter:blur(8px); border-bottom:1px solid var(--line); }
-  .nav { display:flex; align-items:center; justify-content:space-between; height:56px; gap:16px; }
-  .brand { font-weight:700; color:var(--ink); letter-spacing:-.01em; }
-  .brand .dot { display:inline-block; width:9px; height:9px; border-radius:50%; background:var(--small); margin-right:8px;
-                box-shadow:14px 0 0 var(--llm); margin-right:22px; }
-  nav a { color:var(--muted); margin-left:18px; font-size:.93rem; } nav a:hover { color:var(--ink); text-decoration:none; }
-  nav a.gh { color:var(--ink); border:1px solid var(--line); padding:5px 12px; border-radius:8px; }
-  @media (max-width:760px) { nav a:not(.gh) { display:none; } }
+  a { color:var(--blue); text-decoration:none; }
 
-  .hero { padding:44px 20px 8px; }
-  .eyebrow { color:var(--accent); font-weight:600; font-size:.85rem; letter-spacing:.04em; text-transform:uppercase; margin:0 0 10px; }
-  h1 { font-size:clamp(1.6rem, 3.4vw, 2.35rem); line-height:1.2; margin:0 0 14px; letter-spacing:-.02em; max-width:820px; }
-  .lead { color:var(--muted); font-size:1.08rem; max-width:760px; margin:0 0 26px; }
-  .stats { display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; }
+  /* ---------- animated background */
+  #bg { position:fixed; inset:0; z-index:-1; pointer-events:none; }
+  .orb { position:fixed; border-radius:50%; filter:blur(70px); opacity:.45; z-index:-2; pointer-events:none; }
+  .orb.a { width:520px; height:520px; background:var(--blue); top:-160px; left:-120px; animation:drift1 26s ease-in-out infinite alternate; }
+  .orb.b { width:460px; height:460px; background:var(--purple); top:30%; right:-160px; animation:drift2 32s ease-in-out infinite alternate; }
+  .orb.c { width:420px; height:420px; background:var(--teal); bottom:-180px; left:30%; animation:drift3 29s ease-in-out infinite alternate; }
+  @media (prefers-color-scheme: light) { .orb { opacity:.22; } }
+  @keyframes drift1 { to { transform:translate(140px, 90px) scale(1.1); } }
+  @keyframes drift2 { to { transform:translate(-120px, 120px) scale(.9); } }
+  @keyframes drift3 { to { transform:translate(110px, -100px) scale(1.15); } }
+  @media (prefers-reduced-motion: reduce) { .orb { animation:none; } }
+
+  .wrap { max-width:1120px; margin:0 auto; padding:0 20px; }
+  header.top { position:sticky; top:0; z-index:10; backdrop-filter:blur(12px); background:color-mix(in srgb, var(--bg) 70%, transparent);
+               border-bottom:1px solid var(--line); }
+  .nav { display:flex; align-items:center; justify-content:space-between; height:58px; }
+  .brand { font-weight:750; color:var(--ink); display:flex; align-items:center; gap:10px; letter-spacing:-.01em; }
+  .logo { width:26px; height:26px; border-radius:8px; background:linear-gradient(135deg, var(--green), var(--blue) 55%, var(--purple)); }
+  nav a { color:var(--muted); margin-left:20px; font-size:.93rem; } nav a:hover { color:var(--ink); }
+  nav a.gh { color:var(--ink); border:1px solid var(--line); padding:6px 12px; border-radius:9px; background:var(--glass); }
+  @media (max-width:720px) { nav a:not(.gh) { display:none; } }
+
+  .glass { background:var(--glass); border:1px solid var(--line); border-radius:18px; box-shadow:var(--shadow);
+           backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); }
+
+  /* ---------- hero */
+  .hero { padding:70px 20px 30px; text-align:center; }
+  .pill-top { display:inline-flex; gap:8px; align-items:center; padding:6px 14px; border-radius:999px; font-size:.85rem;
+              color:var(--muted); background:var(--glass); border:1px solid var(--line); }
+  .pill-top .live { width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 0 0 var(--green); animation:pulse 2s infinite; }
+  @keyframes pulse { 0% { box-shadow:0 0 0 0 rgba(26,143,85,.55); } 70% { box-shadow:0 0 0 10px rgba(26,143,85,0); } 100% { box-shadow:0 0 0 0 rgba(26,143,85,0); } }
+  h1 { font-size:clamp(2rem, 5vw, 3.4rem); line-height:1.08; letter-spacing:-.03em; margin:18px auto 16px; max-width:880px; }
+  .grad { background:linear-gradient(90deg, var(--blue), var(--purple) 50%, var(--teal)); -webkit-background-clip:text; background-clip:text; color:transparent;
+          background-size:200% 100%; animation:shine 9s linear infinite; }
+  @keyframes shine { to { background-position:200% 0; } }
+  .lead { color:var(--muted); font-size:clamp(1rem, 2vw, 1.15rem); max-width:720px; margin:0 auto 28px; }
+  .cta { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:38px; }
+  .btn { font:inherit; border-radius:12px; padding:11px 20px; cursor:pointer; border:1px solid var(--line); background:var(--glass-strong);
+         color:var(--ink); font-weight:600; display:inline-flex; gap:8px; align-items:center; }
+  .btn.primary { background:linear-gradient(135deg, var(--blue), var(--purple)); color:#fff; border:none; box-shadow:0 8px 22px rgba(42,111,219,.3); }
+  .btn:disabled { opacity:.6; cursor:wait; }
+  .stats { display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; text-align:left; }
   @media (max-width:860px) { .stats { grid-template-columns:repeat(2, 1fr); } }
-  .stat { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; box-shadow:var(--shadow); }
-  .stat b { display:block; font-size:1.5rem; letter-spacing:-.02em; }
+  .stat { padding:18px; }
+  .stat b { display:block; font-size:clamp(1.4rem, 3vw, 1.9rem); letter-spacing:-.02em; font-variant-numeric:tabular-nums; }
   .stat span { color:var(--muted); font-size:.9rem; }
-  .note { color:var(--faint); font-size:.85rem; margin:10px 0 0; }
 
-  section { padding:34px 0 8px; }
-  h2 { font-size:1.35rem; margin:0 0 6px; letter-spacing:-.01em; }
-  .sub { color:var(--muted); margin:0 0 18px; max-width:760px; }
-  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:20px; box-shadow:var(--shadow); }
-  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:18px; align-items:start; }
-  .grid2 > *, .charts > *, .domains > *, .steps > * { min-width:0; }  /* let long chips shrink instead of overflowing */
-  @media (max-width:860px) { .grid2 { grid-template-columns:1fr; } }
+  section { padding:56px 0 10px; }
+  .head { text-align:center; margin-bottom:26px; }
+  .head h2 { font-size:clamp(1.5rem, 3vw, 2.1rem); letter-spacing:-.02em; margin:0 0 8px; }
+  .head p { color:var(--muted); margin:0 auto; max-width:640px; }
 
-  .tabs { display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap; }
-  .tab { border:1px solid var(--line); background:transparent; color:var(--muted); border-radius:999px; padding:5px 14px;
-         font:inherit; font-size:.9rem; cursor:pointer; }
-  .tab[aria-selected="true"] { background:var(--accent-soft); color:var(--accent); border-color:transparent; font-weight:600; }
-  .chips { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:14px; min-height:34px; }
-  .chip { border:1px solid var(--line); background:var(--bg); color:var(--ink); border-radius:8px; padding:5px 10px;
-          font:inherit; font-size:.88rem; cursor:pointer; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .chip:hover { border-color:var(--accent); }
-  textarea { width:100%; min-height:110px; resize:vertical; font:inherit; font-size:1.05rem; color:var(--ink); background:var(--bg);
-             border:1px solid var(--line); border-radius:10px; padding:12px; }
-  textarea:focus { outline:2px solid var(--accent-soft); border-color:var(--accent); }
-  .meta { display:flex; justify-content:space-between; color:var(--faint); font-size:.82rem; margin:6px 2px 14px; }
-  .badge { display:inline-block; padding:1px 8px; border-radius:999px; background:var(--track); color:var(--muted); }
-  .actions { display:flex; gap:8px; flex-wrap:wrap; }
-  button.btn { font:inherit; border-radius:9px; padding:9px 16px; cursor:pointer; border:1px solid var(--line);
-               background:var(--card); color:var(--ink); }
-  button.btn.primary { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600; }
-  button.btn:disabled { opacity:.6; cursor:wait; }
-  .kbd { color:var(--faint); font-size:.8rem; align-self:center; }
+  /* ---------- demo */
+  .demo { display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start; }
+  .demo > * { min-width:0; }
+  @media (max-width:900px) { .demo { grid-template-columns:1fr; } }
+  .panel { padding:22px; }
+  .langs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px; }
+  .lang { font:inherit; font-size:.9rem; padding:6px 14px; border-radius:999px; border:1px solid var(--line); background:transparent; color:var(--muted); cursor:pointer; }
+  .lang[aria-pressed="true"] { background:var(--blue-soft); color:var(--blue); border-color:transparent; font-weight:650; }
+  .microw { display:flex; align-items:center; gap:18px; margin:6px 0 16px; }
+  .mic { width:74px; height:74px; border-radius:50%; border:none; cursor:pointer; flex:none; position:relative;
+         background:linear-gradient(135deg, var(--blue), var(--purple)); box-shadow:0 10px 26px rgba(42,111,219,.35); display:grid; place-items:center; }
+  .mic svg { width:30px; height:30px; fill:#fff; }
+  .mic.on::before, .mic.on::after { content:""; position:absolute; inset:-8px; border-radius:50%; border:2px solid var(--purple); animation:ring 1.4s ease-out infinite; }
+  .mic.on::after { animation-delay:.7s; }
+  @keyframes ring { from { transform:scale(.9); opacity:.9; } to { transform:scale(1.45); opacity:0; } }
+  .mictext b { display:block; } .mictext span { color:var(--muted); font-size:.9rem; }
+  .inputrow { display:flex; gap:8px; }
+  .inputrow input { flex:1; min-width:0; font:inherit; font-size:1.02rem; padding:12px 14px; border-radius:12px; border:1px solid var(--line);
+                    background:var(--glass-strong); color:var(--ink); }
+  .inputrow input:focus { outline:2px solid var(--blue-soft); border-color:var(--blue); }
+  .chips { display:flex; flex-wrap:wrap; gap:7px; margin-top:14px; }
+  .chip { font:inherit; font-size:.86rem; padding:6px 11px; border-radius:10px; border:1px solid var(--line); background:var(--glass-strong);
+          color:var(--ink); cursor:pointer; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .chip:hover { border-color:var(--blue); }
+  .chip.task::before { content:""; display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--teal);
+                       margin-right:7px; vertical-align:1px; }
+  .subtle { color:var(--faint); font-size:.82rem; margin-top:12px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+  .toggle { cursor:pointer; user-select:none; }
 
-  .empty { color:var(--faint); text-align:center; padding:48px 12px; }
-  .answer { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:6px; }
-  .answer .domain { background:var(--track); color:var(--muted); border-radius:6px; padding:2px 8px; font-size:.85rem; }
-  .answer .action { font-size:1.6rem; font-weight:700; letter-spacing:-.01em; }
-  .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; color:var(--muted); font-size:.9rem; margin-bottom:16px; }
-  .pill { border-radius:999px; padding:2px 10px; font-size:.85rem; font-weight:600; }
-  .pill.small { background:var(--small-soft); color:var(--small); }
-  .pill.llm { background:var(--llm-soft); color:var(--llm); }
-  .pill.small_fallback { background:var(--fb-soft); color:var(--fb); }
-  .label { font-size:.85rem; color:var(--muted); margin:0 0 6px; display:flex; justify-content:space-between; }
-  .meter { position:relative; height:12px; background:var(--track); border-radius:999px; overflow:visible; }
-  .meter .fill { height:100%; border-radius:999px; transition:width .35s ease; }
-  .meter .mark { position:absolute; top:-5px; bottom:-5px; width:2px; background:var(--ink); opacity:.55; }
-  .meter .mark::after { content:attr(data-label); position:absolute; top:20px; left:50%; transform:translateX(-50%);
-                        font-size:.72rem; color:var(--muted); white-space:nowrap; }
-  .caption { font-size:.88rem; color:var(--muted); margin:26px 0 18px; }
-  .route { display:grid; grid-template-columns:1fr auto 1fr auto 1fr; align-items:center; gap:6px; margin:4px 0 18px; }
-  .node { border:1px solid var(--line); border-radius:10px; padding:8px; text-align:center; font-size:.82rem; color:var(--muted); }
-  .node b { display:block; color:var(--ink); font-size:.88rem; }
-  .node.on-small { border-color:var(--small); background:var(--small-soft); }
-  .node.on-llm { border-color:var(--llm); background:var(--llm-soft); }
-  .node.on-fb { border-color:var(--fb); background:var(--fb-soft); }
-  .arrow { color:var(--faint); }
-  .top3 { margin:0 0 14px; padding:0; list-style:none; }
-  .top3 li { display:grid; grid-template-columns:minmax(0, 1.3fr) 2fr 52px; gap:10px; align-items:center; font-size:.88rem; margin-bottom:7px; }
-  .top3 .name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .top3 .bar { height:8px; background:var(--track); border-radius:999px; overflow:hidden; }
-  .top3 .bar i { display:block; height:100%; background:var(--accent); opacity:.75; border-radius:999px; }
-  .top3 .pct { text-align:right; color:var(--muted); font-variant-numeric:tabular-nums; }
-  .callout { border-radius:10px; padding:10px 12px; font-size:.9rem; margin-bottom:12px; }
-  .callout.ok { background:var(--small-soft); color:var(--small); }
-  .callout.bad { background:var(--bad-soft); color:var(--bad); }
-  .callout.info { background:var(--accent-soft); color:var(--ink); }
-  details { margin-top:6px; } summary { cursor:pointer; color:var(--muted); font-size:.88rem; }
-  pre { background:var(--code); color:var(--code-ink); padding:12px 14px; border-radius:10px; overflow-x:auto; font-size:.84rem; margin:10px 0 0; }
-  .err { color:var(--bad); }
+  .result { min-height:420px; position:relative; }
+  .empty { color:var(--faint); text-align:center; padding:90px 20px; }
+  .empty .big { font-size:2.4rem; margin-bottom:8px; }
+  .heard { color:var(--muted); font-size:.92rem; margin-bottom:12px; overflow-wrap:anywhere; }
+  .heard b { color:var(--ink); }
+  .answer { border-radius:14px; padding:18px; margin-bottom:16px; background:linear-gradient(135deg, var(--blue-soft), var(--purple-soft)); }
+  .answer .k { font-size:.8rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+  .answer .v { font-size:1.7rem; font-weight:750; letter-spacing:-.02em; line-height:1.2; margin:4px 0; overflow-wrap:anywhere; }
+  .answer .s { color:var(--muted); font-size:.95rem; }
+  .answer .src { color:var(--faint); font-size:.78rem; margin-top:8px; }
+  .wx { display:flex; align-items:center; gap:16px; }
+  .wx .t { font-size:2.6rem; font-weight:750; letter-spacing:-.03em; }
+  .route { display:grid; grid-template-columns:1fr 28px 1fr 28px 1fr; align-items:center; margin:6px 0 14px; }
+  .node { border:1px solid var(--line); border-radius:12px; padding:9px 6px; text-align:center; font-size:.8rem; color:var(--muted);
+          background:var(--glass-strong); opacity:.45; transition:all .35s ease; }
+  .node b { display:block; color:var(--ink); font-size:.86rem; }
+  .node.lit { opacity:1; transform:translateY(-2px); }
+  .node.g { border-color:var(--green); background:var(--green-soft); } .node.b { border-color:var(--blue); background:var(--blue-soft); }
+  .node.p { border-color:var(--purple); background:var(--purple-soft); }
+  .link { height:2px; background:var(--track); position:relative; overflow:hidden; }
+  .link i { position:absolute; inset:0; background:linear-gradient(90deg, transparent, var(--blue), transparent); transform:translateX(-100%); }
+  .link.go i { animation:flow .5s ease forwards; }
+  @keyframes flow { to { transform:translateX(100%); } }
+  .meterlab { display:flex; justify-content:space-between; font-size:.85rem; color:var(--muted); margin-bottom:6px; }
+  .meter { position:relative; height:10px; border-radius:999px; background:var(--track); }
+  .meter .fill { height:100%; border-radius:999px; width:0; transition:width .6s ease; }
+  .meter .mark { position:absolute; top:-5px; bottom:-5px; width:2px; background:var(--ink); opacity:.5; }
+  .meta { display:flex; gap:14px; flex-wrap:wrap; color:var(--muted); font-size:.85rem; margin-top:12px; }
+  .badge { padding:2px 10px; border-radius:999px; font-weight:650; font-size:.82rem; }
+  .badge.small { background:var(--green-soft); color:var(--green); } .badge.llm { background:var(--blue-soft); color:var(--blue); }
+  .badge.small_fallback { background:var(--purple-soft); color:var(--purple); }
+  .truth { margin-top:12px; font-size:.9rem; padding:8px 12px; border-radius:10px; }
+  .truth.ok { background:var(--green-soft); color:var(--green); } .truth.bad { background:rgba(179,38,30,.1); color:var(--red); }
+  .err { color:var(--red); margin-top:10px; }
 
-  .session { margin-top:18px; }
-  .session .nums { display:flex; gap:26px; flex-wrap:wrap; margin-bottom:12px; }
-  .session .nums div b { display:block; font-size:1.25rem; } .session .nums div span { color:var(--muted); font-size:.85rem; }
-  .hist { list-style:none; margin:0; padding:0; }
-  .hist li { display:grid; grid-template-columns:12px minmax(0, 1fr) auto; gap:10px; align-items:center; padding:7px 4px;
-             border-top:1px solid var(--line); font-size:.9rem; cursor:pointer; }
-  .hist li:hover { background:var(--bg); }
-  .hist .d { width:10px; height:10px; border-radius:50%; }
-  .hist .t { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .hist .i { color:var(--muted); font-size:.85rem; }
+  /* ---------- dashboard */
+  .dash-tiles { display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; margin-bottom:16px; }
+  @media (max-width:860px) { .dash-tiles { grid-template-columns:repeat(2, 1fr); } }
+  .tile { padding:16px 18px; }
+  .tile b { display:block; font-size:1.6rem; letter-spacing:-.02em; font-variant-numeric:tabular-nums; }
+  .tile span { color:var(--muted); font-size:.88rem; }
+  .charts { display:grid; grid-template-columns:2fr 1fr; gap:16px; }
+  .charts > * { min-width:0; }
+  .charts.three { grid-template-columns:1fr 1fr 1fr; margin-top:16px; }
+  @media (max-width:900px) { .charts, .charts.three { grid-template-columns:1fr; } }
+  .chart { padding:16px 18px; }
+  .chart h3 { margin:0 0 10px; font-size:.95rem; color:var(--muted); font-weight:650; }
+  .chart .box { position:relative; height:230px; }
+  .livebar { display:flex; justify-content:center; gap:8px; align-items:center; color:var(--faint); font-size:.85rem; margin-top:14px; }
+  .livebar .dot { width:8px; height:8px; border-radius:50%; background:var(--green); animation:pulse 2s infinite; }
+  .note { color:var(--faint); font-size:.85rem; text-align:center; max-width:780px; margin:14px auto 0; }
 
-  .steps { display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; margin-bottom:18px; }
-  @media (max-width:860px) { .steps { grid-template-columns:1fr 1fr; } }
-  .step .n { width:26px; height:26px; border-radius:50%; background:var(--accent-soft); color:var(--accent); font-weight:700;
-             display:grid; place-items:center; font-size:.85rem; margin-bottom:8px; }
-  .step h3 { margin:0 0 4px; font-size:1rem; } .step p { margin:0; color:var(--muted); font-size:.9rem; }
-  figure { margin:0; } figure img { width:100%; border-radius:10px; border:1px solid var(--line); background:#fff; }
-  figcaption { color:var(--faint); font-size:.82rem; margin-top:6px; }
-  table { width:100%; border-collapse:collapse; font-size:.92rem; }
-  th, td { text-align:right; padding:9px 10px; border-bottom:1px solid var(--line); font-variant-numeric:tabular-nums; }
-  th:first-child, td:first-child { text-align:left; }
-  th { color:var(--muted); font-weight:600; font-size:.85rem; }
-  td.hi { font-weight:700; color:var(--small); }
-  .charts { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:18px; }
-  .charts .wide { grid-column:1 / -1; }
-  @media (max-width:860px) { .charts { grid-template-columns:1fr; } }
-
-  .search { width:100%; max-width:360px; font:inherit; padding:9px 12px; border:1px solid var(--line); border-radius:9px;
-            background:var(--card); color:var(--ink); margin-bottom:14px; }
-  .domains { display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; }
-  @media (max-width:860px) { .domains { grid-template-columns:1fr 1fr; } }
-  @media (max-width:520px) { .domains { grid-template-columns:1fr; } }
-  .dom h3 { margin:0 0 8px; font-size:.95rem; text-transform:capitalize; }
-  .dom .chips { margin:0; min-height:0; }
-  .copy { float:right; font-size:.8rem; padding:4px 10px; }
-  footer { color:var(--faint); font-size:.85rem; padding:36px 0 48px; border-top:1px solid var(--line); margin-top:34px; }
-  .sr { position:absolute; left:-9999px; }
+  /* ---------- how */
+  .steps { display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; }
+  @media (max-width:860px) { .steps { grid-template-columns:1fr; } }
+  .step { padding:20px; }
+  .step .n { width:34px; height:34px; border-radius:10px; display:grid; place-items:center; font-weight:750; color:#fff; margin-bottom:10px;
+             background:linear-gradient(135deg, var(--blue), var(--purple)); }
+  .step h3 { margin:0 0 6px; font-size:1.05rem; } .step p { margin:0; color:var(--muted); font-size:.93rem; }
+  footer { margin-top:60px; padding:28px 0 40px; border-top:1px solid var(--line); color:var(--faint); font-size:.88rem; text-align:center; }
+  .reveal { opacity:0; transform:translateY(16px); transition:opacity .7s ease, transform .7s ease; }
+  .reveal.in { opacity:1; transform:none; }
+  @media (prefers-reduced-motion: reduce) { .reveal { opacity:1; transform:none; transition:none; } }
 </style>
 </head>
 <body>
+<div class="orb a"></div><div class="orb b"></div><div class="orb c"></div>
+<canvas id="bg" aria-hidden="true"></canvas>
 {% set h = data.get("headline") %}
+
 <header class="top"><div class="wrap nav">
-  <a class="brand" href="#"><span class="dot" aria-hidden="true"></span>Hybrid Intent Router</a>
-  <nav>
-    <a href="#try">Try it</a><a href="#how">How it works</a><a href="#results">Results</a><a href="#intents">Intents</a>
-    <a href="#api">API</a><a class="gh" href="https://github.com/Anubhavkumarkanth/hybrid-intent-router">GitHub</a>
-  </nav>
+  <a class="brand" href="#"><span class="logo" aria-hidden="true"></span>Hybrid Intent Router</a>
+  <nav><a href="#demo">Try it</a><a href="#live">Live dashboard</a><a href="#results">Results</a>
+    <a class="gh" href="https://github.com/Anubhavkumarkanth/hybrid-intent-router" target="_blank" rel="noopener">GitHub</a></nav>
 </div></header>
 
 <main>
 <div class="hero wrap">
-  <p class="eyebrow">Voice-bot intent detection · English, Hindi, Kannada</p>
-  <h1>A small model answers first. The LLM only sees the messages it isn't sure about.</h1>
-  <p class="lead">The small model was trained on English only, yet it also understands Hindi and Kannada.
-    When it is confident, it answers on a CPU in milliseconds. When it isn't, the message goes to
-    {{ "Gemini" if llm_enabled else "an LLM (switched off on this server, so the small model answers)" }}.</p>
+  <span class="pill-top"><span class="live"></span>Live · English · हिन्दी · ಕನ್ನಡ · Hinglish</span>
+  <h1>A voice assistant brain that <span class="grad">understands India's languages</span> and only pays for an LLM when it has to.</h1>
+  <p class="lead">Speak or type a request. A small model trained only on English answers most messages on a CPU in milliseconds,
+    sends the unsure ones to Gemini, and then actually does the task.</p>
+  <div class="cta">
+    <a class="btn primary" href="#demo" id="hero-talk"><svg width="18" height="18" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-2.08A7 7 0 0 0 19 12h-2z"/></svg>Talk to it</a>
+    <a class="btn" href="#live">See live traffic</a>
+  </div>
   {% if h %}
   <div class="stats">
-    <div class="stat"><b>{{ "%.1f"|format(h.router_acc * 100) }}%</b><span>accuracy, same as sending everything to the LLM ({{ "%.1f"|format(h.llm_acc * 100) }}%)</span></div>
-    <div class="stat"><b>{{ "%.0f"|format(h.calls_avoided * 100) }}%</b><span>of messages answered without the LLM</span></div>
-    <div class="stat"><b>${{ "%.2f"|format(h.cost_llm) }} → ${{ "%.2f"|format(h.cost_router) }}</b><span>LLM cost per 1,000 messages</span></div>
-    <div class="stat"><b>{{ "{:,.0f}".format(h.lat_llm) }} → {{ "%.0f"|format(h.lat_router) }} ms</b><span>typical time per message</span></div>
+    <div class="glass stat"><b data-count="{{ h.router_acc * 100 }}" data-fmt="pct1">{{ "%.1f"|format(h.router_acc * 100) }}%</b><span>accuracy, the same as sending everything to the LLM</span></div>
+    <div class="glass stat"><b data-count="{{ h.calls_avoided * 100 }}" data-fmt="pct0">{{ "%.0f"|format(h.calls_avoided * 100) }}%</b><span>of messages answered without the LLM</span></div>
+    <div class="glass stat"><b data-count="{{ (1 - h.cost_router / h.cost_llm) * 100 }}" data-fmt="pct0">{{ "%.0f"|format((1 - h.cost_router / h.cost_llm) * 100) }}%</b><span>lower LLM cost</span></div>
+    <div class="glass stat"><b data-count="{{ h.lat_llm / h.lat_router }}" data-fmt="x">{{ "%.0f"|format(h.lat_llm / h.lat_router) }}×</b><span>faster per message ({{ "{:,.0f}".format(h.lat_llm) }} → {{ "%.0f"|format(h.lat_router) }} ms)</span></div>
   </div>
-  <p class="note">Measured on {{ "{:,}".format(h.n_per_lang * 3) }} test sentences ({{ h.n_per_lang }} per language). The confidence threshold ({{ "%.2f"|format(h.threshold) }}) was chosen on separate dev data.</p>
   {% endif %}
 </div>
 
-<section id="try"><div class="wrap">
-  <h2>Try it</h2>
-  <p class="sub">Type anything a voice assistant might hear, pick an example, or pull a random sentence from the test set to see the model being right or wrong.</p>
-  <div class="grid2">
-    <div class="card">
-      <div class="tabs" role="tablist" id="tabs">
-        <button class="tab" role="tab" data-lang="en" aria-selected="true">English</button>
-        <button class="tab" role="tab" data-lang="hi" aria-selected="false">हिन्दी</button>
-        <button class="tab" role="tab" data-lang="kn" aria-selected="false">ಕನ್ನಡ</button>
+<section id="demo"><div class="wrap">
+  <div class="head reveal"><h2>Try it</h2><p>Tap the mic and ask in any of the four languages, or pick an example. The examples with a dot run a real task: it checks the weather, converts money and does maths.</p></div>
+  <div class="demo">
+    <div class="glass panel reveal">
+      <div class="langs" id="langs">
+        <button class="lang" data-lang="en" aria-pressed="true">English</button>
+        <button class="lang" data-lang="hi" aria-pressed="false">हिन्दी</button>
+        <button class="lang" data-lang="kn" aria-pressed="false">ಕನ್ನಡ</button>
+        <button class="lang" data-lang="hinglish" aria-pressed="false">Hinglish</button>
+      </div>
+      <div class="microw">
+        <button class="mic" id="mic" aria-label="Speak"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-2.08A7 7 0 0 0 19 12h-2z"/></svg></button>
+        <div class="mictext"><b id="mic-title">Tap and speak</b><span id="mic-sub">Your browser turns speech into text; the router does the rest.</span></div>
+      </div>
+      <div class="inputrow">
+        <input id="text" maxlength="500" placeholder="...or type, e.g. what's the weather in Mumbai?" autocomplete="off">
+        <button class="btn primary" id="go">Ask</button>
       </div>
       <div class="chips" id="examples"></div>
-      <label for="text" class="sr">Message</label>
-      <textarea id="text" maxlength="500" placeholder="For example: wake me up at six tomorrow"></textarea>
-      <div class="meta"><span>Detected script: <span class="badge" id="script">none</span></span><span id="count">0 / 500</span></div>
-      <div class="actions">
-        <button class="btn primary" id="go">Classify</button>
-        <button class="btn" id="random">Random test sentence</button>
-        <button class="btn" id="clear">Clear</button>
-        <span class="kbd">Ctrl + Enter</span>
-      </div>
+      <div class="subtle"><span class="toggle" id="speak-toggle">🔊 Spoken replies: on</span><button class="chip" id="random" style="border-style:dashed">🎲 Random test sentence</button></div>
     </div>
 
-    <div class="card" id="out" aria-live="polite">
-      <div class="empty" id="empty">Pick an example or type a message.<br>The answer, the confidence and the route it took show up here.</div>
-      <div id="result" hidden>
-        <div class="answer"><span class="domain" id="r-domain"></span><span class="action" id="r-action"></span></div>
-        <div class="row"><span>Answered by</span><span class="pill" id="r-who"></span><span id="r-lat"></span></div>
-        <div id="r-truth"></div>
-        <p class="label"><span>Small model confidence</span><b id="r-conf"></b></p>
-        <div class="meter"><div class="fill" id="r-fill"></div><div class="mark" id="r-mark"></div></div>
-        <p class="caption" id="r-caption"></p>
-        <div class="route" aria-label="Route this message took">
-          <div class="node on-small"><b>Small model</b>MuRIL, CPU</div><span class="arrow">→</span>
-          <div class="node" id="r-check"><b>Confident?</b><span id="r-check-t"></span></div><span class="arrow">→</span>
-          <div class="node" id="r-final"><b id="r-final-b"></b><span id="r-final-t"></span></div>
+    <div class="glass panel result reveal" aria-live="polite">
+      <div class="empty" id="empty"><div class="big">🎙️</div>Ask something and the answer appears here,<br>with the route it took through the system.</div>
+      <div id="res" hidden>
+        <div class="heard" id="heard"></div>
+        <div class="answer" id="answer"></div>
+        <div class="route">
+          <div class="node" id="n1"><b>Small model</b>CPU · <span id="n1t"></span></div><div class="link" id="l1"><i></i></div>
+          <div class="node" id="n2"><b>Confident?</b><span id="n2t"></span></div><div class="link" id="l2"><i></i></div>
+          <div class="node" id="n3"><b id="n3b"></b><span id="n3t"></span></div>
         </div>
-        <p class="label"><span>Small model's top 3 guesses</span></p>
-        <ul class="top3" id="r-top"></ul>
-        <div id="r-note"></div>
-        <details><summary>Raw API response</summary><pre id="r-json"></pre></details>
+        <div class="meterlab"><span>Small model confidence</span><b id="conf"></b></div>
+        <div class="meter"><div class="fill" id="fill"></div><div class="mark" id="mark"></div></div>
+        <div class="meta"><span>Answered by <span class="badge" id="who"></span></span><span id="lat"></span><span id="intent"></span></div>
+        <div id="truth"></div>
       </div>
-      <p class="err" id="r-err" hidden></p>
+      <p class="err" id="err" hidden></p>
     </div>
-  </div>
-
-  <div class="card session">
-    <div class="nums">
-      <div><b id="s-n">0</b><span>messages this visit</span></div>
-      <div><b id="s-small">-</b><span>answered without the LLM</span></div>
-      <div><b id="s-lat">-</b><span>average server time</span></div>
-      <div><b id="s-acc">-</b><span>right on random test sentences</span></div>
-    </div>
-    <ul class="hist" id="hist"></ul>
   </div>
 </div></section>
 
-<section id="how"><div class="wrap">
-  <h2>How it works</h2>
-  <p class="sub">Every message takes the cheap path first. Only uncertain ones pay for the LLM.</p>
-  <div class="steps">
-    <div class="card step"><div class="n">1</div><h3>Small model</h3><p>MuRIL, a BERT-style encoder pre-trained on 17 Indian languages and English, with my own classification head over 60 intents. Fine-tuned on English only.</p></div>
-    <div class="card step"><div class="n">2</div><h3>Calibrated confidence</h3><p>Temperature scaling (T = {{ "%.2f"|format(h.temperature) if h else "?" }}) makes the confidence honest: "90% sure" means right about 90% of the time.</p></div>
-    <div class="card step"><div class="n">3</div><h3>Threshold</h3><p>Confidence {{ "%.2f"|format(h.threshold) if h else "t" }} or more: the small model answers. Below that, the message goes to the LLM. The threshold was picked on dev data, never on test data.</p></div>
-    <div class="card step"><div class="n">4</div><h3>Safe fallback</h3><p>If the LLM fails, times out or hits the per-minute cap, the small model's answer is used, marked <i>small_fallback</i>. Nothing crashes.</p></div>
+<section id="live"><div class="wrap">
+  <div class="head reveal"><h2>Live dashboard</h2><p>Real traffic on this server in the last 24 hours, including your messages. Only the route, language, intent and timing are stored, never what you typed.</p></div>
+  <div class="dash-tiles">
+    <div class="glass tile reveal"><b id="d-total">0</b><span>requests in the last 24 h</span></div>
+    <div class="glass tile reveal"><b id="d-free">-</b><span>answered without the LLM</span></div>
+    <div class="glass tile reveal"><b id="d-p95">-</b><span>p95 routing time</span></div>
+    <div class="glass tile reveal"><b id="d-saved">-</b><span>LLM cost avoided</span></div>
   </div>
-  <figure class="card"><img src="/charts/architecture.png" alt="Diagram: a message goes to the small model; if confident it answers, otherwise the LLM answers" loading="lazy">
-    <figcaption>The routing rule. On this server, requests go through gunicorn behind Render's load balancer; locally the same app runs behind NGINX.</figcaption></figure>
+  <div class="charts">
+    <div class="glass chart reveal"><h3>Requests per hour, by who answered</h3><div class="box"><canvas id="c-time"></canvas></div></div>
+    <div class="glass chart reveal"><h3>Who answered</h3><div class="box"><canvas id="c-route"></canvas></div></div>
+  </div>
+  <div class="charts three">
+    <div class="glass chart reveal"><h3>Languages</h3><div class="box"><canvas id="c-lang"></canvas></div></div>
+    <div class="glass chart reveal" style="grid-column:span 2"><h3>Top intents</h3><div class="box"><canvas id="c-intents"></canvas></div></div>
+  </div>
+  <div class="livebar"><span class="dot"></span><span id="d-updated">connecting...</span></div>
 </div></section>
 
 <section id="results"><div class="wrap">
-  <h2>Results</h2>
-  <p class="sub">Test set, {{ h.n_per_lang if h else "500" }} sentences per language, threshold fixed beforehand on dev data.</p>
-  {% if data.get("per_lang") %}
-  <div class="card">
-    <table>
-      <thead><tr><th>Language</th><th>Small model only</th><th>LLM only</th><th>Router</th><th>Sent to LLM</th></tr></thead>
-      <tbody>
-      {% for lg, name in [("en", "English"), ("hi", "Hindi"), ("kn", "Kannada"), ("pooled", "All three")] %}
-        {% set r = data.per_lang[lg] %}
-        <tr><td>{{ name }}</td><td>{{ "%.1f"|format(r.small_only_acc * 100) }}%</td><td>{{ "%.1f"|format(r.llm_only_acc * 100) }}%</td>
-            <td class="hi">{{ "%.1f"|format(r.router_acc * 100) }}%</td><td>{{ "%.1f"|format(r.llm_share * 100) }}%</td></tr>
-      {% endfor %}
-      </tbody>
-    </table>
-    {% if data.get("small_model") %}<p class="note">The small model alone, on the full test sets with no Hindi or Kannada training data:
-      English {{ "%.1f"|format(data.small_model.en * 100) }}%, Hindi {{ "%.1f"|format(data.small_model.hi * 100) }}%, Kannada {{ "%.1f"|format(data.small_model.kn * 100) }}%.</p>{% endif %}
-    {% if data.get("deployed") and data.deployed_onnx %}<p class="note">This server runs a {{ "%.0f"|format(data.deployed.size_mb) }} MB copy of the model (the original is {{ "%.0f"|format(data.deployed.orig_mb) }} MB)
-      that gives the same answer as the original on {{ "%.1f"|format(data.deployed.agree_min * 100) }}-{{ "%.0f"|format(data.deployed.agree_max * 100) }}% of test sentences, so it fits a free 512 MB server.</p>{% endif %}
-  </div>
-  {% endif %}
+  <div class="head reveal"><h2>How well it works</h2><p>Measured on held-out test sentences (500 per language). The confidence threshold was chosen beforehand on separate data, so these numbers are honest.</p></div>
   <div class="charts">
-    <figure class="card wide"><img src="/charts/accuracy_vs_llm_share.png" alt="Accuracy against the share of messages sent to the LLM, per language" loading="lazy">
-      <figcaption>Accuracy against the share of messages sent to the LLM. Dots mark the chosen threshold.</figcaption></figure>
-    <figure class="card"><img src="/charts/cost_per_1000.png" alt="LLM cost per 1000 messages, LLM only against router" loading="lazy">
-      <figcaption>LLM cost per 1,000 messages, from real token counts and the paid price.</figcaption></figure>
-    <figure class="card"><img src="/charts/reliability.png" alt="Reliability diagram before and after temperature scaling" loading="lazy">
-      <figcaption>Calibration: after temperature scaling, the confidence is much closer to the real accuracy.</figcaption></figure>
+    <div class="glass chart reveal"><h3>Accuracy as more messages go to the LLM (dots: the chosen threshold)</h3><div class="box" style="height:280px"><canvas id="c-curve"></canvas></div></div>
+    <div class="glass chart reveal"><h3>Accuracy by language</h3><div class="box" style="height:280px"><canvas id="c-langacc"></canvas></div></div>
   </div>
+  {% if data.get("hinglish") %}
+  <p class="note reveal">Hinglish: the same 500 test sentences rewritten as casual romanized Hindi by Gemini, with the dataset's own labels. The small model never saw Hinglish in training and still gets {{ "%.1f"|format(data.hinglish.small_only_acc * 100) }}%; the router reaches {{ "%.1f"|format(data.hinglish.router_acc * 100) }}% while asking the LLM about only {{ "%.1f"|format(data.hinglish.llm_share * 100) }}% of them. Gemini also wrote these sentences, which may flatter its own score.</p>
+  {% endif %}
+  {% if data.get("deployed") and data.deployed_onnx %}<p class="note reveal">This server runs a {{ "%.0f"|format(data.deployed.size_mb) }} MB compressed copy of the model (the original is {{ "%.0f"|format(data.deployed.orig_mb) }} MB) that gives the same answer on {{ "%.1f"|format(data.deployed.agree_min * 100) }}-{{ "%.0f"|format(data.deployed.agree_max * 100) }}% of test sentences, so it fits a free 512 MB server.</p>{% endif %}
 </div></section>
 
-<section id="intents"><div class="wrap">
-  <h2>All 60 intents</h2>
-  <p class="sub">The intents come from Amazon's MASSIVE dataset. Click one to try a real English training sentence for it.</p>
-  <input class="search" id="search" type="search" placeholder="Search intents, e.g. alarm, music, weather">
-  <div class="domains" id="domains"></div>
-</div></section>
-
-<section id="api"><div class="wrap">
-  <h2>API</h2>
-  <p class="sub">The page above uses the same endpoint. Text must be 1 to 500 characters.</p>
-  <div class="card">
-    <button class="btn copy" id="copy">Copy</button>
-    <pre id="curl"></pre>
-    <pre>{"intent": "alarm_set", "confidence": 0.9158, "routed_to": "small", "latency_ms": 28.2,
- "threshold": {{ data.headline.threshold if h else 0.56 }}, "small_model_top": [{"intent": "alarm_set", "confidence": 0.9158}, ...]}</pre>
-    <p class="note">routed_to is "small" (confident), "llm" (the LLM answered) or "small_fallback" (unsure, but the LLM was unavailable or over its per-minute cap).</p>
+<section id="how"><div class="wrap">
+  <div class="head reveal"><h2>How it works</h2></div>
+  <div class="steps">
+    <div class="glass step reveal"><div class="n">1</div><h3>Small model first</h3><p>A multilingual model fine-tuned on English only reads every message on a CPU in about 30 ms, in any of the four languages.</p></div>
+    <div class="glass step reveal"><div class="n">2</div><h3>LLM only when unsure</h3><p>If its calibrated confidence is below the threshold, the message goes to Gemini. If Gemini is down or busy, the small model's answer is kept.</p></div>
+    <div class="glass step reveal"><div class="n">3</div><h3>Then it does the task</h3><p>Weather, time, currency, maths, word meanings and jokes run live through free public APIs, and the reply is spoken back.</p></div>
   </div>
 </div></section>
 </main>
 
 <footer><div class="wrap">
-  Code, results and the full write-up: <a href="https://github.com/Anubhavkumarkanth/hybrid-intent-router">github.com/Anubhavkumarkanth/hybrid-intent-router</a>.
-  Data: Amazon MASSIVE 1.1 (CC BY 4.0). Base model: google/muril-base-cased (Apache-2.0).
-  Free server: the first request after a quiet spell takes a few seconds while it wakes up.
+  Built with PyTorch, ONNX Runtime, Flask and Gemini · Data: Amazon MASSIVE (CC BY 4.0) ·
+  <a href="https://github.com/Anubhavkumarkanth/hybrid-intent-router" target="_blank" rel="noopener">Source code on GitHub</a><br>
+  Free server: the first request after a quiet spell can take a few seconds while it wakes up.
 </div></footer>
 
 <script id="page-data" type="application/json">{{ data|tojson }}</script>
 <script>
 (() => {
   const D = JSON.parse(document.getElementById("page-data").textContent);
-  const T = {{ threshold|tojson }};
+  const T = {{ threshold|tojson }}, LLM_ON = {{ llm_enabled|tojson }};
   const $ = (id) => document.getElementById(id);
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
-  const pct = (x) => (x * 100).toFixed(1) + "%";
+  const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const pct = (x, d = 1) => (x * 100).toFixed(d) + "%";
   const ms = (x) => x >= 1000 ? (x / 1000).toFixed(1) + " s" : Math.round(x) + " ms";
-  const split = (intent) => { const i = intent.indexOf("_"); return i < 0 ? [intent, intent] : [intent.slice(0, i), intent.slice(i + 1).replace(/_/g, " ")]; };
-  const pretty = (intent) => { const [d, a] = split(intent); return d === a ? d : d + " · " + a; };
-  const WHO = { small: "Small model", llm: "LLM (Gemini)", small_fallback: "Small model (LLM unavailable)" };
-  const DOT = { small: "var(--small)", llm: "var(--llm)", small_fallback: "var(--fb)" };
+  const pretty = (intent) => intent.replace("_", " · ").replace(/_/g, " ");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  // ---- script detection
-  function detect(text) {
-    let lat = 0, dev = 0, kan = 0;
-    for (const ch of text) {
-      const c = ch.codePointAt(0);
-      if (c >= 0x0900 && c <= 0x097F) dev++; else if (c >= 0x0C80 && c <= 0x0CFF) kan++; else if (/[a-z]/i.test(ch)) lat++;
-    }
-    const n = lat + dev + kan;
-    if (!n) return "none";
-    const parts = [[lat, "Latin (English)"], [dev, "Devanagari (Hindi)"], [kan, "Kannada"]].filter(p => p[0] / n > 0.15);
-    return parts.length > 1 ? "Mixed" : parts[0][1];
-  }
-  const text = $("text");
-  function onInput() { $("script").textContent = detect(text.value); $("count").textContent = text.value.length + " / 500"; }
-  text.addEventListener("input", onInput);
+  /* ---------- animated network background */
+  (() => {
+    const c = $("bg"), ctx = c.getContext("2d"); let pts = [], w, h;
+    const size = () => { w = c.width = innerWidth * devicePixelRatio; h = c.height = innerHeight * devicePixelRatio;
+      c.style.width = innerWidth + "px"; c.style.height = innerHeight + "px";
+      const n = Math.min(70, Math.floor(innerWidth * innerHeight / 22000));
+      pts = Array.from({ length: n }, () => ({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - .5) * .25, vy: (Math.random() - .5) * .25 })); };
+    size(); addEventListener("resize", size);
+    const draw = () => {
+      ctx.clearRect(0, 0, w, h);
+      const col = css("--blue") || "#2a6fdb", R = 150 * devicePixelRatio;
+      ctx.fillStyle = col; ctx.strokeStyle = col;
+      for (const p of pts) { p.x += p.vx; p.y += p.vy; if (p.x < 0 || p.x > w) p.vx *= -1; if (p.y < 0 || p.y > h) p.vy *= -1; }
+      for (let i = 0; i < pts.length; i++) {
+        const a = pts[i]; ctx.globalAlpha = .35; ctx.beginPath(); ctx.arc(a.x, a.y, 1.6 * devicePixelRatio, 0, 7); ctx.fill();
+        for (let j = i + 1; j < pts.length; j++) { const b = pts[j], d = Math.hypot(a.x - b.x, a.y - b.y);
+          if (d < R) { ctx.globalAlpha = .14 * (1 - d / R); ctx.lineWidth = devicePixelRatio; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); } }
+      }
+      ctx.globalAlpha = 1;
+      if (!reduce && !document.hidden) requestAnimationFrame(draw); else setTimeout(() => requestAnimationFrame(draw), 1000);
+    };
+    draw();
+  })();
 
-  // ---- example tabs
+  /* ---------- reveal on scroll + count-up */
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: .12 });
+  document.querySelectorAll(".reveal").forEach(e => io.observe(e));
+  document.querySelectorAll("[data-count]").forEach(e => {
+    const end = parseFloat(e.dataset.count), f = e.dataset.fmt, t0 = performance.now(), dur = 1400;
+    const fmt = (v) => f === "pct1" ? v.toFixed(1) + "%" : f === "pct0" ? Math.round(v) + "%" : Math.round(v) + "×";
+    if (reduce) return;
+    const tick = (t) => { const k = Math.min(1, (t - t0) / dur), v = end * (1 - Math.pow(1 - k, 3)); e.textContent = fmt(v); if (k < 1) requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+  });
+
+  /* ---------- examples */
+  const TASKS = {
+    en: ["what's the weather in Mumbai", "convert 100 dollars to rupees", "what is 25 times 48", "what time is it in London", "define serendipity", "tell me a joke", "wake me up at six tomorrow", "play some jazz"],
+    hi: ["मुंबई में मौसम कैसा है", "100 डॉलर कितने रुपये हैं", "मुझे कल सुबह छह बजे जगा देना", "कोई गाना चलाओ", "आज की खबरें सुनाओ"],
+    kn: ["ಬೆಂಗಳೂರಿನ ಹವಾಮಾನ ಹೇಗಿದೆ", "ನಾಳೆ ಬೆಳಿಗ್ಗೆ ಆರು ಗಂಟೆಗೆ ಅಲಾರಂ ಇಡು", "ಹಾಡು ಹಾಕು", "ಲೈಟ್ ಆಫ್ ಮಾಡು"],
+    hinglish: ["aaj Delhi mein mausam kaisa hai", "ek dollar kitne rupaye ka hai", "kal subah 6 baje alarm laga do", "koi accha gaana bajao", "lights band kar do"],
+  };
+  const TASK_WORDS = /weather|मौसम|ಹವಾಮಾನ|mausam|dollar|डॉलर|rupaye|times|time is it|define|joke/i;
   let lang = "en";
   function showExamples() {
     const box = $("examples"); box.replaceChildren();
-    (D.samples[lang] || []).slice(0, 6).forEach(s => {
-      const b = el("button", "chip", s.text); b.title = s.text;
-      b.onclick = () => { text.value = s.text; onInput(); classify(s.text, null); };
-      box.append(b);
-    });
+    (TASKS[lang] || []).forEach(t => { const b = el("button", "chip" + (TASK_WORDS.test(t) ? " task" : ""), t);
+      b.onclick = () => { $("text").value = t; ask(t, null, false); }; box.append(b); });
   }
-  document.querySelectorAll(".tab").forEach(t => t.onclick = () => {
-    document.querySelectorAll(".tab").forEach(x => x.setAttribute("aria-selected", "false"));
-    t.setAttribute("aria-selected", "true"); lang = t.dataset.lang; showExamples();
-  });
+  document.querySelectorAll(".lang").forEach(b => b.onclick = () => {
+    document.querySelectorAll(".lang").forEach(x => x.setAttribute("aria-pressed", "false"));
+    b.setAttribute("aria-pressed", "true"); lang = b.dataset.lang; showExamples(); });
 
-  // ---- session
-  const S = { n: 0, small: 0, ms: 0, tried: 0, right: 0, hist: [] };
-  function updateSession(entry) {
-    S.n++; if (entry.routed !== "llm") S.small++; S.ms += entry.ms;
-    if (entry.truth) { S.tried++; if (entry.ok) S.right++; }
-    S.hist.unshift(entry); S.hist = S.hist.slice(0, 8);
-    $("s-n").textContent = S.n; $("s-small").textContent = Math.round(100 * S.small / S.n) + "%";
-    $("s-lat").textContent = ms(S.ms / S.n);
-    $("s-acc").textContent = S.tried ? S.right + " / " + S.tried : "-";
-    const ul = $("hist"); ul.replaceChildren();
-    S.hist.forEach(h => {
-      const li = el("li"); const d = el("span", "d"); d.style.background = DOT[h.routed];
-      li.append(d, el("span", "t", h.text), el("span", "i", pretty(h.intent) + (h.truth ? (h.ok ? "  ✓" : "  ✗") : "")));
-      li.title = "Run again"; li.onclick = () => { text.value = h.text; onInput(); classify(h.text, h.truth); };
-      ul.append(li);
-    });
-  }
-
-  // ---- classify
-  let busy = false, wakeTimer;
-  async function classify(msg, truth) {
-    msg = (msg ?? text.value).trim();
-    if (!msg || busy) return;
-    busy = true; $("go").disabled = $("random").disabled = true; $("go").textContent = "Classifying...";
-    wakeTimer = setTimeout(() => { $("go").textContent = "Still working (the LLM or a sleeping server)..."; }, 2500);
-    $("r-err").hidden = true;
-    try {
-      const r = await fetch("/predict", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: msg }) });
-      const j = await r.json();
-      if (!r.ok) throw new Error(j.error || ("HTTP " + r.status));
-      render(j, truth);
-      updateSession({ text: msg, intent: j.intent, routed: j.routed_to, ms: j.latency_ms, truth, ok: truth ? j.intent === truth : null });
-    } catch (e) {
-      $("r-err").textContent = "Could not classify: " + e.message; $("r-err").hidden = false;
-    } finally {
-      clearTimeout(wakeTimer); busy = false; $("go").disabled = $("random").disabled = false; $("go").textContent = "Classify";
-    }
-  }
-
-  function render(j, truth) {
-    $("empty").hidden = true; $("result").hidden = false;
-    const [d, a] = split(j.intent);
-    $("r-domain").textContent = d; $("r-action").textContent = a;
-    const who = $("r-who"); who.className = "pill " + j.routed_to; who.textContent = WHO[j.routed_to] || j.routed_to;
-    $("r-lat").textContent = "· " + ms(j.latency_ms) + " on the server";
-    const thr = j.threshold ?? T, conf = j.confidence, sure = conf >= thr;
-    $("r-conf").textContent = pct(conf);
-    const fill = $("r-fill"); fill.style.width = (conf * 100) + "%";
-    fill.style.background = sure ? "var(--small)" : "var(--fb)";
-    const mark = $("r-mark"); mark.style.left = (thr * 100) + "%"; mark.dataset.label = "threshold " + thr.toFixed(2);
-    $("r-caption").textContent = sure
-      ? "At or above the threshold, so the small model answered on its own."
-      : (j.routed_to === "llm" ? "Below the threshold, so the message went to the LLM."
-         : "Below the threshold, but the LLM was unavailable here, so the small model's answer was kept.");
-    const check = $("r-check"), fin = $("r-final");
-    check.className = "node " + (sure ? "on-small" : "on-fb");
-    $("r-check-t").textContent = pct(conf) + (sure ? " ≥ " : " < ") + thr.toFixed(2);
-    fin.className = "node " + (j.routed_to === "llm" ? "on-llm" : j.routed_to === "small" ? "on-small" : "on-fb");
-    $("r-final-b").textContent = j.routed_to === "llm" ? "Gemini answers" : "Small model answers";
-    $("r-final-t").textContent = pretty(j.intent);
-
-    const ul = $("r-top"); ul.replaceChildren();
-    (j.small_model_top || [{ intent: j.intent, confidence: conf }]).forEach(t => {
-      const li = el("li"); const bar = el("div", "bar"); const i = el("i"); i.style.width = (t.confidence * 100) + "%"; bar.append(i);
-      li.append(el("span", "name", pretty(t.intent)), bar, el("span", "pct", pct(t.confidence))); ul.append(li);
-    });
-    const note = $("r-note"); note.replaceChildren();
-    const top1 = (j.small_model_top || [])[0];
-    if (j.routed_to === "llm" && top1 && top1.intent !== j.intent)
-      note.append(el("div", "callout info", "Gemini answered " + pretty(j.intent) + ". The small model's best guess was " + pretty(top1.intent) + " (" + pct(top1.confidence) + ")."));
-    else if (j.routed_to === "llm" && top1)
-      note.append(el("div", "callout info", "Gemini agreed with the small model's best guess, but the small model wasn't sure enough to answer alone."));
-    const tr = $("r-truth"); tr.replaceChildren();
-    if (truth) {
-      const ok = truth === j.intent;
-      tr.append(el("div", "callout " + (ok ? "ok" : "bad"), (ok ? "✓ Correct. " : "✗ Wrong. ") + "The true intent in the test set is " + pretty(truth) + "."));
-    }
-    $("r-json").textContent = JSON.stringify(j, null, 2);
-  }
-
-  $("go").onclick = () => classify(null, null);
-  $("clear").onclick = () => { text.value = ""; onInput(); text.focus(); };
-  $("random").onclick = () => {
-    const pool = D.samples[lang] || []; if (!pool.length) return;
-    const s = pool[Math.floor(Math.random() * pool.length)];
-    text.value = s.text; onInput(); classify(s.text, s.intent);
+  /* ---------- voice in */
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const SR_LANG = { en: "en-IN", hi: "hi-IN", kn: "kn-IN", hinglish: "en-IN" };
+  let rec = null, listening = false;
+  if (!SR) { $("mic-title").textContent = "Voice needs Chrome or Edge"; $("mic-sub").textContent = "Typing works everywhere."; }
+  $("mic").onclick = () => {
+    if (!SR) return;
+    if (listening) { rec && rec.stop(); return; }
+    rec = new SR(); rec.lang = SR_LANG[lang]; rec.interimResults = true; rec.maxAlternatives = 1;
+    rec.onstart = () => { listening = true; $("mic").classList.add("on"); $("mic-title").textContent = "Listening..."; $("mic-sub").textContent = "Speak now (" + rec.lang + ")"; };
+    rec.onresult = (e) => { const r = e.results[e.results.length - 1]; $("text").value = r[0].transcript; if (r.isFinal) ask(r[0].transcript, null, true); };
+    rec.onerror = (e) => { $("mic-sub").textContent = e.error === "not-allowed" ? "Microphone permission was blocked." : "Didn't catch that, try again."; };
+    rec.onend = () => { listening = false; $("mic").classList.remove("on"); $("mic-title").textContent = "Tap and speak"; };
+    rec.start();
   };
-  text.addEventListener("keydown", e => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); classify(null, null); } });
+  $("hero-talk").addEventListener("click", () => setTimeout(() => SR && !listening && $("mic").click(), 700));
 
-  // ---- intents explorer
-  const DOMAIN = { iot: "Smart home (IoT)", qa: "Questions (QA)", general: "General chat", datetime: "Date and time",
-                   play: "Play media", recommendation: "Recommendations", takeaway: "Takeaway food" };
-  function showIntents(q) {
-    const box = $("domains"); box.replaceChildren(); q = (q || "").toLowerCase();
-    Object.entries(D.intents || {}).forEach(([dom, items]) => {
-      const hits = items.filter(it => !q || it.intent.includes(q) || it.action.includes(q) || dom.includes(q) || (it.example || "").toLowerCase().includes(q));
-      if (!hits.length) return;
-      const card = el("div", "card dom"); card.append(el("h3", null, (DOMAIN[dom] || dom) + " (" + hits.length + ")"));
-      const chips = el("div", "chips");
-      hits.forEach(it => {
-        const b = el("button", "chip", it.action.replace(/_/g, " ")); b.title = it.example ? "Try: " + it.example : it.intent;
-        b.onclick = () => { if (!it.example) return; text.value = it.example; onInput(); location.hash = "try"; classify(it.example, it.intent); };
-        chips.append(b);
-      });
-      card.append(chips); box.append(card);
-    });
+  /* ---------- voice out */
+  let speakOn = "speechSynthesis" in window;
+  if (!speakOn) $("speak-toggle").textContent = "🔇 Spoken replies not supported here";
+  $("speak-toggle").onclick = () => { if (!("speechSynthesis" in window)) return; speakOn = !speakOn;
+    $("speak-toggle").textContent = speakOn ? "🔊 Spoken replies: on" : "🔇 Spoken replies: off"; if (!speakOn) speechSynthesis.cancel(); };
+  function speak(text) {
+    if (!speakOn || !text) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text); const vs = speechSynthesis.getVoices();
+    u.voice = vs.find(v => v.lang === "en-IN") || vs.find(v => v.lang.startsWith("en")) || null; u.rate = 1.02;
+    speechSynthesis.speak(u);
   }
-  $("search").addEventListener("input", e => showIntents(e.target.value));
 
-  // ---- API snippet
-  const curl = "curl -s -X POST " + location.origin + "/predict \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"text\": \"wake me up at five am this week\"}'";
-  $("curl").textContent = curl;
-  $("copy").onclick = async () => { try { await navigator.clipboard.writeText(curl.replace(/\\\n\s*/g, "")); $("copy").textContent = "Copied"; setTimeout(() => $("copy").textContent = "Copy", 1500); } catch (e) { $("copy").textContent = "Select and copy"; } };
+  /* ---------- ask */
+  let busy = false;
+  async function ask(msg, truth, voice) {
+    msg = (msg ?? $("text").value).trim(); if (!msg || busy) return;
+    busy = true; $("go").disabled = true; $("go").textContent = "...";
+    const slow = setTimeout(() => { $("go").textContent = "Thinking..."; }, 2000);
+    $("err").hidden = true;
+    try {
+      const r = await fetch("/predict", { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: msg, lang, voice: !!voice }) });
+      const j = await r.json(); if (!r.ok) throw new Error(j.error || "HTTP " + r.status);
+      render(msg, j, truth); speak(j.reply); setTimeout(loadDash, 800);
+    } catch (e) { $("err").textContent = "Something went wrong: " + e.message; $("err").hidden = false; }
+    finally { clearTimeout(slow); busy = false; $("go").disabled = false; $("go").textContent = "Ask"; }
+  }
+  $("go").onclick = () => ask(null, null, false);
+  $("text").addEventListener("keydown", e => { if (e.key === "Enter") ask(null, null, false); });
+  $("random").onclick = () => { const pool = (D.samples || {})[lang] || []; if (!pool.length) return;
+    const s = pool[Math.floor(Math.random() * pool.length)]; $("text").value = s.text; ask(s.text, s.intent, false); };
 
-  showExamples(); showIntents(""); onInput();
+  function answerCard(j) {
+    const box = $("answer"); box.replaceChildren(); const a = j.action;
+    const k = el("div", "k"), v = el("div", "v"), s = el("div", "s");
+    if (a && a.kind === "weather" && !a.detail.error) {
+      k.textContent = "Weather · " + a.title;
+      const wx = el("div", "wx"); wx.append(el("div", "t", Math.round(a.detail.temp_c) + "°C"),
+        el("div", null, a.detail.description + " · " + Math.round(a.detail.min_c) + "–" + Math.round(a.detail.max_c) + "°C · humidity " + a.detail.humidity + "%"));
+      box.append(k, wx, el("div", "s", a.detail.place_from_message ? "" : "No city in the message, so here is " + a.title.split(",")[0] + "."));
+    } else if (a && a.kind === "currency" && !a.detail.error) {
+      k.textContent = "Currency"; v.textContent = a.detail.value.toLocaleString() + " " + a.detail.to;
+      s.textContent = a.detail.amount.toLocaleString() + " " + a.detail.from + " · rate " + a.detail.rate + " · " + (a.detail.date || ""); box.append(k, v, s);
+    } else if (a && a.kind === "time") { k.textContent = "Time · " + a.title; v.textContent = a.detail.time; s.textContent = a.detail.date; box.append(k, v, s);
+    } else if (a && a.kind === "maths") { k.textContent = "Maths"; v.textContent = a.reply; box.append(k, v);
+    } else if (a) { k.textContent = a.kind === "joke" ? "Joke" : a.kind === "definition" ? "Meaning · " + a.title : a.title; v.textContent = ""; s.textContent = a.reply; s.style.fontSize = "1.05rem"; s.style.color = "var(--ink)"; box.append(k, s);
+    } else { k.textContent = "Understood"; v.textContent = pretty(j.intent); s.textContent = j.reply; box.append(k, v, s); }
+    if (a && a.source) box.append(el("div", "src", "Source: " + a.source));
+  }
+
+  function render(msg, j, truth) {
+    $("empty").hidden = true; $("res").hidden = false;
+    $("heard").replaceChildren("You said: ", el("b", null, "“" + msg + "”"));
+    answerCard(j);
+    const sure = j.confidence >= (j.threshold ?? T), who = j.routed_to;
+    ["n1", "n2", "n3"].forEach(id => $(id).className = "node"); ["l1", "l2"].forEach(id => $(id).className = "link");
+    $("n1t").textContent = pct(j.confidence, 0); $("n2t").textContent = (sure ? "yes, " : "no, ") + pct(j.confidence, 0) + (sure ? " ≥ " : " < ") + (j.threshold ?? T).toFixed(2);
+    $("n3b").textContent = who === "llm" ? "Gemini" : "Small model"; $("n3t").textContent = who === "small_fallback" ? "LLM unavailable" : "answers";
+    const lit = (id, cls, t) => setTimeout(() => $(id).classList.add("lit", cls), t), go = (id, t) => setTimeout(() => $(id).classList.add("go"), t);
+    lit("n1", "g", 0); go("l1", 150); lit("n2", sure ? "g" : "p", 450); go("l2", 600); lit("n3", who === "llm" ? "b" : who === "small" ? "g" : "p", 900);
+    $("conf").textContent = pct(j.confidence);
+    $("fill").style.background = sure ? "var(--green)" : "var(--purple)"; requestAnimationFrame(() => $("fill").style.width = (j.confidence * 100) + "%");
+    $("mark").style.left = ((j.threshold ?? T) * 100) + "%";
+    const b = $("who"); b.className = "badge " + who; b.textContent = who === "llm" ? "Gemini" : who === "small" ? "Small model" : "Small model (LLM busy)";
+    $("lat").textContent = "routing " + ms(j.latency_ms); $("intent").textContent = "intent: " + j.intent;
+    const t = $("truth"); t.replaceChildren();
+    if (truth) { const ok = truth === j.intent; t.append(el("div", "truth " + (ok ? "ok" : "bad"), (ok ? "✓ Correct: " : "✗ Wrong: ") + "the test set says " + pretty(truth) + ".")); }
+  }
+
+  /* ---------- charts */
+  Chart.defaults.font.family = getComputedStyle(document.body).fontFamily;
+  Chart.defaults.color = css("--muted"); Chart.defaults.borderColor = css("--line");
+  const C = { small: css("--green"), llm: css("--blue"), fb: css("--purple"), en: css("--blue"), hi: css("--purple"), kn: css("--green"), hinglish: css("--teal"), pooled: css("--ink") };
+  const LN = { en: "English", hi: "Hindi", kn: "Kannada", hinglish: "Hinglish", pooled: "All three", unknown: "Other" };
+  const noLegend = { legend: { display: false } };
+  const charts = {
+    time: new Chart($("c-time"), { type: "bar", data: { labels: [], datasets: [
+      { label: "Small model", data: [], backgroundColor: C.small, borderRadius: 4, stack: "s" },
+      { label: "Gemini", data: [], backgroundColor: C.llm, borderRadius: 4, stack: "s" },
+      { label: "Small model (LLM busy)", data: [], backgroundColor: C.fb, borderRadius: 4, stack: "s" }] },
+      options: { maintainAspectRatio: false, scales: { x: { grid: { display: false }, ticks: { maxTicksLimit: 8 } }, y: { beginAtZero: true, ticks: { precision: 0 } } },
+        plugins: { legend: { position: "bottom", labels: { boxWidth: 10 } } } } }),
+    route: new Chart($("c-route"), { type: "doughnut", data: { labels: ["Small model", "Gemini", "LLM busy"], datasets: [{ data: [0, 0, 0], backgroundColor: [C.small, C.llm, C.fb], borderWidth: 0 }] },
+      options: { maintainAspectRatio: false, cutout: "68%", plugins: { legend: { position: "bottom", labels: { boxWidth: 10 } } } } }),
+    lang: new Chart($("c-lang"), { type: "doughnut", data: { labels: [], datasets: [{ data: [], backgroundColor: [], borderWidth: 0 }] },
+      options: { maintainAspectRatio: false, cutout: "62%", plugins: { legend: { position: "bottom", labels: { boxWidth: 10 } } } } }),
+    intents: new Chart($("c-intents"), { type: "bar", data: { labels: [], datasets: [{ data: [], backgroundColor: C.llm, borderRadius: 6 }] },
+      options: { indexAxis: "y", maintainAspectRatio: false, plugins: noLegend, scales: { x: { beginAtZero: true, ticks: { precision: 0 } }, y: { grid: { display: false } } } } }),
+  };
+  let lastUpdate = 0;
+  async function loadDash() {
+    try {
+      const s = await (await fetch("/api/metrics?hours=24")).json(); if (s.error) throw new Error(s.error);
+      $("d-total").textContent = s.total.toLocaleString();
+      $("d-free").textContent = s.without_llm_share == null ? "-" : pct(s.without_llm_share, 0);
+      $("d-p95").textContent = s.latency_ms.p95 == null ? "-" : ms(s.latency_ms.p95);
+      $("d-saved").textContent = s.total ? "$" + s.cost_usd.saved.toFixed(4) : "-";
+      charts.time.data.labels = s.timeline.map(b => new Date(b.t * 1000).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
+      charts.time.data.datasets[0].data = s.timeline.map(b => b.small); charts.time.data.datasets[1].data = s.timeline.map(b => b.llm);
+      charts.time.data.datasets[2].data = s.timeline.map(b => b.small_fallback); charts.time.update();
+      charts.route.data.datasets[0].data = [s.routes.small || 0, s.routes.llm || 0, s.routes.small_fallback || 0]; charts.route.update();
+      const langs = Object.entries(s.languages);
+      charts.lang.data.labels = langs.map(([k]) => LN[k] || k); charts.lang.data.datasets[0].data = langs.map(([, v]) => v);
+      charts.lang.data.datasets[0].backgroundColor = langs.map(([k]) => C[k] || css("--faint")); charts.lang.update();
+      charts.intents.data.labels = s.top_intents.map(([k]) => pretty(k)); charts.intents.data.datasets[0].data = s.top_intents.map(([, v]) => v); charts.intents.update();
+      lastUpdate = Date.now();
+      const since = s.first_ts ? new Date(s.first_ts * 1000).toLocaleDateString([], { day: "numeric", month: "short" }) : null;
+      $("d-updated").dataset.extra = (s.total_all_time ? s.total_all_time.toLocaleString() + " requests in total" + (since ? " since " + since : "") : "No traffic yet: try the demo above and watch it appear");
+    } catch (e) { lastUpdate = 0; $("d-updated").textContent = "The live dashboard turns on when the server's database is connected."; }
+  }
+  setInterval(() => { if (lastUpdate) $("d-updated").textContent = "Live · updated " + Math.round((Date.now() - lastUpdate) / 1000) + " s ago · " + ($("d-updated").dataset.extra || ""); }, 1000);
+  loadDash(); setInterval(() => { if (!document.hidden) loadDash(); }, 15000);
+
+  /* ---------- evaluation charts (from results/) */
+  if (D.curve) {
+    const groups = ["en", "hi", "kn", "pooled"].filter(g => D.curve[g]);
+    const t = (D.headline || {}).threshold ?? T;
+    new Chart($("c-curve"), { type: "scatter", data: { datasets: groups.map(g => ({ label: LN[g], data: D.curve[g].map(([x, y, tt]) => ({ x, y, tt })), showLine: true,
+        borderColor: C[g], backgroundColor: C[g], borderWidth: g === "pooled" ? 2.5 : 1.8, borderDash: g === "pooled" ? [6, 4] : [],
+        pointRadius: (c) => Math.abs((c.raw || {}).tt - t) < 1e-9 ? 6 : 0, pointHoverRadius: 6, pointBorderColor: css("--bg"), pointBorderWidth: 2 })) },
+      options: { maintainAspectRatio: false, scales: { x: { title: { display: true, text: "% of messages sent to the LLM" }, min: 0, max: 100 },
+        y: { title: { display: true, text: "accuracy (%)" } } }, plugins: { legend: { position: "bottom", labels: { boxWidth: 10 } },
+        tooltip: { callbacks: { label: (c) => c.dataset.label + ": " + c.parsed.y + "% at " + c.parsed.x + "% to LLM" } } } } });
+  }
+  if (D.per_lang) {
+    const rows = [["en", D.per_lang.en], ["hi", D.per_lang.hi], ["kn", D.per_lang.kn]];
+    if (D.hinglish) rows.push(["hinglish", D.hinglish]);
+    new Chart($("c-langacc"), { type: "bar", data: { labels: rows.map(([k]) => LN[k]), datasets: [
+        { label: "Small model only", data: rows.map(([, r]) => +(r.small_only_acc * 100).toFixed(1)), backgroundColor: css("--faint"), borderRadius: 5 },
+        { label: "LLM only", data: rows.map(([, r]) => +(r.llm_only_acc * 100).toFixed(1)), backgroundColor: C.llm, borderRadius: 5 },
+        { label: "Router", data: rows.map(([, r]) => +(r.router_acc * 100).toFixed(1)), backgroundColor: C.small, borderRadius: 5 }] },
+      options: { maintainAspectRatio: false, scales: { y: { min: 50, max: 100, title: { display: true, text: "accuracy (%)" } } },
+        plugins: { legend: { position: "bottom", labels: { boxWidth: 10 } }, tooltip: { callbacks: { afterLabel: (c) => c.datasetIndex === 2 ? "LLM used for " + (rows[c.dataIndex][1].llm_share * 100).toFixed(1) + "% of messages" : "" } } } } });
+  }
+
+  showExamples();
+  if (!LLM_ON) $("mic-sub").textContent += " (LLM switched off on this server.)";
 })();
 </script>
 </body>

@@ -379,5 +379,132 @@
    "text": "ಪೂಜಾ ಎಂಟರ್ಪ್ರೈಸಸ್ ಲ್ಲಿ ದಯವಿಟ್ಟು ನಕಾರಾತ್ಮಕ ಪ್ರತಿಕ್ರಿಯೆ ಟ್ವೀಟ್ ಮಾಡಿ",
    "intent": "social_post"
   }
+ ],
+ "hinglish": [
+  {
+   "id": "12281",
+   "text": "london se manchester ke liye train ticket book kar do",
+   "intent": "transport_ticket"
+  },
+  {
+   "id": "8280",
+   "text": "mujhhe pandrah march ke liye reminder set karna hai",
+   "intent": "calendar_set"
+  },
+  {
+   "id": "397",
+   "text": "joe prsaise ka koi bhi gaana play karo",
+   "intent": "play_music"
+  },
+  {
+   "id": "9406",
+   "text": "sirius xm radio channel start karo",
+   "intent": "play_radio"
+  },
+  {
+   "id": "7711",
+   "text": "arey do march ki meri baaki saari meetings aur calls cancel kar do kyunki us din jim ka birthday hai, ise calendar mein ek event ki tarah tag kar do",
+   "intent": "calendar_set"
+  },
+  {
+   "id": "4813",
+   "text": "dusre city mein kya time hai",
+   "intent": "datetime_query"
+  },
+  {
+   "id": "10743",
+   "text": "wo item remove kar do",
+   "intent": "lists_remove"
+  },
+  {
+   "id": "8598",
+   "text": "mujhe yaad dila dena ki sham ko chhe baje airport se mark ko pick karna hai",
+   "intent": "calendar_set"
+  },
+  {
+   "id": "11424",
+   "text": "vitaly channel",
+   "intent": "play_podcasts"
+  },
+  {
+   "id": "6946",
+   "text": "kya agle wednesday koi meetings hain",
+   "intent": "calendar_query"
+  },
+  {
+   "id": "4985",
+   "text": "haan mujhe chal rahe gaane par opinion save karna hai aur yeh bhi ki kaun sa player is gaane ko support karta hai",
+   "intent": "music_likeness"
+  },
+  {
+   "id": "5243",
+   "text": "siri bathroom ki lights off kar do please",
+   "intent": "iot_hue_lightoff"
+  },
+  {
+   "id": "5062",
+   "text": "mujhe eighties ke gaane sunao",
+   "intent": "play_music"
+  },
+  {
+   "id": "7289",
+   "text": "jeff ke sath wale saare events hata do",
+   "intent": "calendar_remove"
+  },
+  {
+   "id": "13348",
+   "text": "mujhe aapse poochna hai ki ek pinhead par kitne angels dance kar sakte hain",
+   "intent": "general_quirky"
+  },
+  {
+   "id": "13900",
+   "text": "life ka definition kya hai",
+   "intent": "qa_definition"
+  },
+  {
+   "id": "7690",
+   "text": "aage kya kya hai mere paas",
+   "intent": "calendar_query"
+  },
+  {
+   "id": "10534",
+   "text": "aaj ki to do list kaisi hai",
+   "intent": "lists_query"
+  },
+  {
+   "id": "2165",
+   "text": "kya dinner taiyar hai",
+   "intent": "takeaway_query"
+  },
+  {
+   "id": "3894",
+   "text": "wo wapas padho",
+   "intent": "play_audiobook"
+  },
+  {
+   "id": "3960",
+   "text": "time kya hua hai batao",
+   "intent": "datetime_query"
+  },
+  {
+   "id": "4377",
+   "text": "abhi ka weather kaisa hai",
+   "intent": "weather_query"
+  },
+  {
+   "id": "8100",
+   "text": "reschedule karne ke liye mere appointments email kar do",
+   "intent": "email_sendemail"
+  },
+  {
+   "id": "10982",
+   "text": "meri grocery list me hamburger daal dena",
+   "intent": "lists_createoradd"
+  },
+  {
+   "id": "11695",
+   "text": "action movies ke liye koi suggestion hai kya",
+   "intent": "recommendation_movies"
+  }
  ]
 }

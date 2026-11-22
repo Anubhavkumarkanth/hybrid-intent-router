@@ -90,6 +90,10 @@ stack-down: nginx-stop
 		else echo "gunicorn not running"; fi
 	@for i in $$(seq 45); do [ -f $(RUN)/gunicorn.pid ] || exit 0; sleep 1; done; echo "gunicorn still running"; exit 1
 
+# Hinglish (romanized code-mixed) test set + router results (uses the Gemini key; resumable, cached)
+hinglish:
+	$(PY) scripts/hinglish.py 2>&1 | tee logs/13_hinglish.log
+
 # Sentences for the demo page's "Random test sentence" button
 demo-samples:
 	$(PY) scripts/make_demo_samples.py
