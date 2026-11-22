@@ -1,6 +1,7 @@
 """API tests with a fake small model and a fake LLM (no weights, no network)."""
 
 import json
+from pathlib import Path
 
 import pytest
 
@@ -33,6 +34,39 @@ def test_llm_call_limit_falls_back_to_small_model():
     assert routed == ["llm", "llm", "small_fallback"]  # third unsure message in the same minute
     now[0] = 60.0  # a minute later the window is free again
     assert c.post("/predict", json={"text": "x"}).get_json()["routed_to"] == "llm"
+
+
+class FakeTop(FakeSmall):
+    def predict_top(self, text, k=3):
+        return [("alarm_set", self.conf), ("alarm_query", 0.2), ("play_music", 0.05)][:k]
+
+
+def test_predict_returns_small_model_top3_and_threshold():
+    app = create_app(small=FakeTop(0.9), llm_fn=None, threshold=0.5, use_llm=False)
+    j = app.test_client().post("/predict", json={"text": "wake me up"}).get_json()
+    assert j["threshold"] == 0.5 and j["intent"] == "alarm_set"
+    assert [t["intent"] for t in j["small_model_top"]] == ["alarm_set", "alarm_query", "play_music"]
+
+
+def test_llm_answer_keeps_small_model_guesses():
+    app = create_app(small=FakeTop(0.3), llm_fn=lambda t: "play_music", threshold=0.5, use_llm=True)
+    j = app.test_client().post("/predict", json={"text": "x"}).get_json()
+    assert j["routed_to"] == "llm" and j["intent"] == "play_music"
+    assert j["small_model_top"][0] == {"intent": "alarm_set", "confidence": 0.3}
+
+
+def test_charts_only_serves_known_files():
+    c = client()
+    assert c.get("/charts/architecture.png").status_code == 200
+    assert c.get("/charts/routing.json").status_code == 404
+    assert c.get("/charts/..%2Frouting.json").status_code == 404
+
+
+def test_index_shows_headline_numbers_from_results():
+    html = client().get("/").get_data(as_text=True)
+    routing = json.loads((Path(__file__).resolve().parents[1] / "results" / "routing.json").read_text())
+    assert f"{routing['test_sub']['pooled']['router_acc'] * 100:.1f}%" in html
+    assert "All 60 intents" in html and "page-data" in html
 
 
 def test_rate_limit_zero_means_unlimited():

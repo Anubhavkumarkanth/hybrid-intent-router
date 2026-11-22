@@ -90,6 +90,10 @@ stack-down: nginx-stop
 		else echo "gunicorn not running"; fi
 	@for i in $$(seq 45); do [ -f $(RUN)/gunicorn.pid ] || exit 0; sleep 1; done; echo "gunicorn still running"; exit 1
 
+# Sentences for the demo page's "Random test sentence" button
+demo-samples:
+	$(PY) scripts/make_demo_samples.py
+
 # ONNX + INT8 model for the free 512 MB deployment, with its accuracy and memory measured
 quantize:
 	$(PY) scripts/quantize.py 2>&1 | tee logs/12_quantize.log

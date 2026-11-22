@@ -27,7 +27,7 @@ from collections import deque
 from pathlib import Path
 from typing import Callable, Protocol
 
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, send_from_directory
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -54,14 +54,17 @@ class TorchSmallModel:
         self.T = temperature
         self.labels = labels
 
-    def predict(self, text: str) -> tuple[str, float]:
+    def predict_top(self, text: str, k: int = 3) -> list[tuple[str, float]]:
         torch = self.torch
         with torch.inference_mode():
             enc = self.tok([text], truncation=True, max_length=self.max_len, return_tensors="pt")
             logits = self.model(enc["input_ids"], enc["attention_mask"])[0]
             probs = torch.softmax(logits / self.T, -1)
-            conf, idx = probs.max(-1)
-        return self.labels[int(idx)], float(conf)
+            conf, idx = probs.topk(k)
+        return [(self.labels[int(i)], float(c)) for c, i in zip(conf, idx, strict=True)]
+
+    def predict(self, text: str) -> tuple[str, float]:
+        return self.predict_top(text, 1)[0]
 
 
 class OnnxSmallModel:
@@ -74,14 +77,73 @@ class OnnxSmallModel:
         self.T = temperature
         self.labels = labels
 
-    def predict(self, text: str) -> tuple[str, float]:
+    def predict_top(self, text: str, k: int = 3) -> list[tuple[str, float]]:
         import numpy as np
 
         z = self.model.logits([text])[0] / self.T
         p = np.exp(z - z.max())
         p /= p.sum()
-        i = int(p.argmax())
-        return self.labels[i], float(p[i])
+        return [(self.labels[int(i)], float(p[i])) for i in np.argsort(-p)[:k]]
+
+    def predict(self, text: str) -> tuple[str, float]:
+        return self.predict_top(text, 1)[0]
+
+
+CHARTS = {"architecture.png", "serving.png", "accuracy_vs_llm_share.png", "cost_per_1000.png", "reliability.png",
+          "training_curve.png", "examples_table.png"}
+
+
+def _load(root: Path, rel: str):
+    p = root / rel
+    return json.loads(p.read_text(encoding="utf-8")) if p.exists() else None
+
+
+def page_data(root: Path = ROOT, deployed_onnx: bool = False) -> dict:
+    """Everything the demo page shows besides live predictions, read from results/ (never typed in by hand).
+    A missing file just leaves its part of the page out."""
+    routing = _load(root, "results/routing.json")
+    small = _load(root, "results/small_model.json")
+    single = _load(root, "results/llm_single_call.json")
+    quant = _load(root, "results/quantized.json")
+    load = _load(root, "results/loadtest.json")
+    labels = _load(root, "data/processed/labels.json") or []
+    examples = _load(root, "results/prompt_examples.json") or {}
+    domains: dict[str, list[dict]] = {}
+    for lab in labels:
+        dom, _, action = lab.partition("_")
+        domains.setdefault(dom, []).append({"intent": lab, "action": action or dom, "example": examples.get(lab, "")})
+    data: dict = {"intents": domains, "samples": _load(root, "results/demo_samples.json") or {},
+                  "deployed_onnx": deployed_onnx}
+    if routing:
+        p = routing["test_sub"]["pooled"]
+        data["headline"] = {
+            "router_acc": p["router_acc"], "llm_acc": p["llm_only_acc"], "small_acc": p["small_only_acc"],
+            "llm_share": p["llm_share"], "calls_avoided": routing["savings_test_sub_pooled"]["llm_calls_avoided_share"],
+            "cost_llm": p["llm_only_cost_per_1000_usd"], "cost_router": p["router_cost_per_1000_usd"],
+            "lat_llm": p["llm_only_avg_latency_ms"], "lat_router": p["router_avg_latency_ms"],
+            "n_per_lang": routing["test_sub"]["en"]["n"], "threshold": routing["chosen_threshold"]["t"],
+            "temperature": routing["temperature"],
+        }
+        data["per_lang"] = {lg: {k: routing["test_sub"][lg][k] for k in ("small_only_acc", "llm_only_acc",
+                                                                         "router_acc", "llm_share")}
+                            for lg in ("en", "hi", "kn", "pooled")}
+    if small:
+        data["small_model"] = {"en": small["accuracy"]["en_test_full"], "hi": small["accuracy"]["hi_test_full"],
+                               "kn": small["accuracy"]["kn_test_full"],
+                               "cpu_ms": small["cpu_latency_single_message"]["median_ms"]}
+    if single:
+        data["llm_ms"] = single["latency_ms_median"]
+    if quant:
+        agree = quant["agreement_with_original"]
+        data["deployed"] = {"size_mb": quant["size_mb"]["onnx_small"],
+                            "orig_mb": quant["size_mb"]["pytorch_checkpoint"],
+                            "agree_min": min(agree.values()), "agree_max": max(agree.values()),
+                            "cpu_ms": quant["cpu_latency_single_message_1_thread"]["median_ms"],
+                            "memory_mb": quant["peak_memory_mb_load_and_predict"]}
+    if load:
+        data["load"] = {"rps": load["requests_per_sec"], "p95": load["p95_ms"], "failures": load["failures"],
+                        "requests": load["requests"]}
+    return data
 
 
 def read_settings(root: Path = ROOT) -> dict:
@@ -157,6 +219,7 @@ def create_app(small: SmallModel | None = None, llm_fn: Callable[[str], str] | N
         llm_fn = None
 
     app.config.update(SMALL=small, LLM_FN=llm_fn, THRESHOLD=threshold)
+    data = page_data(deployed_onnx=isinstance(small, OnnxSmallModel))  # read once; results don't change at runtime
 
     @app.get("/health")
     def health():
@@ -165,7 +228,13 @@ def create_app(small: SmallModel | None = None, llm_fn: Callable[[str], str] | N
     @app.get("/")
     def index():
         return render_template("index.html", threshold=app.config["THRESHOLD"],
-                               llm_enabled=app.config["LLM_FN"] is not None)
+                               llm_enabled=app.config["LLM_FN"] is not None, data=data)
+
+    @app.get("/charts/<name>")
+    def chart(name: str):
+        if name not in CHARTS:  # only the project's own charts, never arbitrary paths
+            return jsonify(error="not found"), 404
+        return send_from_directory(ROOT / "results" / "charts", name, max_age=86400)
 
     @app.post("/predict")
     def predict():
@@ -179,7 +248,9 @@ def create_app(small: SmallModel | None = None, llm_fn: Callable[[str], str] | N
         if len(text) > MAX_CHARS:
             return jsonify(error=f"text is longer than {MAX_CHARS} characters"), 400
 
-        intent, conf = app.config["SMALL"].predict(text)
+        small_model = app.config["SMALL"]
+        top = small_model.predict_top(text, 3) if hasattr(small_model, "predict_top") else [small_model.predict(text)]
+        intent, conf = top[0]
         routed_to = "small"
         if conf < app.config["THRESHOLD"]:
             llm = app.config["LLM_FN"]
@@ -196,7 +267,9 @@ def create_app(small: SmallModel | None = None, llm_fn: Callable[[str], str] | N
                     log.warning("LLM failed, using small model answer: %s: %s", type(e).__name__, e)
                     routed_to = "small_fallback"
         return jsonify(intent=intent, confidence=round(conf, 4), routed_to=routed_to,
-                       latency_ms=round((time.perf_counter() - t0) * 1000, 1))
+                       latency_ms=round((time.perf_counter() - t0) * 1000, 1),
+                       threshold=app.config["THRESHOLD"],
+                       small_model_top=[{"intent": i, "confidence": round(c, 4)} for i, c in top])
 
     return app
 

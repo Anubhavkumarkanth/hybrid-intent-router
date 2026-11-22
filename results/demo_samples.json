@@ -1,0 +1,383 @@
+{
+ "en": [
+  {
+   "id": "3507",
+   "text": "is there snow in the forecast",
+   "intent": "weather_query"
+  },
+  {
+   "id": "7287",
+   "text": "remind me about my anniversary in one day advance",
+   "intent": "calendar_set"
+  },
+  {
+   "id": "680",
+   "text": "keep me informed about bitcoin price",
+   "intent": "news_query"
+  },
+  {
+   "id": "14306",
+   "text": "explain the geographical location of india",
+   "intent": "qa_factoid"
+  },
+  {
+   "id": "1076",
+   "text": "do not play rock metal",
+   "intent": "music_dislikeness"
+  },
+  {
+   "id": "1710",
+   "text": "change the music mode to rock",
+   "intent": "music_settings"
+  },
+  {
+   "id": "10909",
+   "text": "olly read my lists to me",
+   "intent": "lists_query"
+  },
+  {
+   "id": "15296",
+   "text": "read me new post on my feed",
+   "intent": "social_query"
+  },
+  {
+   "id": "16961",
+   "text": "respond with",
+   "intent": "email_sendemail"
+  },
+  {
+   "id": "5122",
+   "text": "check if default alarm is set",
+   "intent": "alarm_query"
+  },
+  {
+   "id": "16245",
+   "text": "send email to joe at a. o. l. dot com",
+   "intent": "email_sendemail"
+  },
+  {
+   "id": "17069",
+   "text": "are there any new emails in outlook",
+   "intent": "email_query"
+  },
+  {
+   "id": "8867",
+   "text": "olly set alarm for reminder",
+   "intent": "alarm_set"
+  },
+  {
+   "id": "4702",
+   "text": "please turn my speakers on google",
+   "intent": "audio_volume_up"
+  },
+  {
+   "id": "15880",
+   "text": "please check my mails",
+   "intent": "email_query"
+  },
+  {
+   "id": "16229",
+   "text": "which contact haven't i called in twelve months",
+   "intent": "email_querycontact"
+  },
+  {
+   "id": "6151",
+   "text": "i want to know today's weather",
+   "intent": "weather_query"
+  },
+  {
+   "id": "9408",
+   "text": "start radio play",
+   "intent": "play_radio"
+  },
+  {
+   "id": "2551",
+   "text": "change the lights in my home to green",
+   "intent": "iot_hue_lightchange"
+  },
+  {
+   "id": "16914",
+   "text": "do i have emails from this sender",
+   "intent": "email_query"
+  },
+  {
+   "id": "8280",
+   "text": "i need to set reminder on fifteenth march",
+   "intent": "calendar_set"
+  },
+  {
+   "id": "4934",
+   "text": "what time is my domino's order expected to arrive",
+   "intent": "takeaway_query"
+  },
+  {
+   "id": "6101",
+   "text": "are there any alarms currently set",
+   "intent": "alarm_query"
+  },
+  {
+   "id": "6980",
+   "text": "give me to do list",
+   "intent": "calendar_query"
+  },
+  {
+   "id": "11459",
+   "text": "go back to the last episode in this podcast",
+   "intent": "play_podcasts"
+  }
+ ],
+ "hi": [
+  {
+   "id": "10019",
+   "text": "कृपया मुझे बताएं कि मैं बारह दलिया कुकीज़ कैसे बेक करूं",
+   "intent": "cooking_recipe"
+  },
+  {
+   "id": "13690",
+   "text": "कुर्सियाँ किस रंग की हैं",
+   "intent": "qa_factoid"
+  },
+  {
+   "id": "16438",
+   "text": "मुझे अभी भेजा गया यह ईमेल चाहिए",
+   "intent": "email_sendemail"
+  },
+  {
+   "id": "14354",
+   "text": "ब्रह्मांड का उत्तर क्या है",
+   "intent": "qa_factoid"
+  },
+  {
+   "id": "399",
+   "text": "पहला अलार्म हटाएं",
+   "intent": "alarm_remove"
+  },
+  {
+   "id": "7397",
+   "text": "क्या अगले तीन महीने के लिए किसी कार्यक्रम की योजना है",
+   "intent": "calendar_query"
+  },
+  {
+   "id": "17147",
+   "text": "मेल का जवाब दो इस कंटेंट से हैलो यू",
+   "intent": "email_sendemail"
+  },
+  {
+   "id": "2780",
+   "text": "क्या कोई आगामी संगीत कार्यक्रम हैं",
+   "intent": "music_likeness"
+  },
+  {
+   "id": "11664",
+   "text": "olly मैं एक बार की तलाश में हूं क्या आप एक अच्छे बार को जानते हैं",
+   "intent": "recommendation_locations"
+  },
+  {
+   "id": "10909",
+   "text": "मेरे लिए मेरी सूचियाँ पढ़ें",
+   "intent": "lists_query"
+  },
+  {
+   "id": "17081",
+   "text": "मेरे हाल ही में सहेजे गए दस्तावेज़ों के साथ मेरी कंपनी के कर्मचारी के लिए एक ईमेल बनाएं",
+   "intent": "email_sendemail"
+  },
+  {
+   "id": "11845",
+   "text": "olly ने मुझे खाड़ी क्षेत्र में कुछ रोमांचक घटनाओं के साथ मारा",
+   "intent": "recommendation_events"
+  },
+  {
+   "id": "3671",
+   "text": "क्या मैं इस रेस्टोरेंट के साथ काम कर सकता हूँ",
+   "intent": "takeaway_query"
+  },
+  {
+   "id": "1777",
+   "text": "अगला गाना",
+   "intent": "play_music"
+  },
+  {
+   "id": "14150",
+   "text": "कन्वर्से शू क्या हैं",
+   "intent": "qa_definition"
+  },
+  {
+   "id": "14792",
+   "text": "मेरे पास चलने का रास्ता कहाँ है",
+   "intent": "recommendation_locations"
+  },
+  {
+   "id": "6151",
+   "text": "मुझे आज का मौसम जानना है",
+   "intent": "weather_query"
+  },
+  {
+   "id": "3779",
+   "text": "youtube प्लेलिस्ट कक्कड़ चालू करो",
+   "intent": "play_music"
+  },
+  {
+   "id": "7693",
+   "text": "क्या मेरे पास इक्कीसवीं के लिए कुछ योजना है",
+   "intent": "calendar_query"
+  },
+  {
+   "id": "15987",
+   "text": "इस नए ईमेल को संपर्क के साथ जोड़ें",
+   "intent": "email_addcontact"
+  },
+  {
+   "id": "5544",
+   "text": "इस गाने का संगीत निर्देशक कौन है",
+   "intent": "music_query"
+  },
+  {
+   "id": "1084",
+   "text": "यूजर फ्रेंडली",
+   "intent": "news_query"
+  },
+  {
+   "id": "15968",
+   "text": "अगर यह बहुत परिचित जगह से है तो इसे महत्वपूर्ण के रूप में चिह्नित करें",
+   "intent": "email_query"
+  },
+  {
+   "id": "11250",
+   "text": "मेरे लिए किराना की सूची फिर से पढ़ो",
+   "intent": "lists_query"
+  },
+  {
+   "id": "12381",
+   "text": "बलरामपुर उत्तर प्रदेश से अयोध्या उत्तर प्रदेश के लिए रेलगाड़ी का टिकट खरीदें",
+   "intent": "transport_ticket"
+  }
+ ],
+ "kn": [
+  {
+   "id": "10621",
+   "text": "ಮೆನು ಕಾರ್ಡ್‌ನಲ್ಲಿ ಪಾವ್ ಭಾಜಿ ಸೇರಿಸಿ",
+   "intent": "lists_createoradd"
+  },
+  {
+   "id": "9940",
+   "text": "ನನಗೆ ಚಾಕೊಲೇಟ್ ಕೇಕ್ ಪಾಕವಿಧಾನವನ್ನು ಹುಡುಕಿ",
+   "intent": "cooking_recipe"
+  },
+  {
+   "id": "12310",
+   "text": "ಇಂಡಿಯಾನಿಂದ ಬೆಂಗಳೂರು ಗೆ ಲಭ್ಯವಿರುವ ರೈಲು ಟಿಕೆಟ್‌ಗಳ ಪಟ್ಟಿಯನ್ನು ನನಗೆ ನೀಡಿ",
+   "intent": "transport_query"
+  },
+  {
+   "id": "6652",
+   "text": "ಆಹಾರಕ್ರಮಕ್ಕೆ ಅಂಟಿಕೊಳ್ಳುವುದು",
+   "intent": "general_quirky"
+  },
+  {
+   "id": "13554",
+   "text": "ನಂದು ಎಷ್ಟು ಎತ್ತರ",
+   "intent": "qa_factoid"
+  },
+  {
+   "id": "6495",
+   "text": "ನೀವು ದಯವಿಟ್ಟು ಸಲಹೆ ನೀಡಬಹುದೇ",
+   "intent": "general_quirky"
+  },
+  {
+   "id": "7520",
+   "text": "ಪ್ರತಿ ದಿನ ಮಧ್ಯಾಹ್ನ ಎರಡು ​ಗಂಟೆ ನನಗೆ ನೆನಪಿಸಿ ಊಟಕ್ಕೆ",
+   "intent": "calendar_set"
+  },
+  {
+   "id": "10868",
+   "text": "olly ಲಿಸ್ಟಅಲ್ಲಿ ಬೇರೆ ಏನು ಉಳಿದಿದೆ",
+   "intent": "lists_query"
+  },
+  {
+   "id": "13741",
+   "text": "ಇಂಡಿಯಾಕ್ಕೆ ಕರೆನ್ಸಿ ವಿನಿಮಯ ದರ ಏನು",
+   "intent": "qa_currency"
+  },
+  {
+   "id": "3507",
+   "text": "ಮುನ್ಸೂಚನೆಯಲ್ಲಿ ಹಿಮ ವಿದೆಯೇ",
+   "intent": "weather_query"
+  },
+  {
+   "id": "2542",
+   "text": "ದಯವಿಟ್ಟು ಮಲಗುವ ಕೋಣೆಯ ದೀಪಗಳನ್ನು ಕೆಂಪು ಮತ್ತು ಹಾಲ್ ಲೈಟ್ಸ್ ಸಾಮಾನ್ಯ ಬಣ್ಣ ಮಾಡಿ",
+   "intent": "iot_hue_lightchange"
+  },
+  {
+   "id": "12289",
+   "text": "ನನ್ನ ಮಾರ್ಗದಲ್ಲಿ ಟ್ರಾಫಿಕ್ ಜಾಮ್ ಆಗಿದೆಯೇ",
+   "intent": "transport_traffic"
+  },
+  {
+   "id": "5707",
+   "text": "ನನ್ನ ಮೆಚ್ಚಿನವುಗಳನ್ನು ಆಲಿಸಿ",
+   "intent": "play_music"
+  },
+  {
+   "id": "8631",
+   "text": "ನನ್ನ ಕ್ಯಾಲೆಂಡರ್‌ನಿಂದ ಅದನ್ನು ಅಳಿಸಿ",
+   "intent": "calendar_remove"
+  },
+  {
+   "id": "11947",
+   "text": "ನನ್ನ ಹತ್ತಿರವಿರುವ ಕೆಲವು ರೆಸ್ಟೋರೆಂಟ್‌ಗಳು ಯಾವುವು",
+   "intent": "recommendation_locations"
+  },
+  {
+   "id": "13616",
+   "text": "ಹೆಚ್ಚಿನ ಸೆಲೆಬ್ರಿಟಿಗಳು ಎಲ್ಲಿ ಸುತ್ತಾಡುತ್ತಾರೆ",
+   "intent": "qa_factoid"
+  },
+  {
+   "id": "1483",
+   "text": "ನಾನು ಯಾವ ಅಲಾರಾಂಗಳು ಹೊಂದಿಸಿದ್ದೇನೆ",
+   "intent": "alarm_query"
+  },
+  {
+   "id": "5243",
+   "text": "ಸಿರಿ ದಯವಿಟ್ಟು ಬಾತ್ರೂಮ್ನಲ್ಲಿ ಲೈಟ್ಸ್ ಆಫ್ ಮಾಡಿ",
+   "intent": "iot_hue_lightoff"
+  },
+  {
+   "id": "17069",
+   "text": "ಔಟ್‌ಲುಕ್‌ನಲ್ಲಿ ಯಾವುದೇ ಹೊಸ ಇಮೇಲ್‌ಗಳಿವೆಯೇ",
+   "intent": "email_query"
+  },
+  {
+   "id": "15610",
+   "text": "ಒಂದು ಟ್ವೀಟ್ ಅನ್ನು ಈ ಕೆಳಗಿನಂತೆ ಪೋಸ್ಟ್ ಮಾಡಿ ಅರ್ಜುನ್ ಜನ್ಯ ನನ್ನ ಖಾತೆಯಲ್ಲಿ ತೃಪ್ತಿ ಹೊಂದಿಲ್ಲ",
+   "intent": "social_post"
+  },
+  {
+   "id": "6034",
+   "text": "ಕಾಫಿ",
+   "intent": "iot_coffee"
+  },
+  {
+   "id": "10078",
+   "text": "ನಾನು ಸಪ್ಪರ್ ಏನು ಬೇಯಿಸಬೇಕು",
+   "intent": "cooking_recipe"
+  },
+  {
+   "id": "16229",
+   "text": "ನಾನು ಹನ್ನೆರಡು ತಿಂಗಳಿಂದ ಯಾವ ಸಂಪರ್ಕಕ್ಕೆ ಕರೆ ಮಾಡಿಲ್ಲ",
+   "intent": "email_querycontact"
+  },
+  {
+   "id": "11860",
+   "text": "ಸ್ಥಳೀಯ ಇವೆಂಟ್ಸ್ ಹೇಳಿ",
+   "intent": "recommendation_events"
+  },
+  {
+   "id": "15553",
+   "text": "ಪೂಜಾ ಎಂಟರ್ಪ್ರೈಸಸ್ ಲ್ಲಿ ದಯವಿಟ್ಟು ನಕಾರಾತ್ಮಕ ಪ್ರತಿಕ್ರಿಯೆ ಟ್ವೀಟ್ ಮಾಡಿ",
+   "intent": "social_post"
+  }
+ ]
+}
