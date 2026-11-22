@@ -1,0 +1,36 @@
+scene 01   24.7s  Hybrid Intent Router
+scene 02   26.4s  The problem
+scene 03   28.1s  The idea: small model first, LLM when unsure
+scene 04   30.8s  Phase 0: check the machine first
+scene 05   29.6s  Phase 1: research before code
+scene 06   24.5s  Phase 2: the data
+scene 07   29.3s  Phase 2: fixed subsets for decisions and for final numbers
+scene 08   26.4s  Phase 3: the LLM client
+scene 09   20.1s  Phase 3: a cache that makes runs resumable
+scene 10   25.0s  Phase 3: picking the prompt on dev data
+scene 11   25.0s  Phase 3: the LLM baseline
+scene 12   34.0s  Phase 3: two real errors and their fixes
+scene 13   25.2s  Phase 3: the real cost of one message
+scene 14   24.3s  Phase 4: the small model
+scene 15   32.9s  Phase 4: my own training loop
+scene 16   27.8s  Phase 4: the first run was not finished learning
+scene 17   16.1s  Phase 4: the final training run
+scene 18   35.5s  Phase 4: zero-shot results
+scene 19   31.3s  Phase 5: can we trust the confidence?
+scene 20   30.4s  Phase 5: choosing the threshold, on dev only
+scene 21   39.1s  Phase 5: the trade-off curve
+scene 22   37.5s  Phase 5: final results on test_sub
+scene 23   21.6s  Phase 5: per language
+scene 24   41.6s  Phase 5: cost and latency
+scene 25   17.0s  Phase 5: real examples
+scene 26   25.3s  Phase 6: the Flask API
+scene 27   11.7s  Phase 6: the demo
+scene 28   26.6s  Phase 7: serving it like production
+scene 29   18.4s  Phase 7: NGINX without sudo
+scene 30   53.2s  Phase 7: the load test
+scene 31   22.9s  Phase 8: the quality gate
+scene 32   29.9s  How to explain it in an interview: 30 seconds
+scene 33   37.0s  Interview questions, part 1
+scene 34   30.9s  Interview questions, part 2
+scene 35   17.1s  Summary
+wrote video/tutorial.mp4: 35 scenes, 2804 spoken words, 16.3 min

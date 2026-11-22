@@ -41,7 +41,7 @@ visual: image results/charts/architecture.png
 - WSL2 Ubuntu on Windows, 12 CPU cores, 7.4 GB RAM
 - NVIDIA RTX 3050 laptop GPU with 4 GB for training
 - The .gitignore with .env was committed first, so the API key can never reach git
-visual: output logs/00_env.log 26-46
+visual: output logs/00_env.log 26-47
 > Before writing any code, I checked the machine and saved the output to a log file.
 > The project runs in WSL2 Ubuntu, because gunicorn does not run on native Windows.
 > There are 12 CPU cores and 7.4 gigabytes of RAM, which later decide how many server workers I can run. The laptop also has a small NVIDIA GPU with 4 gigabytes, which is enough for training.
@@ -92,7 +92,7 @@ visual: code src/router/llm.py 68-96
 - Every answer is saved by model, prompt version, mode, language and id
 - A key is never sent to the API twice
 - Runs continue where they stopped, and analysis works without an API key
-visual: code src/router/llm.py 269-302
+visual: code src/router/llm.py 284-298
 > Every LLM answer is written to a cache file. The key is the model, the prompt version, the mode, the language and the sentence id.
 > So if a run stops half way, I just run it again, and only the missing sentences are sent.
 > The cache is also committed to git, so anyone can reproduce the routing analysis without an API key.
@@ -112,8 +112,8 @@ visual: output logs/03_llm_pilot.log
 - 20 messages per request to stay inside the free tier
 - dev_sub, all 3 languages: {{llm_baseline.json:accuracy.pooled_dev_sub|pct}}
 - test_sub, all 3 languages: {{llm_baseline.json:accuracy.pooled_test_sub|pct}}
-- Invalid answers: {{llm_baseline.json:invalid.hi_test_sub|int}}
-visual: output logs/03_llm_run.log tail 16
+- No invalid labels in any language or split
+visual: output logs/03_llm_run.log 51-68
 > Then the full run: three hundred plus five hundred sentences, in three languages. That is two thousand four hundred answers, sent twenty per request.
 > The LLM scored {{llm_baseline.json:accuracy.pooled_dev_sub|pct}} on dev sub and {{llm_baseline.json:accuracy.pooled_test_sub|pct}} on test sub, pooled over the three languages. It never returned an invalid label.
 > Notice that it is almost equally good in all three languages. That is the bar the router has to meet.
@@ -123,7 +123,7 @@ visual: output logs/03_llm_run.log tail 16
 - WSL stopped mid-run and left zero bytes at the end of the cache file
 - Fix: fsync after every write; loader drops crash padding but still fails on real corruption
 - A regression test for each fix
-visual: code src/router/llm.py 274-298
+visual: code src/router/llm.py 214-219
 > Two real errors happened here. First, a read timeout from the HTTP library was not caught by my retry logic, and it crashed the whole run. I mapped all network errors to a retried error, and wrote a test for it.
 > Second, the Linux virtual machine stopped in the middle of a run. The cache file ended with two thousand zero bytes, and the next run crashed while reading it.
 > The fix was at the root. Every write is now flushed and synced to disk. And the loader removes crash padding, but still fails loudly on any other broken line, so real corruption is never hidden.
@@ -152,7 +152,7 @@ visual: code src/router/model.py 15-30
 - fp16 mixed precision on the GPU, seed 42
 - English train only; early stopping on English dev
 - Word embeddings frozen: fits 4 GB and keeps the multilingual vocabulary
-visual: code src/router/train.py 142-162
+visual: code src/router/train.py 142-161
 > I did not use the Hugging Face Trainer. I wrote the loop: get a batch, forward pass, cross entropy loss, backward pass, clip the gradients, and an AdamW step.
 > The learning rate warms up for the first ten percent of steps, then goes down in a straight line.
 > I trained on English only. After every epoch I measure English dev accuracy, keep the best checkpoint, and stop if it does not improve for two epochs.
@@ -180,7 +180,7 @@ visual: image results/charts/training_curve.png
 - Hindi (never trained on Hindi): {{small_model.json:accuracy.hi_test_full|pct}}
 - Kannada (never trained on Kannada): {{small_model.json:accuracy.kn_test_full|pct}}
 - Published MuRIL zero-shot (IndicXTREME): 82.4% Hindi, 77.5% Kannada
-visual: output logs/04_evaluate.log tail 12
+visual: output logs/04_evaluate.log 41-52
 > Now the interesting part. On the full English test set the small model scores {{small_model.json:accuracy.en_test_full|pct}}.
 > On Hindi, which it never saw in training, it scores {{small_model.json:accuracy.hi_test_full|pct}}. On Kannada, {{small_model.json:accuracy.kn_test_full|pct}}.
 > This is zero-shot cross-lingual transfer. MuRIL learned during pre-training that a Hindi sentence and its English translation mean the same thing, so an English classifier partly works in Hindi.
@@ -238,13 +238,13 @@ visual: none
 ## Phase 5: cost and latency
 - LLM cost per 1000 messages: {{routing.json:test_sub.pooled.llm_only_cost_per_1000_usd|usd}} -> {{routing.json:test_sub.pooled.router_cost_per_1000_usd|usd}}
 - LLM calls avoided: {{routing.json:savings_test_sub_pooled.llm_calls_avoided_share|pct}}
-- Average latency: {{routing.json:test_sub.pooled.llm_only_avg_latency_ms|ms}} -> {{routing.json:test_sub.pooled.router_avg_latency_ms|ms}}
+- Typical latency (median-based): {{routing.json:test_sub.pooled.llm_only_avg_latency_ms|ms}} -> {{routing.json:test_sub.pooled.router_avg_latency_ms|ms}}
 - Accuracy change vs LLM only: {{routing.json:savings_test_sub_pooled.accuracy_change_pp|pp}}
 - Small model on the CPU: median {{small_model.json:cpu_latency_single_message.median_ms|ms}} per message
 visual: image results/charts/cost_per_1000.png
 > Speed matters for a voice bot. On the CPU, with four threads, the small model answers one message in a median of {{small_model.json:cpu_latency_single_message.median_ms|ms}}, against {{llm_single_call.json:latency_ms_median|ms}} for one LLM call.
 > Now money and time. Using the paid price of the model and the real token counts, the LLM costs {{routing.json:test_sub.pooled.llm_only_cost_per_1000_usd|usd}} per thousand messages. The router costs {{routing.json:test_sub.pooled.router_cost_per_1000_usd|usd}}.
-> The router avoids {{routing.json:savings_test_sub_pooled.llm_calls_avoided_share|pct}} of LLM calls, and the average time per message drops from {{routing.json:test_sub.pooled.llm_only_avg_latency_ms|ms}} to {{routing.json:test_sub.pooled.router_avg_latency_ms|ms}}.
+> The router avoids {{routing.json:savings_test_sub_pooled.llm_calls_avoided_share|pct}} of LLM calls, and the typical time per message, using median times, drops from {{routing.json:test_sub.pooled.llm_only_avg_latency_ms|ms}} to {{routing.json:test_sub.pooled.router_avg_latency_ms|ms}}.
 > The accuracy change against the LLM alone is {{routing.json:savings_test_sub_pooled.accuracy_change_pp|pp}}.
 
 ## Phase 5: real examples
@@ -260,7 +260,7 @@ visual: image results/charts/examples_table.png
 - POST /predict returns intent, confidence, routed_to and latency_ms
 - Empty text or more than 500 characters: HTTP 400
 - If the LLM fails or times out: keep the small model's answer (small_fallback)
-visual: code app/app.py 115-141
+visual: code app/app.py 121-139
 > Phase six is the API, built with Flask. The model is loaded once when the app starts, and the threshold is read from the routing results file.
 > The predict endpoint validates the input. Empty text, or more than five hundred characters, returns an error 400 with a clear message.
 > If the LLM fails or times out, the app never crashes. It returns the small model's answer and marks it small fallback.
@@ -268,7 +268,7 @@ visual: code app/app.py 115-141
 ## Phase 6: the demo
 - One English, one Hindi and one Kannada sentence
 - Real responses from the running app
-visual: output logs/06_smoke.log
+visual: output logs/06_smoke.log 1-11
 > Here is the smoke test with real requests. One English sentence, one Hindi and one Kannada.
 > Each response shows the intent, the confidence, where it was routed, and how long it took.
 
@@ -286,12 +286,12 @@ visual: image results/charts/serving.png
 - Project-local config, started with nginx -p prefix -c nginx.conf -e error log
 - pid file and all temp folders inside deploy/nginx/
 - No user directive, because it does not run as root
-visual: code deploy/nginx/nginx.conf 6-44
+visual: code deploy/nginx/nginx.conf 1-19
 > I ran NGINX as a normal user, so no sudo password is needed. The trick is a project-local config.
 > The pid file and every temp folder live inside the project, because a normal user cannot write to the system folders. It listens on port 8080 and passes requests to gunicorn.
 
 ## Phase 7: the load test
-- Locust, headless: {{loadtest.json:users|int}} users for {{loadtest.json:duration|raw}}, small model only, through NGINX
+- Locust, headless: {{loadtest.json:users|int}} users for 2 minutes, small model only, through NGINX
 - {{loadtest.json:requests|int}} requests, {{loadtest.json:failures|int}} failures
 - {{loadtest.json:requests_per_sec|f1}} requests per second
 - p50 {{loadtest.json:p50_ms|ms}}, p95 {{loadtest.json:p95_ms|ms}}

@@ -1,0 +1,1183 @@
+1
+00:00:00,000 --> 00:00:00,193
+Hi.
+
+2
+00:00:00,193 --> 00:00:05,463
+In this video I will show you, step by step, how I built the Hybrid Intent Router.
+
+3
+00:00:05,463 --> 00:00:10,284
+It is a small multilingual model that understands what a customer wants, in
+
+4
+00:00:10,284 --> 00:00:12,019
+English, Hindi and Kannada.
+
+5
+00:00:12,019 --> 00:00:15,747
+When it is confident, it answers in milliseconds on a CPU.
+
+6
+00:00:15,747 --> 00:00:18,768
+When it is not, it asks a large language model.
+
+7
+00:00:18,768 --> 00:00:23,974
+I will show the real code, the real commands, and the real results from this run.
+
+8
+00:00:24,674 --> 00:00:28,232
+A voice bot first has to understand what the customer wants.
+
+9
+00:00:28,232 --> 00:00:29,655
+We call that the intent.
+
+10
+00:00:29,655 --> 00:00:33,272
+For example, "wake me up at five am" is the intent alarm set.
+
+11
+00:00:33,272 --> 00:00:37,244
+The easy answer is to send every message to a large language model.
+
+12
+00:00:37,244 --> 00:00:41,217
+But every call is a network round trip, and every call costs money.
+
+13
+00:00:41,217 --> 00:00:45,130
+A small model is fast and free to run, but it makes more mistakes.
+
+14
+00:00:45,130 --> 00:00:49,933
+And most labelled training data is in English, while many users write in Hindi or
+
+15
+00:00:49,933 --> 00:00:50,407
+Kannada.
+
+16
+00:00:51,107 --> 00:00:52,386
+So here is the idea.
+
+17
+00:00:52,386 --> 00:00:55,200
+Every message goes to the small model first.
+
+18
+00:00:55,200 --> 00:00:58,972
+It returns an intent and a confidence between zero and one.
+
+19
+00:00:58,972 --> 00:01:04,151
+If the confidence is above a threshold, which I call t, we keep the small model's
+
+20
+00:01:04,151 --> 00:01:04,599
+answer.
+
+21
+00:01:04,599 --> 00:01:07,732
+If it is below t, we send the message to the LLM.
+
+22
+00:01:07,732 --> 00:01:10,993
+The whole project is about measuring this honestly.
+
+23
+00:01:10,993 --> 00:01:14,254
+How many messages can the small model handle alone?
+
+24
+00:01:14,254 --> 00:01:15,852
+What happens to accuracy?
+
+25
+00:01:15,852 --> 00:01:18,474
+And how much time and money does it save?
+
+26
+00:01:19,174 --> 00:01:24,493
+Before writing any code, I checked the machine and saved the output to a log file.
+
+27
+00:01:24,493 --> 00:01:29,748
+The project runs in WSL2 Ubuntu, because gunicorn does not run on native Windows.
+
+28
+00:01:29,748 --> 00:01:35,132
+There are 12 CPU cores and 7.4 gigabytes of RAM, which later decide how many server
+
+29
+00:01:35,132 --> 00:01:36,300
+workers I can run.
+
+30
+00:01:36,300 --> 00:01:41,230
+The laptop also has a small NVIDIA GPU with 4 gigabytes, which is enough for
+
+31
+00:01:41,230 --> 00:01:41,814
+training.
+
+32
+00:01:41,814 --> 00:01:47,004
+The very first commit was the gitignore file, so the API key in the dot env file
+
+33
+00:01:47,004 --> 00:01:49,274
+can never be committed by accident.
+
+34
+00:01:49,974 --> 00:01:50,921
+Next, research.
+
+35
+00:01:50,921 --> 00:01:56,034
+I looked up every fact I needed and saved each one with
+
+36
+00:01:56,034 --> 00:01:57,864
+its source link and the date.
+
+37
+00:01:57,864 --> 00:01:59,758
+The dataset is Amazon MASSIVE.
+
+38
+00:01:59,758 --> 00:02:04,492
+The model is MuRIL, which is a BERT style model trained on seventeen Indian
+
+39
+00:02:04,492 --> 00:02:05,880
+languages and English.
+
+40
+00:02:05,880 --> 00:02:10,867
+Published results show it transfers to Hindi and Kannada better than XLM-R, the
+
+41
+00:02:10,867 --> 00:02:12,129
+more popular choice.
+
+42
+00:02:12,129 --> 00:02:16,863
+For the LLM, I picked Gemini 3.5 Flash Lite, because it is cheap, fast, and
+
+43
+00:02:16,863 --> 00:02:18,883
+supports structured JSON output.
+
+44
+00:02:19,583 --> 00:02:22,624
+MASSIVE is a voice assistant dataset from Amazon.
+
+45
+00:02:22,624 --> 00:02:27,652
+Each sentence was translated into fifty-one languages, and the translations share
+
+46
+00:02:27,652 --> 00:02:28,396
+the same id.
+
+47
+00:02:28,396 --> 00:02:29,638
+That is very useful.
+
+48
+00:02:29,638 --> 00:02:34,541
+It means I can test Hindi and Kannada on exactly the same sentences as English.
+
+49
+00:02:34,541 --> 00:02:39,444
+The make data command downloads the official file, checks its SHA-256 hash, and
+
+50
+00:02:39,444 --> 00:02:43,416
+writes clean files with the text, the intent and a number label.
+
+51
+00:02:44,116 --> 00:02:49,293
+The free tier of the LLM is limited, so the LLM cannot see all five thousand test
+
+52
+00:02:49,293 --> 00:02:51,147
+sentences in three languages.
+
+53
+00:02:51,147 --> 00:02:53,512
+I made two fixed subsets with a seed.
+
+54
+00:02:53,512 --> 00:02:57,155
+Dev sub has 300 sentences and is used for every decision.
+
+55
+00:02:57,155 --> 00:03:01,373
+Test sub has 500 sentences and is used only for the final numbers.
+
+56
+00:03:01,373 --> 00:03:06,486
+The sampling is stratified, which means each intent gets a share proportional to
+
+57
+00:03:06,486 --> 00:03:07,061
+its size.
+
+58
+00:03:07,061 --> 00:03:12,238
+Nineteen unit tests check sizes, labels, parallel ids, and that the subsets never
+
+59
+00:03:12,238 --> 00:03:12,750
+overlap.
+
+60
+00:03:13,450 --> 00:03:16,988
+Phase three is the baseline: send everything to the LLM.
+
+61
+00:03:16,988 --> 00:03:19,326
+I used the official google-genai SDK.
+
+62
+00:03:19,326 --> 00:03:24,317
+The response must be JSON, and the intent field is an enum, which means a fixed
+
+63
+00:03:24,317 --> 00:03:25,897
+list of the sixty labels.
+
+64
+00:03:25,897 --> 00:03:27,792
+I still validate every answer.
+
+65
+00:03:27,792 --> 00:03:33,037
+If a label is wrong, I retry once, and then count it as invalid, which means wrong.
+
+66
+00:03:33,037 --> 00:03:38,028
+Rate limits and server errors are retried with exponential backoff, so the wait
+
+67
+00:03:38,028 --> 00:03:39,166
+doubles each time.
+
+68
+00:03:39,866 --> 00:03:42,576
+Every LLM answer is written to a cache file.
+
+69
+00:03:42,576 --> 00:03:47,564
+The key is the model, the prompt version, the mode, the language and the sentence
+
+70
+00:03:47,564 --> 00:03:47,749
+id.
+
+71
+00:03:47,749 --> 00:03:52,861
+So if a run stops half way, I just run it again, and only the missing sentences are
+
+72
+00:03:52,861 --> 00:03:53,169
+sent.
+
+73
+00:03:53,169 --> 00:03:58,096
+The cache is also committed to git, so anyone can reproduce the routing analysis
+
+74
+00:03:58,096 --> 00:03:59,266
+without an API key.
+
+75
+00:03:59,966 --> 00:04:02,830
+I tried two prompts on sixty dev sentences.
+
+76
+00:04:02,830 --> 00:04:05,494
+The first gives only the list of labels.
+
+77
+00:04:05,494 --> 00:04:10,756
+The second also gives one short English example for each intent, taken from the
+
+78
+00:04:10,756 --> 00:04:11,688
+training data.
+
+79
+00:04:11,688 --> 00:04:16,151
+The version with examples scored 86.7%, against 80.0% without them.
+
+80
+00:04:16,151 --> 00:04:19,148
+So version two was frozen for all later runs.
+
+81
+00:04:19,148 --> 00:04:21,346
+This decision used dev data only.
+
+82
+00:04:21,346 --> 00:04:24,277
+The test data stays untouched until the end.
+
+83
+00:04:24,977 --> 00:04:30,311
+Then the full run: three hundred plus five hundred sentences, in three languages.
+
+84
+00:04:30,311 --> 00:04:34,723
+That is two thousand four hundred answers, sent twenty per request.
+
+85
+00:04:34,723 --> 00:04:39,728
+The LLM scored 84.2% on dev sub and 84.1% on test sub, pooled over the three
+
+86
+00:04:39,728 --> 00:04:40,386
+languages.
+
+87
+00:04:40,386 --> 00:04:42,691
+It never returned an invalid label.
+
+88
+00:04:42,691 --> 00:04:46,708
+Notice that it is almost equally good in all three languages.
+
+89
+00:04:46,708 --> 00:04:49,277
+That is the bar the router has to meet.
+
+90
+00:04:49,977 --> 00:04:51,772
+Two real errors happened here.
+
+91
+00:04:51,772 --> 00:04:56,618
+First, a read timeout from the HTTP library was not caught by my retry logic, and
+
+92
+00:04:56,618 --> 00:04:58,114
+it crashed the whole run.
+
+93
+00:04:58,114 --> 00:05:02,422
+I mapped all network errors to a retried error, and wrote a test for it.
+
+94
+00:05:02,422 --> 00:05:06,311
+Second, the Linux virtual machine stopped in the middle of a run.
+
+95
+00:05:06,311 --> 00:05:11,157
+The cache file ended with two thousand zero bytes, and the next run crashed while
+
+96
+00:05:11,157 --> 00:05:11,815
+reading it.
+
+97
+00:05:11,815 --> 00:05:13,251
+The fix was at the root.
+
+98
+00:05:13,251 --> 00:05:16,004
+Every write is now flushed and synced to disk.
+
+99
+00:05:16,004 --> 00:05:20,790
+And the loader removes crash padding, but still fails loudly on any other broken
+
+100
+00:05:20,790 --> 00:05:23,243
+line, so real corruption is never hidden.
+
+101
+00:05:23,943 --> 00:05:29,766
+Batching is good for the free tier, but a real bot sends one message at a time.
+
+102
+00:05:29,766 --> 00:05:32,788
+So I also sent fifty messages one by one.
+
+103
+00:05:32,788 --> 00:05:38,831
+The median latency was 1344 ms, and the slowest five percent took 9114 ms or more.
+
+104
+00:05:38,831 --> 00:05:44,285
+Each call used about 890 input tokens, mostly the label list and examples.
+
+105
+00:05:44,285 --> 00:05:48,486
+These real token counts are what I use for the cost math.
+
+106
+00:05:49,186 --> 00:05:50,999
+Phase four: the small model.
+
+107
+00:05:50,999 --> 00:05:56,050
+I load the MuRIL encoder, and add my own classification head: dropout, and one
+
+108
+00:05:56,050 --> 00:05:58,899
+linear layer from 768 numbers to 60 intents.
+
+109
+00:05:58,899 --> 00:06:02,071
+The first token's vector summarises the sentence.
+
+110
+00:06:02,071 --> 00:06:05,374
+The head turns it into sixty scores, called logits.
+
+111
+00:06:05,374 --> 00:06:08,093
+The highest score is the predicted intent.
+
+112
+00:06:08,093 --> 00:06:12,820
+Writing the head myself keeps the PyTorch part clear and easy to explain.
+
+113
+00:06:13,520 --> 00:06:15,975
+I did not use the Hugging Face Trainer.
+
+114
+00:06:15,975 --> 00:06:20,949
+I wrote the loop: get a batch, forward pass, cross entropy loss, backward pass,
+
+115
+00:06:20,949 --> 00:06:23,341
+clip the gradients, and an AdamW step.
+
+116
+00:06:23,341 --> 00:06:28,503
+The learning rate warms up for the first ten percent of steps, then goes down in a
+
+117
+00:06:28,503 --> 00:06:29,385
+straight line.
+
+118
+00:06:29,385 --> 00:06:31,022
+I trained on English only.
+
+119
+00:06:31,022 --> 00:06:35,995
+After every epoch I measure English dev accuracy, keep the best checkpoint, and
+
+120
+00:06:35,995 --> 00:06:38,702
+stop if it does not improve for two epochs.
+
+121
+00:06:38,702 --> 00:06:41,158
+The big word embedding table is frozen.
+
+122
+00:06:41,158 --> 00:06:45,691
+It saves GPU memory and keeps the shared multilingual vocabulary intact.
+
+123
+00:06:46,391 --> 00:06:51,830
+Before the full run, a thirty step smoke run estimated the training time: about 5.6
+
+124
+00:06:51,830 --> 00:06:52,355
+minutes.
+
+125
+00:06:52,355 --> 00:06:55,369
+Far below my four hour limit, so I kept MuRIL.
+
+126
+00:06:55,369 --> 00:06:57,794
+But the first real run had a problem.
+
+127
+00:06:57,794 --> 00:07:02,316
+After five epochs, English dev accuracy was still going up, at 77.4%.
+
+128
+00:07:02,316 --> 00:07:04,675
+The model had not finished learning.
+
+129
+00:07:04,675 --> 00:07:09,722
+So I raised the limit to fifteen epochs and let early stopping on English dev
+
+130
+00:07:09,722 --> 00:07:10,180
+decide.
+
+131
+00:07:10,180 --> 00:07:13,457
+I kept the first run's log, to be honest about it.
+
+132
+00:07:14,157 --> 00:07:16,486
+Here is the final training curve.
+
+133
+00:07:16,486 --> 00:07:19,732
+The blue line is the training loss going down.
+
+134
+00:07:19,732 --> 00:07:22,554
+The purple line is English dev accuracy.
+
+135
+00:07:22,554 --> 00:07:26,012
+The best epoch was 12, with 87.9% on English dev.
+
+136
+00:07:26,012 --> 00:07:29,540
+The whole run took 14.0 minutes on the laptop GPU.
+
+137
+00:07:30,240 --> 00:07:31,980
+Now the interesting part.
+
+138
+00:07:31,980 --> 00:07:36,017
+On the full English test set the small model scores 88.1%.
+
+139
+00:07:36,017 --> 00:07:40,054
+On Hindi, which it never saw in training, it scores 77.9%.
+
+140
+00:07:40,054 --> 00:07:41,307
+On Kannada, 70.7%.
+
+141
+00:07:41,307 --> 00:07:44,160
+This is zero-shot cross-lingual transfer.
+
+142
+00:07:44,160 --> 00:07:49,937
+MuRIL learned during pre-training that a Hindi sentence and its English translation
+
+143
+00:07:49,937 --> 00:07:54,670
+mean the same thing, so an English classifier partly works in Hindi.
+
+144
+00:07:54,670 --> 00:07:59,751
+The published MuRIL numbers are higher, partly because those papers chose
+
+145
+00:07:59,751 --> 00:08:01,421
+checkpoints differently.
+
+146
+00:08:01,421 --> 00:08:05,040
+I only used English dev, to keep it truly zero-shot.
+
+147
+00:08:05,740 --> 00:08:10,119
+A threshold only makes sense if the confidence means something.
+
+148
+00:08:10,119 --> 00:08:15,679
+If the model says ninety percent, it should be right about ninety percent of the
+
+149
+00:08:15,679 --> 00:08:16,026
+time.
+
+150
+00:08:16,026 --> 00:08:19,501
+Temperature scaling fixes this with one number, T.
+
+151
+00:08:19,501 --> 00:08:22,837
+I divide all the scores by T before the softmax.
+
+152
+00:08:22,837 --> 00:08:26,868
+The predicted intent does not change, only the confidence.
+
+153
+00:08:26,868 --> 00:08:30,274
+T was fitted on English dev and came out as 1.34.
+
+154
+00:08:30,274 --> 00:08:35,208
+The expected calibration error, called E C E, went from 0.076 to 0.016.
+
+155
+00:08:35,208 --> 00:08:36,320
+Lower is better.
+
+156
+00:08:37,020 --> 00:08:38,295
+Now the threshold.
+
+157
+00:08:38,295 --> 00:08:43,887
+I tried every value from zero to one, in steps of one hundredth, plus one point
+
+158
+00:08:43,887 --> 00:08:47,002
+zero one, which sends everything to the LLM.
+
+159
+00:08:47,002 --> 00:08:52,807
+The rule was written down before looking at any test data: pick the threshold with
+
+160
+00:08:52,807 --> 00:08:58,400
+the fewest LLM calls, while the router stays within one percentage point of the
+
+161
+00:08:58,400 --> 00:09:00,453
+LLM-only accuracy on dev sub.
+
+162
+00:09:00,453 --> 00:09:04,701
+On dev, the LLM alone scored 84.2%, so the target was 83.2%.
+
+163
+00:09:04,701 --> 00:09:06,754
+The chosen threshold is 0.56.
+
+164
+00:09:07,454 --> 00:09:09,638
+This chart shows the whole trade-off.
+
+165
+00:09:09,638 --> 00:09:12,530
+On the left is dev sub, on the right is test sub.
+
+166
+00:09:12,530 --> 00:09:16,603
+Each line is one language, and the dashed line is all three together.
+
+167
+00:09:16,603 --> 00:09:19,672
+Moving right means sending more messages to the LLM.
+
+168
+00:09:19,672 --> 00:09:21,738
+The dots show the chosen threshold.
+
+169
+00:09:21,738 --> 00:09:23,214
+Look at the English line.
+
+170
+00:09:23,214 --> 00:09:28,113
+With almost nothing sent to the LLM, it is already high, and a few LLM answers push
+
+171
+00:09:28,113 --> 00:09:28,998
+it even higher.
+
+172
+00:09:28,998 --> 00:09:33,956
+Hindi and Kannada start lower and climb fast as their unsure messages go to the LLM.
+
+173
+00:09:33,956 --> 00:09:37,144
+Notice that the test curve peaks around forty percent.
+
+174
+00:09:37,144 --> 00:09:39,446
+The two models make different mistakes.
+
+175
+00:09:39,446 --> 00:09:44,286
+My rule chose the fewest LLM calls instead, because that was the goal I wrote down
+
+176
+00:09:44,286 --> 00:09:45,820
+before seeing any results.
+
+177
+00:09:46,520 --> 00:09:52,659
+Here are the final numbers on test sub, all three languages together, with the
+
+178
+00:09:52,659 --> 00:09:54,627
+threshold fixed from dev.
+
+179
+00:09:54,627 --> 00:09:56,909
+The small model alone: 78.6%.
+
+180
+00:09:56,909 --> 00:09:58,562
+The LLM alone: 84.1%.
+
+181
+00:09:58,562 --> 00:10:03,835
+The router: 84.2%, while sending only 11.1% of messages to the LLM.
+
+182
+00:10:03,835 --> 00:10:10,368
+So the router matches the LLM-only accuracy, with about one LLM call for every nine
+
+183
+00:10:10,368 --> 00:10:11,076
+messages.
+
+184
+00:10:11,076 --> 00:10:13,516
+The accuracy change is +0.1 pp.
+
+185
+00:10:13,516 --> 00:10:19,261
+The oracle, which is right whenever either model is right, reaches 91.5%.
+
+186
+00:10:19,261 --> 00:10:23,354
+It shows how much a perfect router could still gain.
+
+187
+00:10:24,054 --> 00:10:26,789
+Per language, the picture makes sense.
+
+188
+00:10:26,789 --> 00:10:32,259
+English is the language the small model was trained on, so it keeps the most
+
+189
+00:10:32,259 --> 00:10:34,706
+messages: only 3.8% go to the LLM.
+
+190
+00:10:34,706 --> 00:10:37,800
+Hindi sends 13.0%, and Kannada sends 16.4%.
+
+191
+00:10:37,800 --> 00:10:43,486
+The less the small model knows a language, the more often it is unsure, and the
+
+192
+00:10:43,486 --> 00:10:44,998
+router asks for help.
+
+193
+00:10:45,698 --> 00:10:48,295
+Speed matters for a voice bot.
+
+194
+00:10:48,295 --> 00:10:55,308
+On the CPU, with four threads, the small model answers one message in a median of
+
+195
+00:10:55,308 --> 00:10:58,772
+38 ms, against 1344 ms for one LLM call.
+
+196
+00:10:58,772 --> 00:11:00,417
+Now money and time.
+
+197
+00:11:00,417 --> 00:11:07,516
+Using the paid price of the model and the real token counts, the LLM costs $0.2991
+
+198
+00:11:07,516 --> 00:11:09,421
+per thousand messages.
+
+199
+00:11:09,421 --> 00:11:11,586
+The router costs $0.0331.
+
+200
+00:11:11,586 --> 00:11:18,253
+The router avoids 88.9% of LLM calls, and the typical time per message, using
+
+201
+00:11:18,253 --> 00:11:21,976
+median times, drops from 1344 ms to 186 ms.
+
+202
+00:11:21,976 --> 00:11:26,565
+The accuracy change against the LLM alone is +0.1 pp.
+
+203
+00:11:27,265 --> 00:11:29,401
+Here are eight real test messages.
+
+204
+00:11:29,401 --> 00:11:33,549
+The top four stayed with the small model because it was confident.
+
+205
+00:11:33,549 --> 00:11:35,560
+The bottom four went to the LLM.
+
+206
+00:11:35,560 --> 00:11:40,337
+You can see English, Hindi and Kannada sentences, the true intent, the small
+
+207
+00:11:40,337 --> 00:11:43,542
+model's guess and confidence, and the final answer.
+
+208
+00:11:44,242 --> 00:11:46,705
+Phase six is the API, built with Flask.
+
+209
+00:11:46,705 --> 00:11:51,757
+The model is loaded once when the app starts, and the threshold is read from the
+
+210
+00:11:51,757 --> 00:11:53,083
+routing results file.
+
+211
+00:11:53,083 --> 00:11:55,672
+The predict endpoint validates the input.
+
+212
+00:11:55,672 --> 00:12:00,914
+Empty text, or more than five hundred characters, returns an error 400 with a clear
+
+213
+00:12:00,914 --> 00:12:01,419
+message.
+
+214
+00:12:01,419 --> 00:12:04,767
+If the LLM fails or times out, the app never crashes.
+
+215
+00:12:04,767 --> 00:12:08,808
+It returns the small model's answer and marks it small fallback.
+
+216
+00:12:09,508 --> 00:12:12,082
+Here is the smoke test with real requests.
+
+217
+00:12:12,082 --> 00:12:15,022
+One English sentence, one Hindi and one Kannada.
+
+218
+00:12:15,022 --> 00:12:19,985
+Each response shows the intent, the confidence, where it was routed, and how long
+
+219
+00:12:19,985 --> 00:12:20,475
+it took.
+
+220
+00:12:21,175 --> 00:12:23,885
+Flask's own server is only for development.
+
+221
+00:12:23,885 --> 00:12:29,053
+In production, a request goes from the browser to NGINX, then to gunicorn, then to
+
+222
+00:12:29,053 --> 00:12:32,078
+the Flask app, and then to the model or the LLM.
+
+223
+00:12:32,078 --> 00:12:34,410
+Gunicorn runs three worker processes.
+
+224
+00:12:34,410 --> 00:12:39,514
+Each one uses four PyTorch threads, so together they use the twelve cores without
+
+225
+00:12:39,514 --> 00:12:40,712
+fighting over them.
+
+226
+00:12:40,712 --> 00:12:41,972
+NGINX sits in front.
+
+227
+00:12:41,972 --> 00:12:47,077
+It handles slow clients, limits the request size, and can serve many connections.
+
+228
+00:12:47,777 --> 00:12:51,732
+I ran NGINX as a normal user, so no sudo password is needed.
+
+229
+00:12:51,732 --> 00:12:54,105
+The trick is a project-local config.
+
+230
+00:12:54,105 --> 00:12:59,445
+The pid file and every temp folder live inside the project, because a normal user
+
+231
+00:12:59,445 --> 00:13:01,752
+cannot write to the system folders.
+
+232
+00:13:01,752 --> 00:13:05,444
+It listens on port 8080 and passes requests to gunicorn.
+
+233
+00:13:06,144 --> 00:13:08,056
+Then a load test with Locust.
+
+234
+00:13:08,056 --> 00:13:13,330
+20 simulated users sent real test sentences through NGINX, with the LLM switched
+
+235
+00:13:13,330 --> 00:13:15,307
+off so no API quota was spent.
+
+236
+00:13:15,307 --> 00:13:19,329
+The server handled 41.2 requests per second, with 0 failures.
+
+237
+00:13:19,329 --> 00:13:24,801
+Half of the requests finished within 180 ms, and ninety-five percent within 260 ms.
+
+238
+00:13:24,801 --> 00:13:26,515
+The bottleneck is the CPU.
+
+239
+00:13:26,515 --> 00:13:31,921
+One message alone takes about 38 ms, but under load the twelve cores are shared by
+
+240
+00:13:31,921 --> 00:13:36,272
+three workers and the load generator, so requests wait in a queue.
+
+241
+00:13:36,272 --> 00:13:41,084
+To go faster I would quantize the model or add CPU, not add more workers.
+
+242
+00:13:41,084 --> 00:13:42,864
+One real bug happened here.
+
+243
+00:13:42,864 --> 00:13:45,567
+The first load test showed zero requests.
+
+244
+00:13:45,567 --> 00:13:50,973
+The workers had inherited a broken PyTorch thread pool from the master process and
+
+245
+00:13:50,973 --> 00:13:51,369
+froze.
+
+246
+00:13:51,369 --> 00:13:56,775
+The fix was one line: keep the master single-threaded, and let each worker set its
+
+247
+00:13:56,775 --> 00:13:58,621
+own threads after it starts.
+
+248
+00:13:59,321 --> 00:14:01,224
+Phase eight is the quality gate.
+
+249
+00:14:01,224 --> 00:14:05,923
+One command, make verify, runs the linter, every unit test, and a number check.
+
+250
+00:14:05,923 --> 00:14:07,707
+The number check is important.
+
+251
+00:14:07,707 --> 00:14:12,346
+Every results table in the readme and the report is generated from the results
+
+252
+00:14:12,346 --> 00:14:12,763
+folder.
+
+253
+00:14:12,763 --> 00:14:15,737
+If anyone edits a number by hand, the check fails.
+
+254
+00:14:15,737 --> 00:14:20,376
+Then I had the repo reviewed independently for test leakage, secrets and
+
+255
+00:14:20,376 --> 00:14:21,566
+broken instructions.
+
+256
+00:14:22,266 --> 00:14:27,644
+If an interviewer asks you to explain the project in thirty seconds, say this.
+
+257
+00:14:27,644 --> 00:14:30,471
+I built an intent router for a voice bot.
+
+258
+00:14:30,471 --> 00:14:36,125
+A small multilingual model, fine-tuned in PyTorch on English only, answers when it
+
+259
+00:14:36,125 --> 00:14:37,021
+is confident.
+
+260
+00:14:37,021 --> 00:14:39,573
+Otherwise the message goes to an LLM.
+
+261
+00:14:39,573 --> 00:14:45,158
+On Hindi and Kannada test data, the router gets 84.2% accuracy while sending only
+
+262
+00:14:45,158 --> 00:14:47,157
+11.1% of messages to the LLM.
+
+263
+00:14:47,157 --> 00:14:51,432
+I served it with Flask, gunicorn and NGINX and load-tested it.
+
+264
+00:14:52,132 --> 00:14:52,935
+Question one.
+
+265
+00:14:52,935 --> 00:14:55,589
+Why route, instead of always using the LLM?
+
+266
+00:14:55,589 --> 00:14:57,503
+Because most messages are easy.
+
+267
+00:14:57,503 --> 00:15:02,565
+The small model handles them for free in milliseconds, and we pay for the LLM only
+
+268
+00:15:02,565 --> 00:15:03,615
+on the hard ones.
+
+269
+00:15:03,615 --> 00:15:04,418
+Question two.
+
+270
+00:15:04,418 --> 00:15:06,702
+Why choose the threshold on dev data?
+
+271
+00:15:06,702 --> 00:15:11,764
+Because if you tune on test data, your test score is no longer an honest estimate.
+
+272
+00:15:11,764 --> 00:15:13,554
+It looks better than reality.
+
+273
+00:15:13,554 --> 00:15:14,480
+Question three.
+
+274
+00:15:14,480 --> 00:15:17,135
+Why does English training work for Kannada?
+
+275
+00:15:17,135 --> 00:15:21,950
+MuRIL was pre-trained on many languages together, including translation pairs.
+
+276
+00:15:21,950 --> 00:15:26,519
+So similar meanings get similar vectors in every language, and the English
+
+277
+00:15:26,519 --> 00:15:28,432
+classifier partly carries over.
+
+278
+00:15:29,132 --> 00:15:30,017
+Question four.
+
+279
+00:15:30,017 --> 00:15:32,102
+What does temperature scaling do?
+
+280
+00:15:32,102 --> 00:15:37,219
+It divides the scores by one number before the softmax, so the confidence matches
+
+281
+00:15:37,219 --> 00:15:38,357
+the real accuracy.
+
+282
+00:15:38,357 --> 00:15:40,378
+It never changes the prediction.
+
+283
+00:15:40,378 --> 00:15:41,263
+Question five.
+
+284
+00:15:41,263 --> 00:15:42,716
+What is the bottleneck?
+
+285
+00:15:42,716 --> 00:15:44,359
+CPU-bound model inference.
+
+286
+00:15:44,359 --> 00:15:49,476
+Each worker answers one request at a time, so throughput is limited by the cores,
+
+287
+00:15:49,476 --> 00:15:50,866
+not by NGINX or Flask.
+
+288
+00:15:50,866 --> 00:15:51,751
+And what next?
+
+289
+00:15:51,751 --> 00:15:56,995
+Quantize the model to make it faster, add a little Hindi and Kannada training data,
+
+290
+00:15:56,995 --> 00:15:59,332
+and test with real code-mixed speech.
+
+291
+00:16:00,032 --> 00:16:01,537
+That is the whole project.
+
+292
+00:16:01,537 --> 00:16:05,879
+A small model trained on English, a big model for the hard cases, an honest
+
+293
+00:16:05,879 --> 00:16:07,557
+threshold, and a real server.
+
+294
+00:16:07,557 --> 00:16:12,130
+The readme, the final report and the interview guide are in the repository, and
+
+295
+00:16:12,130 --> 00:16:15,082
+every number in them comes from the results folder.
+
+296
+00:16:15,082 --> 00:16:16,413
+Thank you for watching.

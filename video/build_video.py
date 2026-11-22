@@ -34,7 +34,7 @@ from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-from router.fonts import font_for, font_for_text  # noqa: E402
+from router.fonts import font_for, font_for_text, script_of  # noqa: E402
 
 VIDEO = ROOT / "video"
 BUILD = VIDEO / "build"
@@ -176,7 +176,12 @@ def strip_ansi(s: str) -> str:
 
 def read_lines(path: str, spec: list[str]) -> tuple[list[str], int]:
     """spec: ["10-30"] or ["tail", "8"] -> (lines, first line number)."""
-    lines = strip_ansi((ROOT / path).read_text(encoding="utf-8")).splitlines()
+    # Split on "\n" only, like sed/grep: progress bars write bare "\r", which splitlines() would count as
+    # extra lines (that shifted every log range once). A "\r" overwrites the line, so keep the last part.
+    raw = (ROOT / path).read_bytes().decode("utf-8")
+    lines = [strip_ansi(ln.split("\r")[-1]) for ln in raw.split("\n")]
+    if raw.endswith("\n"):
+        lines = lines[:-1]
     if spec and spec[0] == "tail":
         n = int(spec[1])
         return lines[-n:], max(1, len(lines) - n + 1)
@@ -190,38 +195,83 @@ def code_image(path: str, spec: list[str]) -> Image.Image:
     from pygments import highlight
     from pygments.formatters import ImageFormatter
     from pygments.lexers import get_lexer_for_filename
+    from pygments.styles.default import DefaultStyle
+    from pygments.token import Comment, String
+
+    class CalmStyle(DefaultStyle):  # the default style draws string escapes in a brownish orange; use purple
+        styles = {**DefaultStyle.styles, String.Escape: "bold #7b5ea7", Comment.Preproc: "#3D7B7B"}
 
     lines, start = read_lines(path, spec)
     src = "\n".join(lines)
     fmt = ImageFormatter(font_name="DejaVu Sans Mono", font_size=30, line_numbers=True, line_number_start=start,
-                         style="default", line_pad=6, image_pad=24, line_number_bg="#eef1f5",
+                         line_number_chars=len(str(start + len(lines))) + 1,  # 3-digit numbers need a wider gutter
+                         style=CalmStyle, line_pad=6, image_pad=24, line_number_bg="#eef1f5",
                          line_number_fg="#8a93a3")
     img = Image.open(BytesIO(highlight(src, get_lexer_for_filename(path), fmt))).convert("RGB")
     return add_caption(img, f"{path}  (lines {start}-{start + len(lines) - 1})")
 
 
-def output_image(path: str, spec: list[str], max_chars: int = 92) -> Image.Image:
+def script_runs(text: str) -> list[tuple[str, str]]:
+    """Split text into (font kind, piece) runs: Devanagari / Kannada letters use Noto, everything else
+    (Latin, digits, punctuation, spaces) uses DejaVu Sans Mono. Noto Indic fonts have no Latin letters."""
+    runs: list[tuple[str, str]] = []
+    for ch in text:
+        kind = script_of(ch)
+        if kind == "latin":
+            kind = "mono"
+        if ch in (" ", "‌", "‍") and runs:  # spaces and zero-width (non-)joiners stay with the run
+            kind = runs[-1][0]
+        if runs and runs[-1][0] == kind:
+            runs[-1] = (kind, runs[-1][1] + ch)
+        else:
+            runs.append((kind, ch))
+    return runs
+
+
+def mixed_width(d: ImageDraw.ImageDraw, text: str, size: int) -> float:
+    return sum(d.textlength(piece, font=font_for(kind, size)) for kind, piece in script_runs(text))
+
+
+def draw_mixed(d: ImageDraw.ImageDraw, xy: tuple[int, int], text: str, size: int, fill: str) -> None:
+    x, y = xy
+    for kind, piece in script_runs(text):
+        d.text((x, y), piece, font=font_for(kind, size), fill=fill)
+        x += d.textlength(piece, font=font_for(kind, size))
+
+
+def output_image(path: str, spec: list[str], max_width: int = 1500) -> Image.Image:
     lines, _ = read_lines(path, spec)
+    lines = [ln.rstrip().replace("\t", "    ") for ln in lines]
+    probe = ImageDraw.Draw(Image.new("RGB", (10, 10)))
+    for size in range(28, 17, -2):  # shrink first, so tables keep their shape
+        if max([mixed_width(probe, ln, size) for ln in lines] + [0]) <= max_width:
+            break
     out = []
     for ln in lines:
-        ln = ln.rstrip().replace("\t", "    ")
-        while len(ln) > max_chars:
-            out.append(ln[:max_chars])
-            ln = "    " + ln[max_chars:]
-        out.append(ln)
-    size, lh, pad = 28, 38, 28
-    font = font_for("mono", size)
-    probe = ImageDraw.Draw(Image.new("RGB", (10, 10)))
-    width = int(max([probe.textlength(ln, font=font_for_text(ln, size) if not ln.isascii() else font)
-                     for ln in out] + [400])) + 2 * pad
+        if mixed_width(probe, ln, size) <= max_width:
+            out.append(ln)  # fits: keep it exactly, leading spaces included
+            continue
+        # still too long at the smallest size: wrap only at spaces, keeping the indent, so words and
+        # Indic letter clusters are never cut in half
+        indent = ln[: len(ln) - len(ln.lstrip(" "))]
+        cur = ""
+        for word in ln.strip(" ").split(" "):
+            cand = f"{cur} {word}" if cur else indent + word
+            if cur and mixed_width(probe, cand, size) > max_width:
+                out.append(cur)
+                cur = indent + "    " + word
+            else:
+                cur = cand
+        out.append(cur)
+    lh, pad = int(size * 1.36), 28
+    width = int(max([mixed_width(probe, ln, size) for ln in out] + [400])) + 2 * pad
     img = Image.new("RGB", (width, len(out) * lh + 2 * pad + 44), TERM_BG)
     d = ImageDraw.Draw(img)
     for i, c in enumerate(("#8a93a3", "#a5adbb", "#c3c9d4")):  # window dots
         d.ellipse([pad + i * 26, 14, pad + i * 26 + 14, 28], fill=c)
     y = 44 + pad
     for ln in out:
-        f = font if ln.isascii() else font_for_text(ln, size)
-        d.text((pad, y), ln, font=f, fill=TERM_INK)
+        draw_mixed(d, (pad, y), ln, size, TERM_INK)
         y += lh
     return add_caption(img, path)
 

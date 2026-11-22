@@ -1,0 +1,4 @@
+duration 16.29 min; streams ['video', 'audio']; video h264 1920x1080 yuv420p 30/1
+audio mean volume -19.8 dB
+extracted 35 frames to video/build/frames (35 scenes)
+video-check: OK
