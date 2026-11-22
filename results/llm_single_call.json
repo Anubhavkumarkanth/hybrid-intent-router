@@ -9,6 +9,7 @@
   },
   "latency_ms_median": 1344.5,
   "latency_ms_p95": 9113.5,
+  "latency_ms_mean": 3133.4,
   "mean_input_tokens": 890.3,
   "mean_output_tokens": 12.8,
   "mean_thinking_tokens": 0.0,

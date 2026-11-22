@@ -15,7 +15,7 @@
 ## Final results
 
 <!-- RESULTS:routing:START -->
-| Language | Small only | LLM only | Router | Oracle | Sent to LLM | Router cost /1000 | LLM-only cost /1000 | Router avg latency | LLM-only latency |
+| Language | Small only | LLM only | Router | Oracle | Sent to LLM | Router cost /1000 | LLM-only cost /1000 | Router latency* | LLM-only latency* |
 |---|---|---|---|---|---|---|---|---|---|
 | English | 88.2% | 86.2% | **90.6%** | 93.4% | 3.8% | $0.0114 | $0.2991 | 89 ms | 1344 ms |
 | Hindi | 77.0% | 84.2% | **82.0%** | 90.8% | 13.0% | $0.0389 | $0.2991 | 212 ms | 1344 ms |
@@ -23,6 +23,8 @@
 | All 3 (pooled) | 78.6% | 84.1% | **84.2%** | 91.5% | 11.1% | $0.0331 | $0.2991 | 186 ms | 1344 ms |
 
 test_sub, 500 messages per language. Threshold t = 0.56 was chosen on dev_sub (pooled dev accuracy 83.2%, target 83.2%, 14.3% sent to LLM). Temperature T = 1.342.
+
+*Typical time per message, built from **median** times: small model (CPU, every message) + share sent to the LLM x median LLM single-call time. The LLM's *mean* single-call time was 3133 ms (slow outliers while the API was overloaded), so mean-based savings would be even larger.
 <!-- RESULTS:routing:END -->
 
 <!-- RESULTS:savings:START -->
@@ -30,7 +32,7 @@ test_sub, 500 messages per language. Threshold t = 0.56 was chosen on dev_sub (p
 |---|---|
 | LLM calls avoided | 88.9% |
 | LLM cost saved | 88.9% |
-| Average latency saved per message | 1158 ms |
+| Typical (median-based) latency saved per message | 1158 ms |
 | Accuracy change vs LLM only | +0.1 percentage points |
 <!-- RESULTS:savings:END -->
 
@@ -76,7 +78,7 @@ Load test:
 
 **In plain words:** pooled over English, Hindi and Kannada, the router is as accurate as sending everything to
 the LLM (84.2% vs 84.1% on test_sub) while sending only 11.1% of messages to it. That avoids 88.9% of LLM calls
-and cuts the average time per message from 1,344 ms to 186 ms. In English the router beats both models (90.6%).
+and cuts the typical (median-based) time per message from 1,344 ms to 186 ms. In English the router beats both models (90.6%).
 In Hindi and Kannada it is about 2 points below the LLM alone (82.0% vs 84.2%, 80.0% vs 81.8%), because one pooled
 threshold was chosen; English makes up the difference. The small model alone reached 77.9% (Hindi) and 70.7%
 (Kannada) on the full test sets with no training data in those languages, a few points below the published MuRIL
@@ -84,7 +86,7 @@ numbers (82.4% / 77.5%) and above the MASSIVE paper's XLM-R base (74.8% / 63.5%)
 
 ## Time per phase
 
-Wall-clock times on 22 Nov 2026 (from logs and git commit times). Two WSL restarts cost about 25 minutes.
+Wall-clock times on 22 Nov 2026, UTC (from file times, logs and git commit times; the Ubuntu user was created at 09:27). Some phases overlapped. Two WSL restarts cost about 25 minutes.
 
 | Phase | Time | Notes |
 |---|---|---|

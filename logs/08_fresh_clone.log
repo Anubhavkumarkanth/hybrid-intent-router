@@ -1,0 +1,29 @@
+== cloned f67511c Docs: README, interview guide, final report and journals with numbers rendered from results/; verify passes
+== no .env in the clone (good)
+WARNING: Retrying (Retry(total=9, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError("HTTPSConnectionPool(host='download.pytorch.org', port=443): Read timed out. (read timeout=120.0)")': /whl/setuptools-78.1.0-py3-none-any.whl
+== installed
+.venv/bin/python -m router.data 2>&1 | tee logs/02_data.log
+downloading https://amazon-massive-nlu-dataset.s3.amazonaws.com/amazon-massive-dataset-1.1.tar.gz
+downloaded, sha256 ok: 4cba5faa11c71437928e17cb1b9b3d8b8e727e7ea363a3a9a8045e19c0491577
+wrote data/processed/en_train.jsonl
+wrote data/processed/en_dev.jsonl
+wrote data/processed/en_test.jsonl
+wrote data/processed/hi_train.jsonl
+wrote data/processed/hi_dev.jsonl
+wrote data/processed/hi_test.jsonl
+wrote data/processed/kn_train.jsonl
+wrote data/processed/kn_dev.jsonl
+wrote data/processed/kn_test.jsonl
+wrote dev_sub_ids.json (300 ids)
+wrote test_sub_ids.json (500 ids)
+.venv/bin/python -m ruff check .
+All checks passed!
+.venv/bin/python -m pytest -q
+................................................................         [100%]
+64 passed in 5.00s
+.venv/bin/python scripts/check_numbers.py
+checked README.md: 7 result sections
+checked FINAL_REPORT.md: 5 result sections
+checked INTERVIEW_GUIDE.md: 3 result sections
+check_numbers: OK, all result tables match results/
+== FRESH CLONE TEST PASSED

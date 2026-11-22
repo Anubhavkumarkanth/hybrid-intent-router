@@ -11,6 +11,7 @@ Only files in results/ are read. A missing results file renders as "TBD".
 
 from __future__ import annotations
 
+import csv
 import json
 import re
 import sys
@@ -86,11 +87,17 @@ def t_routing() -> str:
                      f"{s['llm_only_avg_latency_ms']:.0f} ms"])
     c = r["chosen_threshold"]
     head = ["Language", "Small only", "LLM only", "Router", "Oracle", "Sent to LLM", "Router cost /1000",
-            "LLM-only cost /1000", "Router avg latency", "LLM-only latency"]
+            "LLM-only cost /1000", "Router latency*", "LLM-only latency*"]
+    single = load("llm_single_call.json") or {}
+    mean_note = (f" The LLM's *mean* single-call time was {single['latency_ms_mean']:.0f} ms (slow outliers while "
+                 f"the API was overloaded), so mean-based savings would be even larger."
+                 if "latency_ms_mean" in single else "")
     return (table(head, rows)
-            + f"\n\ntest_sub, 500 messages per language. Threshold t = {c['t']:.2f} was chosen on dev_sub "
-              f"(pooled dev accuracy {pct(c['accuracy'])}, target {pct(r['target_dev_sub_acc'])}, "
-              f"{pct(c['llm_share'])} sent to LLM). Temperature T = {r['temperature']:.3f}.")
+            + f"\n\ntest_sub, {r['test_sub']['en']['n']} messages per language. Threshold t = {c['t']:.2f} was "
+              f"chosen on dev_sub (pooled dev accuracy {pct(c['accuracy'])}, target {pct(r['target_dev_sub_acc'])}, "
+              f"{pct(c['llm_share'])} sent to LLM). Temperature T = {r['temperature']:.3f}."
+              f"\n\n*Typical time per message, built from **median** times: small model (CPU, every message) + share "
+              f"sent to the LLM x median LLM single-call time.{mean_note}")
 
 
 def t_savings() -> str:
@@ -101,7 +108,7 @@ def t_savings() -> str:
     return table(["What (test_sub, all 3 languages)", "Value"], [
         ["LLM calls avoided", pct(s["llm_calls_avoided_share"])],
         ["LLM cost saved", pct(s["cost_saving_share"])],
-        ["Average latency saved per message", f"{s['latency_saving_ms']:.0f} ms"],
+        ["Typical (median-based) latency saved per message", f"{s['latency_saving_ms']:.0f} ms"],
         ["Accuracy change vs LLM only", f"{s['accuracy_change_pp']:+.1f} percentage points"],
     ])
 
@@ -162,7 +169,13 @@ def _headline() -> dict | None:
         "hi": pct(s["accuracy"]["hi_test_full"]), "kn": pct(s["accuracy"]["kn_test_full"]),
         "en": pct(s["accuracy"]["en_test_full"]), "small_ms": f"{s['cpu_latency_single_message']['median_ms']:.0f} ms",
         "rps": f"{lt['requests_per_sec']:.1f}", "p95": f"{lt['p95_ms']:.0f} ms", "fail": str(lt["failures"]),
+        "n_test": f"{p['n']:,}", "n_thresholds": str(_count_thresholds()),
     }
+
+
+def _count_thresholds() -> int:
+    with open(RESULTS / "routing_curve.csv", newline="") as f:
+        return sum(1 for row in csv.DictReader(f) if row["split"] == "dev_sub" and row["group"] == "pooled")
 
 
 def t_pitch() -> str:
@@ -170,12 +183,13 @@ def t_pitch() -> str:
     if not h:
         return "TBD"
     return (f"\"I built an intent router for a voice bot. A small multilingual model (MuRIL), fine-tuned in plain "
-            f"PyTorch on English only, answers when it is confident; otherwise the message goes to Gemini. On 1,500 "
-            f"test messages in English, Hindi and Kannada the router scored {h['router']} accuracy, against "
-            f"{h['llm']} for the LLM alone and {h['small']} for the small model alone, while sending only "
+            f"PyTorch on English only, answers when it is confident; otherwise the message goes to Gemini. "
+            f"On {h['n_test']} test messages in English, Hindi and Kannada the router scored {h['router']} accuracy, "
+            f"against {h['llm']} for the LLM alone and {h['small']} for the small model alone, while sending only "
             f"{h['share']} of messages to the LLM. That cuts the LLM cost per 1,000 messages from {h['cost_llm']} "
-            f"to {h['cost_router']} and the average latency from {h['lat_llm']} to {h['lat_router']}. I served it "
-            f"with Flask, gunicorn and NGINX and load-tested it at {h['rps']} requests per second with "
+            f"to {h['cost_router']} and the typical (median-based) latency from {h['lat_llm']} to "
+            f"{h['lat_router']}. I served it with Flask, gunicorn and NGINX and load-tested it at {h['rps']} "
+            f"requests per second with "
             f"{h['fail']} failures.\"")
 
 
@@ -188,11 +202,11 @@ def t_resume() -> str:
             f"confidence routing sent only {h['share']} of messages to an LLM ({h['pp']} pp accuracy vs LLM-only, "
             f"{h['cost_cut']} lower LLM cost); served with Flask, gunicorn and NGINX at {h['rps']} requests/s "
             f"(p95 {h['p95']}).\n"
-            f"- **Data analyst resume:** Compared an LLM with a small model on 1,500 multilingual test messages; "
-            f"chose a routing threshold on a separate dev set from 102 candidates and showed the router keeps "
-            f"LLM-only accuracy ({h['pp']} percentage points) with {h['avoided']} fewer LLM calls (LLM cost per "
-            f"1,000 messages {h['cost_llm']} -> {h['cost_router']}); built the charts and auto-generated result "
-            f"tables that tests check against the raw results.")
+            f"- **Data analyst resume:** Compared an LLM with a small model on {h['n_test']} multilingual test "
+            f"messages; chose a routing threshold on a separate dev set from {h['n_thresholds']} candidates and "
+            f"showed the router keeps LLM-only accuracy ({h['pp']} percentage points) with {h['avoided']} fewer "
+            f"LLM calls (LLM cost per 1,000 messages {h['cost_llm']} -> {h['cost_router']}); built the charts and "
+            f"auto-generated result tables that tests check against the raw results.")
 
 
 SECTIONS = {

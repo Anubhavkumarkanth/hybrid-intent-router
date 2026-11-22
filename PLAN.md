@@ -30,7 +30,7 @@ src/router/  data.py model.py train.py evaluate.py llm.py llm_baseline.py calibr
 app/         app.py templates/index.html
 deploy/      gunicorn.conf.py nginx/nginx.conf locustfile.py
 scripts/     render_tables.py check_numbers.py loadtest_summary.py make_diagram.py
-tests/       test_data.py test_llm.py test_model.py test_route.py test_api.py test_numbers.py
+tests/       test_data.py test_llm.py test_model.py test_route.py test_api.py test_results.py (doc numbers: scripts/check_numbers.py in make verify)
 results/     *.json, *.csv, logits/, charts/, llm_cache.jsonl
 video/       script.md build_video.py check_video.py
 ```

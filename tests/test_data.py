@@ -10,7 +10,7 @@ LANGS = ["en", "hi", "kn"]
 EXPECTED = {"train": 11514, "dev": 2033, "test": 2974}
 
 pytestmark = pytest.mark.skipif(
-    not (D.PROC_DIR / "labels.json").exists(), reason="run `make data` first"
+    not (D.PROC_DIR / "en_train.jsonl").exists(), reason="run `make data` first"
 )
 
 

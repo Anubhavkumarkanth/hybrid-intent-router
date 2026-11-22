@@ -61,7 +61,7 @@ flowchart LR
 
 - **Same accuracy as the LLM, far cheaper and faster.** Pooled over the three languages the router scores 84.2%
   against 84.1% for the LLM alone, while sending only 11.1% of messages to the LLM. That avoids 88.9% of LLM calls,
-  cuts the LLM cost per 1,000 messages from $0.2991 to $0.0331, and the average time per message from 1,344 ms
+  cuts the LLM cost per 1,000 messages from $0.2991 to $0.0331, and the typical (median-based) time per message from 1,344 ms
   to 186 ms.
 - **English: the router beats both models.** The small model alone (88.2%) is already better than the LLM (86.2%)
   on English, and the router reaches 90.6% by sending only its 3.8% least confident messages to the LLM.
@@ -70,14 +70,14 @@ flowchart LR
   ends at 82.0% and 80.0%, against 84.2% and 81.8% for the LLM alone. The single, pooled threshold accepts this
   because English makes up the difference; a per-language threshold would buy that accuracy back with more LLM calls.
 - **There is more to gain.** The oracle (right if either model is right) is 91.5%, and the test curve peaks
-  near 86% when about 40% of messages go to the LLM: the two models make different mistakes.
+  near 86% when about 34-43% of messages go to the LLM: the two models make different mistakes.
 - **It holds up under load.** 20 simulated users through NGINX: 41.2 requests per second, 0 failures out of
   4,908, p95 260 ms, on one laptop CPU (small model only).
 
 ### Router vs LLM only vs small model only (test_sub)
 
 <!-- RESULTS:routing:START -->
-| Language | Small only | LLM only | Router | Oracle | Sent to LLM | Router cost /1000 | LLM-only cost /1000 | Router avg latency | LLM-only latency |
+| Language | Small only | LLM only | Router | Oracle | Sent to LLM | Router cost /1000 | LLM-only cost /1000 | Router latency* | LLM-only latency* |
 |---|---|---|---|---|---|---|---|---|---|
 | English | 88.2% | 86.2% | **90.6%** | 93.4% | 3.8% | $0.0114 | $0.2991 | 89 ms | 1344 ms |
 | Hindi | 77.0% | 84.2% | **82.0%** | 90.8% | 13.0% | $0.0389 | $0.2991 | 212 ms | 1344 ms |
@@ -85,6 +85,8 @@ flowchart LR
 | All 3 (pooled) | 78.6% | 84.1% | **84.2%** | 91.5% | 11.1% | $0.0331 | $0.2991 | 186 ms | 1344 ms |
 
 test_sub, 500 messages per language. Threshold t = 0.56 was chosen on dev_sub (pooled dev accuracy 83.2%, target 83.2%, 14.3% sent to LLM). Temperature T = 1.342.
+
+*Typical time per message, built from **median** times: small model (CPU, every message) + share sent to the LLM x median LLM single-call time. The LLM's *mean* single-call time was 3133 ms (slow outliers while the API was overloaded), so mean-based savings would be even larger.
 <!-- RESULTS:routing:END -->
 
 <!-- RESULTS:savings:START -->
@@ -92,7 +94,7 @@ test_sub, 500 messages per language. Threshold t = 0.56 was chosen on dev_sub (p
 |---|---|
 | LLM calls avoided | 88.9% |
 | LLM cost saved | 88.9% |
-| Average latency saved per message | 1158 ms |
+| Typical (median-based) latency saved per message | 1158 ms |
 | Accuracy change vs LLM only | +0.1 percentage points |
 <!-- RESULTS:savings:END -->
 
@@ -181,14 +183,17 @@ sudo apt install -y python3-venv python3-dev build-essential git make curl nginx
 git clone <this repo> hybrid-intent-router && cd hybrid-intent-router
 python3 -m venv .venv
 # PyTorch first: CUDA 12.8 build if you have an NVIDIA GPU, otherwise the CPU build
-.venv/bin/pip install torch==2.11.0 --index-url https://download.pytorch.org/whl/cpu
-.venv/bin/pip install -r requirements.txt -r requirements-dev.txt
+.venv/bin/pip install --timeout 120 --retries 10 torch==2.11.0 --index-url https://download.pytorch.org/whl/cpu
+.venv/bin/pip install --timeout 120 --retries 10 -r requirements.txt -r requirements-dev.txt
 ```
+
+(`--timeout` and `--retries` help on slow connections: the PyTorch download timed out more than once while this
+project was built.)
 
 | Step | Command | Needs |
 |---|---|---|
 | Download + prepare data | `make data` | internet |
-| Tests, lint, number check | `make verify` | nothing else |
+| Tests, lint, number check | `make verify` | after `make data` |
 | LLM baseline (cached answers are in the repo) | `make llm-pilot`, `make llm`, `make llm-single` | `GEMINI_API_KEY` in `.env` |
 | Train the small model | `make smoke`, then `make train` | GPU: ~1 min per epoch on an RTX 3050 |
 | Evaluate | `make evaluate` | trained model |
@@ -232,6 +237,11 @@ Open `http://127.0.0.1:8080/` for a small demo page with English, Hindi and Kann
   a few points of sampling noise.
 - LLM cost uses the paid-tier price of `gemini-3.5-flash-lite` (checked 2026-11-22); prices change.
 - Training ran on a 4 GB laptop GPU; serving and latency numbers are CPU-only, on one laptop.
+- Router latency is a *typical* value built from **median** times (small model + share x median LLM call). The
+  LLM's mean single-call time (3,133 ms) is much higher because of slow calls during API overload.
+- The load test ran with the LLM off. With the LLM on, an unsure message holds a gunicorn sync worker for the
+  whole LLM call (up to about 20 s with retries), so throughput would be lower. Threaded or async workers
+  (`gthread`), or a separate LLM queue, would fix that.
 - The model is picked with **English** dev accuracy only. Picking with Hindi/Kannada dev data would
   probably help those languages, but it would no longer be zero-shot.
 

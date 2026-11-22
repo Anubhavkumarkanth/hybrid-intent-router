@@ -203,7 +203,7 @@ def train(cfg: dict, smoke_steps: int = 0) -> dict:
     return summary
 
 
-def plot_curve(history: list[dict]) -> None:
+def plot_curve(history: list[dict], out: Path | None = None) -> None:
     import matplotlib
 
     matplotlib.use("Agg")
@@ -221,7 +221,7 @@ def plot_curve(history: list[dict]) -> None:
     ax1.set_title("Training curve (English train only)")
     fig.legend(loc="center right", bbox_to_anchor=(0.88, 0.5))
     fig.tight_layout()
-    out = RESULTS / "charts" / "training_curve.png"
+    out = out or RESULTS / "charts" / "training_curve.png"
     out.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(out)
     plt.close(fig)

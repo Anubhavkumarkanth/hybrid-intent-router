@@ -6,7 +6,7 @@ fails if it ever drifts. Numbers written in the answers below were copied from t
 ## 30-second pitch
 
 <!-- RESULTS:pitch:START -->
-"I built an intent router for a voice bot. A small multilingual model (MuRIL), fine-tuned in plain PyTorch on English only, answers when it is confident; otherwise the message goes to Gemini. On 1,500 test messages in English, Hindi and Kannada the router scored 84.2% accuracy, against 84.1% for the LLM alone and 78.6% for the small model alone, while sending only 11.1% of messages to the LLM. That cuts the LLM cost per 1,000 messages from $0.2991 to $0.0331 and the average latency from 1344 ms to 186 ms. I served it with Flask, gunicorn and NGINX and load-tested it at 41.2 requests per second with 0 failures."
+"I built an intent router for a voice bot. A small multilingual model (MuRIL), fine-tuned in plain PyTorch on English only, answers when it is confident; otherwise the message goes to Gemini. On 1,500 test messages in English, Hindi and Kannada the router scored 84.2% accuracy, against 84.1% for the LLM alone and 78.6% for the small model alone, while sending only 11.1% of messages to the LLM. That cuts the LLM cost per 1,000 messages from $0.2991 to $0.0331 and the typical (median-based) latency from 1344 ms to 186 ms. I served it with Flask, gunicorn and NGINX and load-tested it at 41.2 requests per second with 0 failures."
 <!-- RESULTS:pitch:END -->
 
 ## 2-minute explanation
@@ -29,7 +29,7 @@ fails if it ever drifts. Numbers written in the answers below were copied from t
 Final numbers (test_sub, 500 sentences per language):
 
 <!-- RESULTS:routing:START -->
-| Language | Small only | LLM only | Router | Oracle | Sent to LLM | Router cost /1000 | LLM-only cost /1000 | Router avg latency | LLM-only latency |
+| Language | Small only | LLM only | Router | Oracle | Sent to LLM | Router cost /1000 | LLM-only cost /1000 | Router latency* | LLM-only latency* |
 |---|---|---|---|---|---|---|---|---|---|
 | English | 88.2% | 86.2% | **90.6%** | 93.4% | 3.8% | $0.0114 | $0.2991 | 89 ms | 1344 ms |
 | Hindi | 77.0% | 84.2% | **82.0%** | 90.8% | 13.0% | $0.0389 | $0.2991 | 212 ms | 1344 ms |
@@ -37,6 +37,8 @@ Final numbers (test_sub, 500 sentences per language):
 | All 3 (pooled) | 78.6% | 84.1% | **84.2%** | 91.5% | 11.1% | $0.0331 | $0.2991 | 186 ms | 1344 ms |
 
 test_sub, 500 messages per language. Threshold t = 0.56 was chosen on dev_sub (pooled dev accuracy 83.2%, target 83.2%, 14.3% sent to LLM). Temperature T = 1.342.
+
+*Typical time per message, built from **median** times: small model (CPU, every message) + share sent to the LLM x median LLM single-call time. The LLM's *mean* single-call time was 3133 ms (slow outliers while the API was overloaded), so mean-based savings would be even larger.
 <!-- RESULTS:routing:END -->
 
 ## 20 likely questions, with short answers

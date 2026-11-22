@@ -7,11 +7,11 @@
   reported before and after, on English dev and on each language's `dev_sub`.
 - `src/router/route.py`: confidence >= t → the small model's answer; otherwise the cached LLM answer.
 - `src/router/analysis.py` (`make route`): sweeps t = 0.00 ... 1.00 (step 0.01) plus 1.01 on `dev_sub` (pooled and
-  per language), computing accuracy, the share sent to the LLM, LLM cost per 1,000 messages and average latency.
+  per language), computing accuracy, the share sent to the LLM, LLM cost per 1,000 messages and typical (median-based) latency.
   It picks t with the fixed rule, applies it **once** to `test_sub`, and writes `results/routing.json`,
   `results/routing_curve.csv` and four charts.
 - Cost per 1,000 messages = 1,000 x share sent to LLM x (input tokens x $0.30 + output tokens x $2.50) / 1M, using
-  the real mean tokens from the single-call test. Average latency = small-model CPU median + share x LLM median.
+  the real mean tokens from the single-call test. Typical latency = small-model CPU median + share x LLM median.
 
 ## Why
 - A threshold on raw softmax scores is fragile: fine-tuned networks are usually over-confident.
@@ -42,12 +42,12 @@ def choose_threshold(curve, llm_only_acc, tolerance=0.01):
   | All 3 | 78.6% | 84.1% | **84.2%** | 91.5% | 11.1% |
 
 - Pooled, the router is +0.13 percentage points above LLM-only while avoiding 88.9% of LLM calls: LLM cost per
-  1,000 messages $0.2991 → $0.0331, average latency 1,344.5 ms → 186.3 ms.
+  1,000 messages $0.2991 → $0.0331, typical (median-based) latency 1,344.5 ms → 186.3 ms (the LLM mean call time was 3,133.4 ms, so mean-based savings are larger).
 - Honest reading: in English the router beats both models (the small model is better than the LLM there, and the
   LLM fixes some of its unsure cases). In Hindi and Kannada the router is about 2 points below the LLM alone; the
   pooled rule allows this because English makes up the difference. A per-language threshold would trade more
   LLM calls for Hindi/Kannada accuracy.
-- The test curve peaks near 86% with about 35-45% of messages sent to the LLM (the two models make different
+- The test curve peaks near 86% with about 34-43% of messages sent to the LLM (the two models make different
   mistakes). Our rule deliberately optimises for fewest LLM calls, not maximum accuracy.
 - Charts: `accuracy_vs_llm_share.png`, `cost_per_1000.png`, `reliability.png`, `examples_table.png`.
 - `pytest tests/test_route.py -q`: passes (t = 0 → nothing to LLM; t above max confidence → everything; hand-made

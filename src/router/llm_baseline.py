@@ -142,6 +142,7 @@ def cmd_single() -> None:
         "per_lang_n": {lang: len(ids_) for lang, ids_ in plan},
         "latency_ms_median": round(statistics.median(lat), 1),
         "latency_ms_p95": round(lat[int(0.95 * n) - 1], 1),
+        "latency_ms_mean": round(statistics.fmean(lat), 1),  # slow outliers (API overload) pull the mean up
         "mean_input_tokens": round(statistics.fmean(r["input_tokens"] for r in recs), 1),
         "mean_output_tokens": round(statistics.fmean(r["output_tokens"] for r in recs), 1),
         "mean_thinking_tokens": round(statistics.fmean(r["thinking_tokens"] for r in recs), 1),

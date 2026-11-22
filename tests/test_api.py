@@ -1,5 +1,7 @@
 """API tests with a fake small model and a fake LLM (no weights, no network)."""
 
+import json
+
 import pytest
 
 from app.app import MAX_CHARS, create_app
@@ -22,6 +24,15 @@ def client(conf=0.9, llm_fn=None, use_llm=True, threshold=0.5):
 def test_health():
     r = client().get("/health")
     assert r.status_code == 200 and r.get_json() == {"status": "ok"}
+
+
+def test_read_settings_takes_threshold_and_temperature_from_routing_json(tmp_path):
+    from app.app import read_settings
+
+    (tmp_path / "results").mkdir()
+    (tmp_path / "results" / "routing.json").write_text(json.dumps(
+        {"chosen_threshold": {"t": 0.42}, "temperature": 1.5, "llm": {"prompt_version": "v1_labels"}}))
+    assert read_settings(tmp_path) == {"threshold": 0.42, "temperature": 1.5, "prompt_version": "v1_labels"}
 
 
 def test_index_page():
