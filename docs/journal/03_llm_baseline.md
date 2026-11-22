@@ -44,11 +44,11 @@ except _network_errors() as e:          # httpx / httpx2 TransportError, Timeout
 - `pytest tests/test_llm.py -q`: 20 passed (fake backend, no network).
 
 ## Errors and fixes
-1. **ReadTimeout crashed the run.** The SDK's HTTP layer (`httpx2`) raised `ReadTimeout`, which is not the
+1. ReadTimeout crashed the run. The SDK's HTTP layer (`httpx2`) raised `ReadTimeout`, which is not the
    builtin `TimeoutError`, so it skipped our retry logic and stopped the whole run
    (`logs/03_llm_run_crash1.log`). Fix: map all HTTP transport errors to `TransientError` (retried with
    backoff) and raise the request timeout from 30 s to 60 s. Regression test: `test_network_timeout_is_retried`.
-2. **WSL stopped mid-run and corrupted the cache.** At 11:11 the WSL virtual machine stopped (after a network
+2. WSL stopped mid-run and corrupted the cache. At 11:11 the WSL virtual machine stopped (after a network
    error) while the run was appending answers. The cache file ended with 2,244 zero bytes (`\x00`), and the
    next run crashed with `JSONDecodeError` on load. All 700 real answers were intact. Fix at the root:
    (a) the cache now `flush()`es and `fsync()`s after every write, so answers we already paid for reach the

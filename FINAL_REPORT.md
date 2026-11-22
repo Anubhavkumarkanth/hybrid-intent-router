@@ -1,16 +1,17 @@
 # Final report: Hybrid Intent Router
 
-## What was built
+## What I built
 
 - A data pipeline for Amazon MASSIVE 1.1 (English, Hindi, Kannada) with fixed, seeded `dev_sub` (300) and
   `test_sub` (500) subsets that share sentence ids across languages.
 - An LLM baseline (`gemini-3.5-flash-lite`, JSON output limited to the 60 labels) with a crash-safe,
-  resumable answer cache that is committed, so the analysis runs without an API key.
-- A small model: MuRIL-base + our own linear head, trained with our own PyTorch loop on English only.
-- Temperature scaling, a confidence router, a dev-only threshold rule, and charts.
-- A Flask API (`/health`, `/predict`) with input validation and an LLM-failure fallback, plus a demo page.
+  resumable answer cache. The cache is committed, so the analysis runs without an API key.
+- A small model: MuRIL-base with my own linear head, trained with my own PyTorch loop on English only.
+- Temperature scaling, a confidence router, a threshold rule that only looks at dev data, and charts.
+- A Flask API (`/health`, `/predict`) with input checks and a fallback when the LLM fails, plus a demo page.
 - gunicorn + NGINX serving as a normal user (no sudo), and a Locust load test.
-- A quality gate (`make verify`: ruff, pytest, number check), README, interview guide, and a narrated video.
+- `make verify` (ruff, pytest and a check that the docs match `results/`), this report, the README, an
+  interview guide, and a narrated tutorial video.
 
 ## Final results
 
@@ -24,7 +25,7 @@
 
 test_sub, 500 messages per language. Threshold t = 0.56 was chosen on dev_sub (pooled dev accuracy 83.2%, target 83.2%, 14.3% sent to LLM). Temperature T = 1.342.
 
-*Typical time per message, built from **median** times: small model (CPU, every message) + share sent to the LLM x median LLM single-call time. The LLM's *mean* single-call time was 3133 ms (slow outliers while the API was overloaded), so mean-based savings would be even larger.
+\* Typical time per message, built from median times: the small model (CPU, every message) plus the share sent to the LLM times the median LLM single-call time. The mean LLM call took 3133 ms because some calls were slow while the API was overloaded, so savings based on the mean would be even larger.
 <!-- RESULTS:routing:END -->
 
 <!-- RESULTS:savings:START -->
@@ -76,17 +77,19 @@ Load test:
 | p99 latency | 300 ms |
 <!-- RESULTS:loadtest:END -->
 
-**In plain words:** pooled over English, Hindi and Kannada, the router is as accurate as sending everything to
-the LLM (84.2% vs 84.1% on test_sub) while sending only 11.1% of messages to it. That avoids 88.9% of LLM calls
-and cuts the typical (median-based) time per message from 1,344 ms to 186 ms. In English the router beats both models (90.6%).
-In Hindi and Kannada it is about 2 points below the LLM alone (82.0% vs 84.2%, 80.0% vs 81.8%), because one pooled
-threshold was chosen; English makes up the difference. The small model alone reached 77.9% (Hindi) and 70.7%
-(Kannada) on the full test sets with no training data in those languages, a few points below the published MuRIL
-numbers (82.4% / 77.5%) and above the MASSIVE paper's XLM-R base (74.8% / 63.5%).
+Pooled over English, Hindi and Kannada, the router is as accurate as sending everything to the LLM (84.2% vs
+84.1% on test_sub) while sending only 11.1% of messages to it. That avoids 88.9% of LLM calls and cuts the
+typical (median-based) time per message from 1,344 ms to 186 ms. In English the router beats both models
+(90.6%). In Hindi and Kannada it is about 2 points below the LLM alone (82.0% vs 84.2%, 80.0% vs 81.8%),
+because I used one shared threshold and English makes up the difference. The small model alone reached 77.9%
+(Hindi) and 70.7% (Kannada) on the full test sets with no training data in those languages. That is a few
+points below the published MuRIL numbers (82.4% / 77.5%) and above the MASSIVE paper's XLM-R base
+(74.8% / 63.5%).
 
 ## Time per phase
 
-Wall-clock times on 22 Nov 2026, UTC (from file times, logs and git commit times; the Ubuntu user was created at 09:27). Some phases overlapped. Two WSL restarts cost about 25 minutes.
+All times are on 22 Nov 2026, in UTC, taken from file times, logs and git commits. The Ubuntu user was created
+at 09:27, and some phases overlapped. Two WSL restarts cost about 25 minutes.
 
 | Phase | Time | Notes |
 |---|---|---|
@@ -106,7 +109,7 @@ Wall-clock times on 22 Nov 2026, UTC (from file times, logs and git commit times
 |---|---|
 | MASSIVE 1.1, en-US / hi-IN / kn-IN, official tarball with SHA-256 | Parallel sentence ids across languages; exact reproducibility; CC BY 4.0 |
 | dev_sub 300 / test_sub 500, same ids in all languages, stratified, seed 42 | Fits the LLM free tier; languages compared on the same sentences |
-| MuRIL-base + own `nn.Linear(768, 60)` | Best published zero-shot Hindi/Kannada among base models; own head is easy to explain |
+| MuRIL-base + own `nn.Linear(768, 60)` | Best published zero-shot Hindi/Kannada among base models; my own head is easy to explain |
 | Own PyTorch loop, English train only, early stopping on English dev | Keeps it truly zero-shot; every step visible |
 | Frozen word embeddings, fp16, batch 32, lr 2e-5 (head 1e-3) | Fits a 4 GB GPU; keeps the multilingual vocabulary intact |
 | 15-epoch cap (was 5) | Run 1 was still improving at epoch 5; decided on English dev only |
@@ -119,36 +122,31 @@ Wall-clock times on 22 Nov 2026, UTC (from file times, logs and git commit times
 
 ## Problems and fixes
 
-1. **HTTP ReadTimeout crashed the LLM run** (`httpx2.ReadTimeout` is not `TimeoutError`): mapped all transport
-   errors to a retried error; timeout 30 -> 60 s; regression test.
-2. **WSL stopped mid-run and left 2,244 NUL bytes in the answer cache**: `fsync` after every write; loader drops
-   crash padding but still fails on any other bad line; regression test. All 700 answers were kept.
-3. **429 rate limits / 503 overload from the API**: exponential backoff with jitter (already in place).
-4. **Run 1 under-trained** (77.4% en dev, still rising at epoch 5): cap raised to 15, early stopping decides.
-5. **WSL restarts killed long jobs** whenever no Windows terminal was attached to WSL. Long jobs now run in a
-   visible Ubuntu window that keeps WSL alive; the killed training run was repeated from the start.
-6. **`make` hid failures and buffered logs**: `.SHELLFLAGS := -o pipefail -c` and `PYTHONUNBUFFERED=1`.
-7. **transformers 5.x tokenizer change** (`vocab_file=` silently ignored, so every word became `[UNK]` in the
-   test tokenizer): use `vocab=` and assert no `[UNK]`.
-8. **Smoke test used a non-existent test id**: ids are unique across splits; the script now fails loudly.
-9. **gunicorn workers deadlocked** (OpenMP pool inherited through `preload_app`; Locust showed 0 requests):
-   master single-threaded, workers set 4 threads after fork; `/predict` check in `stack-up`; 30 s Locust timeout.
+1. An HTTP `ReadTimeout` crashed the LLM run, because `httpx2.ReadTimeout` is not Python's `TimeoutError`. I
+   mapped all transport errors to a retried error, raised the timeout from 30 to 60 s, and added a test.
+2. WSL stopped mid-run and left 2,244 NUL bytes in the answer cache. The cache now calls `fsync` after every
+   write, and the loader drops crash padding but still fails on any other bad line. All 700 answers were kept.
+3. The API returned 429 rate limits and 503 overload errors. The existing exponential backoff with jitter
+   handled them.
+4. Run 1 was under-trained (77.4% English dev, still rising at epoch 5). I raised the cap to 15 and let early
+   stopping decide.
+5. WSL restarts killed long jobs whenever no Windows terminal was attached to WSL. I ran long jobs in a visible
+   Ubuntu window, which keeps WSL alive, and repeated the killed training run from the start.
+6. `make` hid failures and buffered logs. Fixed with `.SHELLFLAGS := -o pipefail -c` and `PYTHONUNBUFFERED=1`.
+7. transformers 5.x silently ignores the old `vocab_file=` argument, so every word in the test tokenizer became
+   `[UNK]`. The test now uses `vocab=` and asserts there is no `[UNK]`.
+8. The smoke test used a test id that does not exist (MASSIVE ids are unique across splits). The script now
+   fails loudly on a missing id.
+9. gunicorn workers deadlocked because they inherited PyTorch's OpenMP pool through `preload_app`, and Locust
+   reported 0 requests. The master now runs single-threaded and workers set 4 threads after the fork.
+   `make stack-up` sends a real `/predict`, and Locust has a 30 s timeout.
 
-## What is left for you to do
+## What is left
 
-Nothing was pushed or published. To put it on GitHub (your account, your decision):
+The code is public at https://github.com/Anubhavkumarkanth/hybrid-intent-router.
 
-```bash
-cd ~/hybrid-intent-router
-git log --oneline | head            # check the history first
-# create an empty repo named hybrid-intent-router on github.com (no README), then:
-git remote add origin https://github.com/<your-username>/hybrid-intent-router.git
-git push -u origin main
-```
-
-- `.env` (your Gemini key), `.venv/`, `models/` (950 MB weights), the raw tarball and `video/*.mp4` are
-  gitignored. The video is `video/tutorial.mp4`; upload it to YouTube or attach it to a GitHub release if you
-  want it online.
-- Optional public demo: the app needs the 950 MB model and about 1-2 GB RAM per worker; a small VM or a
-  Hugging Face Space works. Run with `ROUTER_DISABLE_LLM=1` unless you want to pay for LLM calls.
-- Keep an Ubuntu window open while long jobs run: WSL shuts down when no terminal is attached.
+- `.env` (the Gemini key), `.venv/`, `models/` (950 MB of weights), the raw tarball and `video/*.mp4` are
+  gitignored. The video is `video/tutorial.mp4` on my machine; it can go on YouTube or into a GitHub release.
+- A public demo would need the 950 MB model and about 1-2 GB of RAM per worker; a small VM or a Hugging Face
+  Space would work. It should run with `ROUTER_DISABLE_LLM=1` unless paying for LLM calls is fine.
+- WSL shuts down when no terminal is attached, so long jobs need an Ubuntu window left open.

@@ -43,7 +43,7 @@ def choose_threshold(curve, llm_only_acc, tolerance=0.01):
 
 - Pooled, the router is +0.13 percentage points above LLM-only while avoiding 88.9% of LLM calls: LLM cost per
   1,000 messages $0.2991 → $0.0331, typical (median-based) latency 1,344.5 ms → 186.3 ms (the LLM mean call time was 3,133.4 ms, so mean-based savings are larger).
-- Honest reading: in English the router beats both models (the small model is better than the LLM there, and the
+- In English the router beats both models (the small model is better than the LLM there, and the
   LLM fixes some of its unsure cases). In Hindi and Kannada the router is about 2 points below the LLM alone; the
   pooled rule allows this because English makes up the difference. A per-language threshold would trade more
   LLM calls for Hindi/Kannada accuracy.

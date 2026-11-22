@@ -89,15 +89,15 @@ def t_routing() -> str:
     head = ["Language", "Small only", "LLM only", "Router", "Oracle", "Sent to LLM", "Router cost /1000",
             "LLM-only cost /1000", "Router latency*", "LLM-only latency*"]
     single = load("llm_single_call.json") or {}
-    mean_note = (f" The LLM's *mean* single-call time was {single['latency_ms_mean']:.0f} ms (slow outliers while "
-                 f"the API was overloaded), so mean-based savings would be even larger."
+    mean_note = (f" The mean LLM call took {single['latency_ms_mean']:.0f} ms because some calls were slow while "
+                 f"the API was overloaded, so savings based on the mean would be even larger."
                  if "latency_ms_mean" in single else "")
     return (table(head, rows)
             + f"\n\ntest_sub, {r['test_sub']['en']['n']} messages per language. Threshold t = {c['t']:.2f} was "
               f"chosen on dev_sub (pooled dev accuracy {pct(c['accuracy'])}, target {pct(r['target_dev_sub_acc'])}, "
               f"{pct(c['llm_share'])} sent to LLM). Temperature T = {r['temperature']:.3f}."
-              f"\n\n*Typical time per message, built from **median** times: small model (CPU, every message) + share "
-              f"sent to the LLM x median LLM single-call time.{mean_note}")
+              f"\n\n\\* Typical time per message, built from median times: the small model (CPU, every message) plus "
+              f"the share sent to the LLM times the median LLM single-call time.{mean_note}")
 
 
 def t_savings() -> str:
@@ -197,12 +197,12 @@ def t_resume() -> str:
     h = _headline()
     if not h:
         return "TBD"
-    return (f"- **Software / ML resume:** Built a hybrid intent router in PyTorch: a MuRIL classifier fine-tuned on "
+    return (f"- Software / ML resume: Built a hybrid intent router in PyTorch: a MuRIL classifier fine-tuned on "
             f"English only reached {h['hi']} (Hindi) and {h['kn']} (Kannada) zero-shot accuracy; temperature-scaled "
             f"confidence routing sent only {h['share']} of messages to an LLM ({h['pp']} pp accuracy vs LLM-only, "
             f"{h['cost_cut']} lower LLM cost); served with Flask, gunicorn and NGINX at {h['rps']} requests/s "
             f"(p95 {h['p95']}).\n"
-            f"- **Data analyst resume:** Compared an LLM with a small model on {h['n_test']} multilingual test "
+            f"- Data analyst resume: Compared an LLM with a small model on {h['n_test']} multilingual test "
             f"messages; chose a routing threshold on a separate dev set from {h['n_thresholds']} candidates and "
             f"showed the router keeps LLM-only accuracy ({h['pp']} percentage points) with {h['avoided']} fewer "
             f"LLM calls (LLM cost per 1,000 messages {h['cost_llm']} -> {h['cost_router']}); built the charts and "

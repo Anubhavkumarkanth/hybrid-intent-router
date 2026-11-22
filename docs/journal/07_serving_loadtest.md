@@ -32,14 +32,14 @@ make stack-down                          # nginx -s stop + kill gunicorn master
 - Load test (`results/loadtest.json`, `logs/07_loadtest.log`): 20 users, spawn 5/s, 2 minutes, small model only,
   through NGINX → **4,908 requests, 0 failures, 41.2 requests/s, p50 180 ms, p95 260 ms, p99 300 ms** (max 370 ms).
 - `make stack-down` stops NGINX and gunicorn (both pid files removed).
-- **The bottleneck is CPU-bound model inference.** One message alone takes 37.5 ms (median, 4 threads). Under
+- The bottleneck is CPU-bound model inference. One message alone takes 37.5 ms (median, 4 threads). Under
   load, 3 workers serving 41.2 requests/s means each worker spends about 3 / 41.2 = 73 ms per request: the
   12 hardware threads are shared by 12 PyTorch threads *and* the Locust load generator on the same laptop, so
   each inference runs slower, and requests wait in gunicorn's queue (p50 180 ms). NGINX and Flask add very little.
   More throughput needs more CPU (or a faster model, e.g. INT8 quantization), not more workers.
 
 ## Errors and fixes
-- **Every request hung; Locust reported 0 requests.** NGINX logged the calls as `499` (client gave up) and
+- Every request hung; Locust reported 0 requests. NGINX logged the calls as `499` (client gave up) and
   gunicorn's access log had only `/health`. A direct `curl` to gunicorn timed out after 20 s. Root cause:
   `preload_app` loads the model in the master process, which started PyTorch's OpenMP thread pool; the forked
   workers inherit a broken copy of that pool and deadlock on their first parallel operation. Fix

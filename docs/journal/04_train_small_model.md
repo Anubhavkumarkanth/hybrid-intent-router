@@ -58,11 +58,11 @@ scaler.step(optimizer); scaler.update(); scheduler.step()
   reproduced the same losses and accuracies).
 
 ## Errors and fixes
-1. **Run 1 was under-trained.** With the plan's 5-epoch cap, English dev accuracy was still rising at the
+1. Run 1 was under-trained. With the plan's 5-epoch cap, English dev accuracy was still rising at the
    last epoch (42.9% → 61.1% → 71.5% → 75.6% → 77.4%; `results/training_log_run1_5epochs.json`). Fix (a
    decision made on English dev only): raise the cap to 15 epochs and let early stopping on English dev decide.
    Run 1's log and curve are kept for honesty.
-2. **Make hid failures and progress.** `python ... | tee log` returns tee's exit code, so a crashed command
+2. Make hid failures and progress. `python ... | tee log` returns tee's exit code, so a crashed command
    looked successful; fixed with `.SHELLFLAGS := -o pipefail -c`. Python also buffers its output when it is
    piped, so the log stayed empty until the end; fixed with `PYTHONUNBUFFERED=1` in the Makefile.
 3. A lint warning (`F821`) came from `del model` inside a function that also has a closure using `model`;

@@ -2,7 +2,7 @@ scene 01   24.7s  Hybrid Intent Router
 scene 02   26.4s  The problem
 scene 03   28.1s  The idea: small model first, LLM when unsure
 scene 04   30.8s  Phase 0: check the machine first
-scene 05   29.6s  Phase 1: research before code
+scene 05   28.2s  Phase 1: research before code
 scene 06   24.5s  Phase 2: the data
 scene 07   29.3s  Phase 2: fixed subsets for decisions and for final numbers
 scene 08   26.4s  Phase 3: the LLM client
@@ -28,9 +28,9 @@ scene 27   11.7s  Phase 6: the demo
 scene 28   26.6s  Phase 7: serving it like production
 scene 29   18.4s  Phase 7: NGINX without sudo
 scene 30   53.2s  Phase 7: the load test
-scene 31   22.9s  Phase 8: the quality gate
+scene 31   22.6s  Phase 8: the quality gate
 scene 32   29.9s  How to explain it in an interview: 30 seconds
 scene 33   37.0s  Interview questions, part 1
 scene 34   30.9s  Interview questions, part 2
 scene 35   17.1s  Summary
-wrote video/tutorial.mp4: 35 scenes, 2804 spoken words, 16.3 min
+wrote video/tutorial.mp4: 35 scenes, 2800 spoken words, 16.3 min
