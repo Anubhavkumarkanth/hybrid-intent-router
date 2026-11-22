@@ -1,0 +1,27 @@
+{
+  "encoder": "google/muril-base-cased",
+  "best_epoch": 12,
+  "trained_on": "en-US train only",
+  "accuracy": {
+    "en_dev_full": 0.8795,
+    "en_test_full": 0.8813,
+    "en_dev_sub": 0.8567,
+    "en_test_sub": 0.882,
+    "hi_test_full": 0.7787,
+    "hi_dev_sub": 0.7567,
+    "hi_test_sub": 0.77,
+    "kn_test_full": 0.7065,
+    "kn_dev_sub": 0.6933,
+    "kn_test_sub": 0.706
+  },
+  "cpu_latency_single_message": {
+    "threads": 4,
+    "n": 200,
+    "warmup": 20,
+    "median_ms": 37.53,
+    "p95_ms": 48.36,
+    "mean_ms": 38.35
+  },
+  "model_size_mb": 950.5,
+  "num_parameters_m": 237.6
+}

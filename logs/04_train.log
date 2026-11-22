@@ -1,0 +1,145 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 6408.83it/s]
+[transformers] [1mBertModel LOAD REPORT[0m from: google/muril-base-cased
+Key                                        | Status     |  | 
+-------------------------------------------+------------+--+-
+cls.predictions.decoder.bias               | UNEXPECTED |  | 
+cls.predictions.transform.dense.bias       | UNEXPECTED |  | 
+cls.predictions.bias                       | UNEXPECTED |  | 
+cls.predictions.decoder.weight             | UNEXPECTED |  | 
+cls.seq_relationship.bias                  | UNEXPECTED |  | 
+cls.predictions.transform.LayerNorm.bias   | UNEXPECTED |  | 
+cls.seq_relationship.weight                | UNEXPECTED |  | 
+cls.predictions.transform.LayerNorm.weight | UNEXPECTED |  | 
+cls.predictions.transform.dense.weight     | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+parameters: total 237.6M, trainable 86.1M
+device=cuda train=11514 dev=2033 steps/epoch=360
+  epoch 1 step 50/5400 loss 4.0958
+  epoch 1 step 100/5400 loss 4.0923
+  epoch 1 step 150/5400 loss 4.0787
+  epoch 1 step 200/5400 loss 4.0424
+  epoch 1 step 250/5400 loss 3.9892
+  epoch 1 step 300/5400 loss 3.9251
+  epoch 1 step 350/5400 loss 3.8512
+epoch 1: train_loss 3.8368 en_dev_acc 0.2882 (61s)
+  saved best checkpoint (epoch 1)
+  epoch 2 step 400/5400 loss 3.1874
+  epoch 2 step 450/5400 loss 3.1142
+  epoch 2 step 500/5400 loss 3.0145
+  epoch 2 step 550/5400 loss 2.9108
+  epoch 2 step 600/5400 loss 2.8085
+  epoch 2 step 650/5400 loss 2.7108
+  epoch 2 step 700/5400 loss 2.6205
+epoch 2: train_loss 2.5829 en_dev_acc 0.5430 (57s)
+  saved best checkpoint (epoch 2)
+  epoch 3 step 750/5400 loss 1.8338
+  epoch 3 step 800/5400 loss 1.7807
+  epoch 3 step 850/5400 loss 1.7265
+  epoch 3 step 900/5400 loss 1.6722
+  epoch 3 step 950/5400 loss 1.6063
+  epoch 3 step 1000/5400 loss 1.5650
+  epoch 3 step 1050/5400 loss 1.5150
+epoch 3: train_loss 1.4896 en_dev_acc 0.6921 (58s)
+  saved best checkpoint (epoch 3)
+  epoch 4 step 1100/5400 loss 1.1317
+  epoch 4 step 1150/5400 loss 1.0820
+  epoch 4 step 1200/5400 loss 1.0397
+  epoch 4 step 1250/5400 loss 1.0224
+  epoch 4 step 1300/5400 loss 0.9952
+  epoch 4 step 1350/5400 loss 0.9736
+  epoch 4 step 1400/5400 loss 0.9524
+epoch 4: train_loss 0.9404 en_dev_acc 0.7924 (58s)
+  saved best checkpoint (epoch 4)
+  epoch 5 step 1450/5400 loss 0.6800
+  epoch 5 step 1500/5400 loss 0.7251
+  epoch 5 step 1550/5400 loss 0.7252
+  epoch 5 step 1600/5400 loss 0.6936
+  epoch 5 step 1650/5400 loss 0.6764
+  epoch 5 step 1700/5400 loss 0.6574
+  epoch 5 step 1750/5400 loss 0.6418
+  epoch 5 step 1800/5400 loss 0.6337
+epoch 5: train_loss 0.6337 en_dev_acc 0.8288 (58s)
+  saved best checkpoint (epoch 5)
+  epoch 6 step 1850/5400 loss 0.4990
+  epoch 6 step 1900/5400 loss 0.4929
+  epoch 6 step 1950/5400 loss 0.4809
+  epoch 6 step 2000/5400 loss 0.4752
+  epoch 6 step 2050/5400 loss 0.4658
+  epoch 6 step 2100/5400 loss 0.4590
+  epoch 6 step 2150/5400 loss 0.4547
+epoch 6: train_loss 0.4553 en_dev_acc 0.8524 (58s)
+  saved best checkpoint (epoch 6)
+  epoch 7 step 2200/5400 loss 0.3333
+  epoch 7 step 2250/5400 loss 0.3393
+  epoch 7 step 2300/5400 loss 0.3445
+  epoch 7 step 2350/5400 loss 0.3407
+  epoch 7 step 2400/5400 loss 0.3407
+  epoch 7 step 2450/5400 loss 0.3379
+  epoch 7 step 2500/5400 loss 0.3398
+epoch 7: train_loss 0.3355 en_dev_acc 0.8633 (58s)
+  saved best checkpoint (epoch 7)
+  epoch 8 step 2550/5400 loss 0.2667
+  epoch 8 step 2600/5400 loss 0.2735
+  epoch 8 step 2650/5400 loss 0.2673
+  epoch 8 step 2700/5400 loss 0.2646
+  epoch 8 step 2750/5400 loss 0.2574
+  epoch 8 step 2800/5400 loss 0.2596
+  epoch 8 step 2850/5400 loss 0.2608
+epoch 8: train_loss 0.2586 en_dev_acc 0.8682 (58s)
+  saved best checkpoint (epoch 8)
+  epoch 9 step 2900/5400 loss 0.1952
+  epoch 9 step 2950/5400 loss 0.1948
+  epoch 9 step 3000/5400 loss 0.2064
+  epoch 9 step 3050/5400 loss 0.2069
+  epoch 9 step 3100/5400 loss 0.2059
+  epoch 9 step 3150/5400 loss 0.2030
+  epoch 9 step 3200/5400 loss 0.2013
+epoch 9: train_loss 0.2011 en_dev_acc 0.8751 (58s)
+  saved best checkpoint (epoch 9)
+  epoch 10 step 3250/5400 loss 0.1578
+  epoch 10 step 3300/5400 loss 0.1481
+  epoch 10 step 3350/5400 loss 0.1508
+  epoch 10 step 3400/5400 loss 0.1537
+  epoch 10 step 3450/5400 loss 0.1536
+  epoch 10 step 3500/5400 loss 0.1545
+  epoch 10 step 3550/5400 loss 0.1559
+  epoch 10 step 3600/5400 loss 0.1562
+epoch 10: train_loss 0.1562 en_dev_acc 0.8780 (61s)
+  saved best checkpoint (epoch 10)
+  epoch 11 step 3650/5400 loss 0.1328
+  epoch 11 step 3700/5400 loss 0.1306
+  epoch 11 step 3750/5400 loss 0.1330
+  epoch 11 step 3800/5400 loss 0.1276
+  epoch 11 step 3850/5400 loss 0.1289
+  epoch 11 step 3900/5400 loss 0.1266
+  epoch 11 step 3950/5400 loss 0.1264
+epoch 11: train_loss 0.1262 en_dev_acc 0.8765 (58s)
+  epoch 12 step 4000/5400 loss 0.1052
+  epoch 12 step 4050/5400 loss 0.1018
+  epoch 12 step 4100/5400 loss 0.1059
+  epoch 12 step 4150/5400 loss 0.1031
+  epoch 12 step 4200/5400 loss 0.1038
+  epoch 12 step 4250/5400 loss 0.1049
+  epoch 12 step 4300/5400 loss 0.1038
+epoch 12: train_loss 0.1029 en_dev_acc 0.8795 (58s)
+  saved best checkpoint (epoch 12)
+  epoch 13 step 4350/5400 loss 0.0998
+  epoch 13 step 4400/5400 loss 0.0938
+  epoch 13 step 4450/5400 loss 0.0937
+  epoch 13 step 4500/5400 loss 0.0905
+  epoch 13 step 4550/5400 loss 0.0895
+  epoch 13 step 4600/5400 loss 0.0866
+  epoch 13 step 4650/5400 loss 0.0862
+epoch 13: train_loss 0.0872 en_dev_acc 0.8785 (58s)
+  epoch 14 step 4700/5400 loss 0.0613
+  epoch 14 step 4750/5400 loss 0.0686
+  epoch 14 step 4800/5400 loss 0.0681
+  epoch 14 step 4850/5400 loss 0.0753
+  epoch 14 step 4900/5400 loss 0.0752
+  epoch 14 step 4950/5400 loss 0.0747
+  epoch 14 step 5000/5400 loss 0.0754
+epoch 14: train_loss 0.0744 en_dev_acc 0.8780 (58s)
+early stopping: no dev improvement for 2 epochs

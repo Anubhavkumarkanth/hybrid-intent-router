@@ -1,0 +1,113 @@
+{
+  "config": {
+    "encoder": "google/muril-base-cased",
+    "max_len": 64,
+    "batch_size": 32,
+    "lr": 2e-05,
+    "head_lr": 0.001,
+    "weight_decay": 0.01,
+    "warmup_ratio": 0.1,
+    "epochs": 15,
+    "patience": 2,
+    "grad_clip": 1.0,
+    "dropout": 0.1,
+    "seed": 42,
+    "amp": true,
+    "freeze_embeddings": true
+  },
+  "device": "cuda",
+  "gpu": "NVIDIA GeForce RTX 3050 Laptop GPU",
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 3.8368,
+      "dev_acc": 0.2882,
+      "seconds": 60.7
+    },
+    {
+      "epoch": 2,
+      "train_loss": 2.5829,
+      "dev_acc": 0.543,
+      "seconds": 57.5
+    },
+    {
+      "epoch": 3,
+      "train_loss": 1.4896,
+      "dev_acc": 0.6921,
+      "seconds": 58.2
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.9404,
+      "dev_acc": 0.7924,
+      "seconds": 57.7
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.6337,
+      "dev_acc": 0.8288,
+      "seconds": 57.8
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.4553,
+      "dev_acc": 0.8524,
+      "seconds": 57.7
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.3355,
+      "dev_acc": 0.8633,
+      "seconds": 58.0
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.2586,
+      "dev_acc": 0.8682,
+      "seconds": 58.1
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.2011,
+      "dev_acc": 0.8751,
+      "seconds": 58.0
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.1562,
+      "dev_acc": 0.878,
+      "seconds": 60.9
+    },
+    {
+      "epoch": 11,
+      "train_loss": 0.1262,
+      "dev_acc": 0.8765,
+      "seconds": 58.2
+    },
+    {
+      "epoch": 12,
+      "train_loss": 0.1029,
+      "dev_acc": 0.8795,
+      "seconds": 58.3
+    },
+    {
+      "epoch": 13,
+      "train_loss": 0.0872,
+      "dev_acc": 0.8785,
+      "seconds": 58.2
+    },
+    {
+      "epoch": 14,
+      "train_loss": 0.0744,
+      "dev_acc": 0.878,
+      "seconds": 58.4
+    }
+  ],
+  "params_total_m": 237.6,
+  "params_trainable_m": 86.1,
+  "best_epoch": 12,
+  "best_en_dev_acc": 0.8795,
+  "train_minutes": 14.0,
+  "math_check_total_steps": 5400,
+  "math_check_warmup_steps": 540
+}

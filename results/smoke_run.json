@@ -1,0 +1,10 @@
+{
+  "device": "cuda",
+  "encoder": "google/muril-base-cased",
+  "steps": 30,
+  "seconds": 5.6,
+  "sec_per_step": 0.187,
+  "steps_per_epoch": 360,
+  "est_total_train_minutes": 5.6,
+  "loss": 4.0964
+}
