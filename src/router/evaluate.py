@@ -99,7 +99,7 @@ def main() -> None:
             out["accuracy"][f"{lang}_{sub}"] = round(accuracy(lg, rows), 4)
         print(lang, {k: v for k, v in out["accuracy"].items() if k.startswith(lang)})
 
-    del model
+    model = None  # free GPU memory before the CPU latency test
     if device == "cuda":
         torch.cuda.empty_cache()
 

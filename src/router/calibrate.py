@@ -52,7 +52,7 @@ def ece(probs: np.ndarray, labels: np.ndarray, n_bins: int = 15) -> float:
     correct = (pred == labels).astype(float)
     edges = np.linspace(0.0, 1.0, n_bins + 1)
     total = 0.0
-    for lo, hi in zip(edges[:-1], edges[1:]):
+    for lo, hi in zip(edges[:-1], edges[1:], strict=True):
         mask = (conf > lo) & (conf <= hi) if lo > 0 else (conf >= lo) & (conf <= hi)
         if mask.any():
             total += mask.mean() * abs(correct[mask].mean() - conf[mask].mean())

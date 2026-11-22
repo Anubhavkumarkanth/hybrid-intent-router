@@ -37,7 +37,7 @@ DEFAULTS = dict(
     head_lr=1e-3,
     weight_decay=0.01,
     warmup_ratio=0.1,
-    epochs=5,
+    epochs=15,  # run 1 used 5: English dev accuracy was still rising at epoch 5 (77.4%)
     patience=2,
     grad_clip=1.0,
     dropout=0.1,
@@ -68,7 +68,7 @@ class TextDataset(Dataset):
 
 def make_collate(tokenizer, max_len: int):
     def collate(batch):
-        texts, labels = zip(*batch)
+        texts, labels = zip(*batch, strict=True)
         enc = tokenizer(list(texts), padding=True, truncation=True, max_length=max_len, return_tensors="pt")
         return enc["input_ids"], enc["attention_mask"], torch.tensor(labels)
 
@@ -215,8 +215,8 @@ def plot_curve(history: list[dict]) -> None:
     ax1.set_xlabel("epoch")
     ax1.set_ylabel("train loss", color="#2a6fdb")
     ax2 = ax1.twinx()
-    ax2.plot(ep, [100 * h["dev_acc"] for h in history], "s-", color="#e07b00", label="English dev accuracy")
-    ax2.set_ylabel("English dev accuracy (%)", color="#e07b00")
+    ax2.plot(ep, [100 * h["dev_acc"] for h in history], "s-", color="#7b5ea7", label="English dev accuracy")
+    ax2.set_ylabel("English dev accuracy (%)", color="#7b5ea7")
     ax1.set_xticks(ep)
     ax1.set_title("Training curve (English train only)")
     fig.legend(loc="center right", bbox_to_anchor=(0.88, 0.5))

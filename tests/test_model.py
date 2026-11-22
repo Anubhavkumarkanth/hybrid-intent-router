@@ -16,8 +16,10 @@ def tiny_dir(tmp_path_factory):
     d = tmp_path_factory.mktemp("tiny")
     vocab = ["[PAD]", "[UNK]", "[CLS]", "[SEP]", "[MASK]"] + list("abcdefghijklmnopqrstuvwxyz") + [
         "wake", "me", "up", "play", "music", "weather", "today", "set", "alarm"]
-    (d / "vocab.txt").write_text("\n".join(vocab))
-    tok = BertTokenizerFast(vocab_file=str(d / "vocab.txt"))
+    # transformers 5.x: the argument is `vocab` (path or dict). The old `vocab_file=` keyword is
+    # silently ignored and gives an empty vocabulary (every word -> [UNK]); this bit us once.
+    tok = BertTokenizerFast(vocab={w: i for i, w in enumerate(vocab)})
+    assert tok.unk_token_id not in tok("wake me up play music")["input_ids"]
     tok.save_pretrained(d)
     cfg = BertConfig(vocab_size=len(vocab), hidden_size=32, num_hidden_layers=2, num_attention_heads=2,
                      intermediate_size=64, max_position_embeddings=64)

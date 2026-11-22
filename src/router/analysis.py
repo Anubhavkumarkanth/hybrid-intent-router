@@ -30,7 +30,7 @@ RESULTS = ROOT / "results"
 CHARTS = RESULTS / "charts"
 LANGS = ("en", "hi", "kn")
 LANG_NAMES = {"en": "English", "hi": "Hindi", "kn": "Kannada", "pooled": "All 3 (pooled)"}
-COLORS = {"en": "#2a6fdb", "hi": "#e07b00", "kn": "#1a9e5c", "pooled": "#333333"}
+COLORS = {"en": "#2a6fdb", "hi": "#7b5ea7", "kn": "#1a9e5c", "pooled": "#333333"}
 TOLERANCE = 0.01  # router may be at most 1.0 percentage point below LLM-only on dev_sub
 
 
@@ -266,7 +266,7 @@ def plot_reliability(dev, en_dev, T, n_bins=10):
             conf, correct = probs.max(1), probs.argmax(1) == dev[lang]["gold"]
             edges = np.linspace(0, 1, n_bins + 1)
             xs, ys = [], []
-            for lo, hi in zip(edges[:-1], edges[1:]):
+            for lo, hi in zip(edges[:-1], edges[1:], strict=True):
                 m = (conf > lo) & (conf <= hi)
                 if m.sum() >= 5:
                     xs.append(100 * conf[m].mean())
@@ -337,7 +337,7 @@ def example_table(test, labels, t, n_each=4, seed=7):
         cells = [r["lang"], r["text"], r["gold"], f"{r['small']} ({r['conf']})", r["route"], r["final"],
                  "OK" if r["ok"] else "X"]
         x = pad
-        for (name, w), val in zip(cols, cells):
+        for (name, w), val in zip(cols, cells, strict=True):
             size = 19
             f = font_for_text(val, size)
             while d.textlength(val, font=f) > w - 14 and size > 11:

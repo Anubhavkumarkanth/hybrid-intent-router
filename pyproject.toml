@@ -8,7 +8,7 @@ pythonpath = ["src", "."]
 testpaths = ["tests"]
 
 [tool.ruff]
-line-length = 110
+line-length = 120
 extend-exclude = [".venv", "data", "models", "results", "logs", "video/build"]
 
 [tool.ruff.lint]

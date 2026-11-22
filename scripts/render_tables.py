@@ -148,9 +148,56 @@ def t_reference() -> str:
               "different checkpoint selection, so compare with care.")
 
 
+def _headline() -> dict | None:
+    r, s, lt = load("routing.json"), load("small_model.json"), load("loadtest.json")
+    if not (r and s and lt):
+        return None
+    p, sv = r["test_sub"]["pooled"], r["savings_test_sub_pooled"]
+    return {
+        "router": pct(p["router_acc"]), "llm": pct(p["llm_only_acc"]), "small": pct(p["small_only_acc"]),
+        "share": pct(p["llm_share"]), "avoided": pct(sv["llm_calls_avoided_share"]),
+        "cost_cut": pct(sv["cost_saving_share"]), "pp": f"{sv['accuracy_change_pp']:+.1f}",
+        "cost_llm": usd(p["llm_only_cost_per_1000_usd"]), "cost_router": usd(p["router_cost_per_1000_usd"]),
+        "lat_llm": f"{p['llm_only_avg_latency_ms']:.0f} ms", "lat_router": f"{p['router_avg_latency_ms']:.0f} ms",
+        "hi": pct(s["accuracy"]["hi_test_full"]), "kn": pct(s["accuracy"]["kn_test_full"]),
+        "en": pct(s["accuracy"]["en_test_full"]), "small_ms": f"{s['cpu_latency_single_message']['median_ms']:.0f} ms",
+        "rps": f"{lt['requests_per_sec']:.1f}", "p95": f"{lt['p95_ms']:.0f} ms", "fail": str(lt["failures"]),
+    }
+
+
+def t_pitch() -> str:
+    h = _headline()
+    if not h:
+        return "TBD"
+    return (f"\"I built an intent router for a voice bot. A small multilingual model (MuRIL), fine-tuned in plain "
+            f"PyTorch on English only, answers when it is confident; otherwise the message goes to Gemini. On 1,500 "
+            f"test messages in English, Hindi and Kannada the router scored {h['router']} accuracy, against "
+            f"{h['llm']} for the LLM alone and {h['small']} for the small model alone, while sending only "
+            f"{h['share']} of messages to the LLM. That cuts the LLM cost per 1,000 messages from {h['cost_llm']} "
+            f"to {h['cost_router']} and the average latency from {h['lat_llm']} to {h['lat_router']}. I served it "
+            f"with Flask, gunicorn and NGINX and load-tested it at {h['rps']} requests per second with "
+            f"{h['fail']} failures.\"")
+
+
+def t_resume() -> str:
+    h = _headline()
+    if not h:
+        return "TBD"
+    return (f"- **Software / ML resume:** Built a hybrid intent router in PyTorch: a MuRIL classifier fine-tuned on "
+            f"English only reached {h['hi']} (Hindi) and {h['kn']} (Kannada) zero-shot accuracy; temperature-scaled "
+            f"confidence routing sent only {h['share']} of messages to an LLM ({h['pp']} pp accuracy vs LLM-only, "
+            f"{h['cost_cut']} lower LLM cost); served with Flask, gunicorn and NGINX at {h['rps']} requests/s "
+            f"(p95 {h['p95']}).\n"
+            f"- **Data analyst resume:** Compared an LLM with a small model on 1,500 multilingual test messages; "
+            f"chose a routing threshold on a separate dev set from 102 candidates and showed {h['avoided']} fewer "
+            f"LLM calls and {h['cost_cut']} lower cost at {h['pp']} percentage points accuracy; built the charts and "
+            f"auto-generated result tables that tests check against the raw results.")
+
+
 SECTIONS = {
     "small": t_small, "llm": t_llm, "routing": t_routing, "savings": t_savings,
     "calibration": t_calibration, "loadtest": t_loadtest, "reference": t_reference,
+    "pitch": t_pitch, "resume": t_resume,
 }
 MARK = re.compile(r"(<!-- RESULTS:(\w+):START -->\n)(.*?)(\n<!-- RESULTS:\2:END -->)", re.S)
 

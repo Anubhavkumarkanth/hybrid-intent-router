@@ -50,7 +50,7 @@ def make_classifier(version: str, backend=None) -> L.Classifier:
 
 
 def acc(preds: list[str], rows: list[dict]) -> float:
-    return sum(p == r["intent"] for p, r in zip(preds, rows)) / len(rows)
+    return sum(p == r["intent"] for p, r in zip(preds, rows, strict=True)) / len(rows)
 
 
 def frozen_version() -> str:
@@ -125,7 +125,7 @@ def cmd_single() -> None:
     recs, agree, single_correct, batch_correct = [], 0, 0, 0
     for lang, id_list in plan:
         rows = {r["id"]: r for r in load_subset(lang, "dev_sub")}
-        batch_preds = dict(zip(id_list, clf.classify_batch(lang, [rows[i] for i in id_list])))
+        batch_preds = dict(zip(id_list, clf.classify_batch(lang, [rows[i] for i in id_list]), strict=True))
         for i in id_list:
             rec = clf.classify_single(lang, rows[i])
             recs.append(rec)
