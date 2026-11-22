@@ -14,6 +14,7 @@ from __future__ import annotations
 import ast
 import datetime as dt
 import json
+import logging
 import operator
 import random
 import re
@@ -23,12 +24,14 @@ import urllib.parse
 import urllib.request
 from zoneinfo import ZoneInfo
 
-TIMEOUT_S = 4.0
+TIMEOUT_S = 6.0
 DEFAULT_CITY = "Bengaluru"
+USER_AGENT = "hybrid-intent-router/1.0 (+https://github.com/Anubhavkumarkanth/hybrid-intent-router)"
+log = logging.getLogger("router.actions")
 
 
 def _http_json(url: str):
-    req = urllib.request.Request(url, headers={"User-Agent": "hybrid-intent-router-demo"})
+    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     with urllib.request.urlopen(req, timeout=TIMEOUT_S) as r:
         return json.loads(r.read())
 
@@ -191,44 +194,98 @@ def weather(text: str) -> dict:
         return _fail("weather", "I couldn't look up the weather right now.")
 
     def make():
-        q = urllib.parse.urlencode(
-            {
-                "latitude": place["lat"],
-                "longitude": place["lon"],
-                "timezone": "auto",
-                "current": "temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m",
-                "daily": "temperature_2m_max,temperature_2m_min,precipitation_probability_max",
-                "forecast_days": 1,
-            }
-        )
-        return fetch(f"https://api.open-meteo.com/v1/forecast?{q}")
+        # Open-Meteo first. It limits requests per IP, and cloud servers share outgoing IPs, so when it refuses
+        # (seen on Render), fall back to MET Norway's free API.
+        try:
+            return _open_meteo(place)
+        except Exception as e:
+            log.warning("Open-Meteo failed (%s: %s), trying MET Norway", type(e).__name__, e)
+            return _met_norway(place)
 
     w = _weather_cache.get((round(place["lat"], 2), round(place["lon"], 2)), make)
-    cur, day = w["current"], w["daily"]
-    desc = WMO.get(cur["weather_code"], "mixed weather")
-    rain = (day.get("precipitation_probability_max") or [None])[0]
+    desc, rain = w["description"], w["rain_pct"]
     where = f"{place['name']}, {place['country']}".strip(", ")
     reply = (
-        f"It's {cur['temperature_2m']:.0f}°C with {desc} in {place['name']} right now. Today: "
-        f"{day['temperature_2m_min'][0]:.0f} to {day['temperature_2m_max'][0]:.0f}°C"
-        + (f", {rain}% chance of rain." if rain is not None else ".")
+        f"It's {w['temp_c']:.0f}°C with {desc} in {place['name']} right now. Today: "
+        f"{w['min_c']:.0f} to {w['max_c']:.0f}°C" + (f", {rain}% chance of rain." if rain is not None else ".")
     )
     return {
         "kind": "weather",
         "title": where,
         "reply": reply,
+        "source": w["source"],
         "detail": {
-            "temp_c": cur["temperature_2m"],
+            "temp_c": w["temp_c"],
             "description": desc,
-            "humidity": cur["relative_humidity_2m"],
-            "wind_kmh": cur["wind_speed_10m"],
-            "min_c": day["temperature_2m_min"][0],
-            "max_c": day["temperature_2m_max"][0],
+            "humidity": w["humidity"],
+            "wind_kmh": w["wind_kmh"],
+            "min_c": w["min_c"],
+            "max_c": w["max_c"],
             "rain_pct": rain,
-            "code": cur["weather_code"],
             "place_from_message": named,
         },
+    }
+
+
+def _open_meteo(place: dict) -> dict:
+    q = urllib.parse.urlencode(
+        {
+            "latitude": place["lat"],
+            "longitude": place["lon"],
+            "timezone": "auto",
+            "current": "temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m",
+            "daily": "temperature_2m_max,temperature_2m_min,precipitation_probability_max",
+            "forecast_days": 1,
+        }
+    )
+    w = fetch(f"https://api.open-meteo.com/v1/forecast?{q}")
+    cur, day = w["current"], w["daily"]
+    return {
+        "temp_c": cur["temperature_2m"],
+        "description": WMO.get(cur["weather_code"], "mixed weather"),
+        "humidity": cur["relative_humidity_2m"],
+        "wind_kmh": cur["wind_speed_10m"],
+        "min_c": day["temperature_2m_min"][0],
+        "max_c": day["temperature_2m_max"][0],
+        "rain_pct": (day.get("precipitation_probability_max") or [None])[0],
         "source": "Open-Meteo",
+    }
+
+
+def _met_words(symbol: str) -> str:
+    s = re.sub(r"_(day|night|polartwilight)$", "", symbol or "")
+    for a, b in (
+        ("clearsky", "clear sky"),
+        ("fair", "mainly clear"),
+        ("partlycloudy", "partly cloudy"),
+        ("andthunder", " and thunder"),
+        ("showers", " showers"),
+        ("heavy", "heavy "),
+        ("light", "light "),
+    ):
+        s = s.replace(a, b)
+    return re.sub(r"\s+", " ", s).strip() or "mixed weather"
+
+
+def _met_norway(place: dict) -> dict:
+    """MET Norway locationforecast (free, no key; asks clients to identify themselves in the User-Agent)."""
+    data = fetch(
+        f"https://api.met.no/weatherapi/locationforecast/2.0/compact?lat={place['lat']:.4f}&lon={place['lon']:.4f}"
+    )
+    series = data["properties"]["timeseries"]
+    now = series[0]["data"]
+    temps = [p["data"]["instant"]["details"]["air_temperature"] for p in series[:24]]
+    symbol = (now.get("next_1_hours") or now.get("next_6_hours") or {}).get("summary", {}).get("symbol_code", "")
+    d = now["instant"]["details"]
+    return {
+        "temp_c": d["air_temperature"],
+        "description": _met_words(symbol),
+        "humidity": round(d.get("relative_humidity", 0)),
+        "wind_kmh": round(d.get("wind_speed", 0) * 3.6, 1),
+        "min_c": min(temps),
+        "max_c": max(temps),
+        "rain_pct": None,
+        "source": "MET Norway",
     }
 
 
@@ -539,5 +596,6 @@ def run_action(intent: str, text: str) -> dict | None:
         return None
     try:
         return handler(text)
-    except Exception:  # an outside API changed or is down: say so, never break the prediction
+    except Exception as e:  # an outside API changed or is down: say so, never break the prediction
+        log.warning("action %s failed: %s: %s", intent, type(e).__name__, e)
         return _fail(intent, "That service is not answering right now.")

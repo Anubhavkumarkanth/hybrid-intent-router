@@ -69,6 +69,26 @@ def test_weather_uses_named_city_or_default():
     assert r["title"].startswith("Bengaluru") and r["detail"]["place_from_message"] is False
 
 
+def test_weather_falls_back_to_met_norway_when_open_meteo_refuses(monkeypatch):
+    real = A.fetch
+
+    def fetch(url):
+        if url.startswith("https://api.open-meteo.com"):  # the forecast host, not geocoding-api
+            raise OSError("HTTP Error 429: Too Many Requests")
+        if "api.met.no" in url:
+            step = {"instant": {"details": {"air_temperature": 22.0, "relative_humidity": 70.2, "wind_speed": 2.5}}}
+            first = {**step, "next_1_hours": {"summary": {"symbol_code": "lightrainshowers_day"}}}
+            temps = [{"data": {"instant": {"details": {"air_temperature": t}}}} for t in (19.0, 27.5)]
+            return {"properties": {"timeseries": [{"data": first}, *temps]}}
+        return real(url)
+
+    monkeypatch.setattr(A, "fetch", fetch)
+    r = A.run_action("weather_query", "weather in London")
+    assert r["source"] == "MET Norway" and r["detail"]["description"] == "light rain showers"
+    assert r["detail"]["wind_kmh"] == 9.0 and (r["detail"]["min_c"], r["detail"]["max_c"]) == (19.0, 27.5)
+    assert r["reply"].startswith("It's 22°C with light rain showers in London")
+
+
 def test_weather_understands_hindi_and_kannada_city_names():
     assert A.run_action("weather_query", "मुंबई में मौसम कैसा है")["title"].startswith("Mumbai")
     assert A.run_action("weather_query", "ಬೆಂಗಳೂರಿನ ಹವಾಮಾನ")["title"].startswith("Bengaluru")

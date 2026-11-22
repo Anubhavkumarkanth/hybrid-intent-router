@@ -347,10 +347,10 @@
   const TASKS = {
     en: ["what's the weather in Mumbai", "convert 100 dollars to rupees", "what is 25 times 48", "what time is it in London", "define serendipity", "tell me a joke", "wake me up at six tomorrow", "play some jazz"],
     hi: ["मुंबई में मौसम कैसा है", "100 डॉलर कितने रुपये हैं", "मुझे कल सुबह छह बजे जगा देना", "कोई गाना चलाओ", "आज की खबरें सुनाओ"],
-    kn: ["ಬೆಂಗಳೂರಿನ ಹವಾಮಾನ ಹೇಗಿದೆ", "ನಾಳೆ ಬೆಳಿಗ್ಗೆ ಆರು ಗಂಟೆಗೆ ಅಲಾರಂ ಇಡು", "ಹಾಡು ಹಾಕು", "ಲೈಟ್ ಆಫ್ ಮಾಡು"],
-    hinglish: ["aaj Delhi mein mausam kaisa hai", "ek dollar kitne rupaye ka hai", "kal subah 6 baje alarm laga do", "koi accha gaana bajao", "lights band kar do"],
+    kn: ["ಬೆಂಗಳೂರಿನ ಹವಾಮಾನ ಹೇಗಿದೆ", "100 ಡಾಲರ್ ಎಷ್ಟು ರೂಪಾಯಿ", "ಬೆಳಿಗ್ಗೆ ಆರು ಗಂಟೆಗೆ ಅಲಾರಂ ಹಾಕು", "ಹಾಡು ಹಾಕು", "ಲೈಟ್ ಆಫ್ ಮಾಡು"],
+    hinglish: ["aaj Delhi mein mausam kaisa hai", "100 dollar ko rupaye mein convert karo", "kal subah 6 baje alarm laga do", "koi accha gaana bajao", "lights band kar do"],
   };
-  const TASK_WORDS = /weather|मौसम|ಹವಾಮಾನ|mausam|dollar|डॉलर|rupaye|times|time is it|define|joke/i;
+  const TASK_WORDS = /weather|मौसम|ಹವಾಮಾನ|mausam|dollar|डॉलर|ಡಾಲರ್|rupaye|times|time is it|define|joke/i;
   let lang = "en";
   function showExamples() {
     const box = $("examples"); box.replaceChildren();
