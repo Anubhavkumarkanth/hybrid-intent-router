@@ -1,0 +1,47 @@
+ * Tip: There are .env files present. Install python-dotenv to use them.
+INFO:httpx2:HTTP Request: GET https://huggingface.co/api/models/google/muril-base-cased "HTTP/1.1 200 OK"
+INFO:httpx2:HTTP Request: HEAD https://huggingface.co/google/muril-base-cased/resolve/main/model.safetensors "HTTP/1.1 404 Not Found"
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+WARNING:huggingface_hub.utils._http:Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 7518.71it/s]
+[transformers] [1mBertModel LOAD REPORT[0m from: google/muril-base-cased
+Key                                        | Status     |  | 
+-------------------------------------------+------------+--+-
+cls.predictions.transform.LayerNorm.bias   | UNEXPECTED |  | 
+cls.predictions.decoder.bias               | UNEXPECTED |  | 
+cls.predictions.transform.LayerNorm.weight | UNEXPECTED |  | 
+cls.predictions.transform.dense.bias       | UNEXPECTED |  | 
+cls.predictions.bias                       | UNEXPECTED |  | 
+cls.seq_relationship.weight                | UNEXPECTED |  | 
+cls.predictions.transform.dense.weight     | UNEXPECTED |  | 
+cls.seq_relationship.bias                  | UNEXPECTED |  | 
+cls.predictions.decoder.weight             | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+INFO:httpx2:HTTP Request: GET https://huggingface.co/api/models/google/muril-base-cased "HTTP/1.1 200 OK"
+INFO:httpx2:HTTP Request: GET https://huggingface.co/api/models/google/muril-base-cased "HTTP/1.1 200 OK"
+INFO:httpx2:HTTP Request: GET https://huggingface.co/api/models/google/muril-base-cased/commits/main "HTTP/1.1 200 OK"
+INFO:httpx2:HTTP Request: GET https://huggingface.co/api/models/google/muril-base-cased/discussions?p=0 "HTTP/1.1 200 OK"
+INFO:httpx2:HTTP Request: GET https://huggingface.co/api/models/google/muril-base-cased/commits/refs%2Fpr%2F3 "HTTP/1.1 200 OK"
+INFO:httpx2:HTTP Request: HEAD https://huggingface.co/google/muril-base-cased/resolve/refs%2Fpr%2F3/model.safetensors.index.json "HTTP/1.1 404 Not Found"
+INFO:httpx2:HTTP Request: HEAD https://huggingface.co/google/muril-base-cased/resolve/refs%2Fpr%2F3/model.safetensors "HTTP/1.1 302 Found"
+ * Serving Flask app 'app.app:make_app()'
+ * Debug mode: off
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug:127.0.0.1 - - [22/Nov/2026 12:25:12] "GET /health HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Nov/2026 12:25:12] "GET /health HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Nov/2026 12:25:12] "POST /predict HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Nov/2026 12:25:12] "POST /predict HTTP/1.1" 200 -
+INFO:google_genai.models:AFC is enabled with max remote calls: 10.
+INFO:httpx2:HTTP Request: POST https://generativelanguage.googleapis.com/v1/models/gemini-3.5-flash-lite:generateContent "HTTP/1.1 200 OK"
+INFO:werkzeug:127.0.0.1 - - [22/Nov/2026 12:25:14] "POST /predict HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Nov/2026 12:25:14] "POST /predict HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Nov/2026 12:25:14] "POST /predict HTTP/1.1" 200 -
+INFO:google_genai.models:AFC is enabled with max remote calls: 10.
+INFO:httpx2:HTTP Request: POST https://generativelanguage.googleapis.com/v1/models/gemini-3.5-flash-lite:generateContent "HTTP/1.1 200 OK"
+INFO:werkzeug:127.0.0.1 - - [22/Nov/2026 12:25:22] "POST /predict HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Nov/2026 12:25:22] "[31m[1mPOST /predict HTTP/1.1[0m" 400 -
+INFO:werkzeug:127.0.0.1 - - [22/Nov/2026 12:25:22] "[31m[1mPOST /predict HTTP/1.1[0m" 400 -

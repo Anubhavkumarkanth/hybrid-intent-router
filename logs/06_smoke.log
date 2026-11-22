@@ -1,0 +1,27 @@
+$ curl -s http://127.0.0.1:5001/health
+{"status":"ok"}
+
+$ curl -s -X POST http://127.0.0.1:5001/predict -d '{"text": "wake me up at five am this week"}'
+{"confidence":0.9125,"intent":"alarm_set","latency_ms":111.4,"routed_to":"small"}
+
+$ curl -s -X POST http://127.0.0.1:5001/predict -d '{"text": "मुझे इस सप्ताह सुबह पांच बजे जगा दो"}'
+{"confidence":0.862,"intent":"alarm_set","latency_ms":37.0,"routed_to":"small"}
+
+$ curl -s -X POST http://127.0.0.1:5001/predict -d '{"text": "ಈ ವಾರ ಬೆಳಗ್ಗೆ ಐದು ಗಂಟೆಗೆ ನನ್ನನ್ನು ಎದ್ದೇಳಿ"}'
+{"confidence":0.273,"intent":"alarm_set","latency_ms":1576.1,"routed_to":"llm"}
+
+$ curl -s -X POST http://127.0.0.1:5001/predict -d '{"text": "pink is all we need"}'
+{"confidence":0.7781,"intent":"iot_hue_lightchange","latency_ms":149.4,"routed_to":"small"}
+
+$ curl -s -X POST http://127.0.0.1:5001/predict -d '{"text": "हमको गुलाबी ही चाहिए"}'
+{"confidence":0.8253,"intent":"iot_hue_lightchange","latency_ms":34.6,"routed_to":"small"}
+
+$ curl -s -X POST http://127.0.0.1:5001/predict -d '{"text": "ಗುಲಾಬಿ ನಮಗೆ ಬೇಕಾಗಿರುವುದು"}'
+{"confidence":0.1702,"intent":"lists_createoradd","latency_ms":8145.0,"routed_to":"llm"}
+
+$ curl -s -X POST http://127.0.0.1:5001/predict -d '{"text": ""}'
+{"error":"text is empty"}
+  -> HTTP 400
+$ curl -s -X POST http://127.0.0.1:5001/predict -d '{"text": "aaa...(501 characters)"}'
+{"error":"text is longer than 500 characters"}
+  -> HTTP 400

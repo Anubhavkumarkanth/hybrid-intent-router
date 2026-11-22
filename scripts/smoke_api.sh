@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Phase 6 smoke test (make smoke-api): start the Flask dev server, send real requests with curl, stop it.
-# Sentences: MASSIVE test id 0 and id 1 (the same sentences in English, Hindi and Kannada).
+# Sentences: MASSIVE test ids 0 and 8 (the same sentences in English, Hindi and Kannada).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 PY=.venv/bin/python
@@ -15,7 +15,7 @@ for _ in $(seq 120); do curl -sf "$URL/health" >/dev/null && break; sleep 1; don
 
 echo "\$ curl -s $URL/health"
 curl -s "$URL/health"
-for id in 0 1; do
+for id in 0 8; do  # MASSIVE ids are unique across train/dev/test, so not every number is a test id
   for lang in en hi kn; do
     body=$($PY - "$lang" "$id" <<'EOF'
 import json, sys
@@ -25,6 +25,8 @@ for line in open(f"data/processed/{lang}_test.jsonl", encoding="utf-8"):
     if r["id"] == id_:
         print(json.dumps({"text": r["text"]}, ensure_ascii=False))
         break
+else:
+    sys.exit(f"test id {id_} not found for {lang}")
 EOF
 )
     echo
