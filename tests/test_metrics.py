@@ -30,10 +30,10 @@ class FakePostgres:
             self.result = sorted((r for r in self.rows if r[0] >= params[0]), reverse=True)
         else:
             self.result = []
-
-    def executemany(self, sql, items):
-        assert sql == M.INSERT and all(len(i) == len(M.COLUMNS) for i in items)
-        self.rows.extend(items)
+        if sql.startswith("INSERT"):
+            n, width = len(params) // len(M.COLUMNS), len(M.COLUMNS)
+            assert sql == M.insert_sql(n) and len(params) == n * width
+            self.rows.extend(tuple(params[i:i + width]) for i in range(0, len(params), width))
 
     def fetchall(self):
         return self.result

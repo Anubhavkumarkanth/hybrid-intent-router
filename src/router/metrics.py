@@ -24,9 +24,13 @@ COLUMNS = ("ts", "language", "routed_to", "intent", "confidence", "latency_ms", 
 SCHEMA = ("CREATE TABLE IF NOT EXISTS requests (ts DOUBLE PRECISION NOT NULL, language TEXT, routed_to TEXT, "
           "intent TEXT, confidence DOUBLE PRECISION, latency_ms DOUBLE PRECISION, action TEXT, voice BOOLEAN)")
 INDEX = "CREATE INDEX IF NOT EXISTS requests_ts ON requests (ts)"
-INSERT = f"INSERT INTO requests ({', '.join(COLUMNS)}) VALUES ({', '.join(['%s'] * len(COLUMNS))})"
+ROW = f"({', '.join(['%s'] * len(COLUMNS))})"
 SELECT_WINDOW = f"SELECT {', '.join(COLUMNS)} FROM requests WHERE ts >= %s ORDER BY ts DESC LIMIT 20000"
 SELECT_TOTALS = "SELECT COUNT(*), MIN(ts) FROM requests"
+
+
+def insert_sql(n_rows: int) -> str:
+    return f"INSERT INTO requests ({', '.join(COLUMNS)}) VALUES {', '.join([ROW] * n_rows)}"
 
 
 def postgres_connect(url: str) -> Callable[[], object]:
@@ -76,7 +80,9 @@ class MetricsStore:
     def _insert(self, items: list[tuple]) -> None:
         conn = self.connect()
         try:
-            conn.cursor().executemany(INSERT, items)
+            # One plain multi-row INSERT: psycopg's executemany() uses pipeline mode, and through Neon's
+            # connection pooler that saved nothing and raised nothing on the live site.
+            conn.cursor().execute(insert_sql(len(items)), [v for item in items for v in item])
         finally:
             conn.close()
 
